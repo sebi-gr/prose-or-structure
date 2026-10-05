@@ -1,4 +1,19 @@
-/data/
+# Local outputs stay ignored; retain only the selected development evidence.
+/data/*
+!/data/runs/
+/data/runs/*
+!/data/runs/VUL4J-18-review-001/
+/data/runs/VUL4J-18-review-001/*
+!/data/runs/VUL4J-18-review-001/findings.jsonl
+!/data/runs/VUL4J-18-review-001/generation_raw.json
+!/data/runs/VUL4J-18-review-001/request.json
+!/data/runs/VUL4J-18-review-001/review_prompt_v1.txt
+!/data/runs/VUL4J-18-review-001/run_manifest.json
+!/data/annotations/
+/data/annotations/*
+!/data/annotations/VUL4J-18-review-001/
+/data/annotations/VUL4J-18-review-001/*
+!/data/annotations/VUL4J-18-review-001/manual_annotation_001.md
 __pycache__/
 *.py[cod]
 .venv/

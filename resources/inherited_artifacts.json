@@ -1,0 +1,46 @@
+{
+  "source_repository": "https://github.com/sebi-gr/prose-or-structure",
+  "source_commit": "e24c6347d4fbd8a140af8d81e866f5a4fa9fe335",
+  "import_date": "2026-10-05",
+  "original_project": "https://github.com/sebi-gr/What-Can-We-Verify",
+  "run_id": "0721c0a0-bba7-48c1-a63c-da196a69d97c",
+  "files": [
+    {
+      "source_path": "findings.jsonl",
+      "path": "data/runs/VUL4J-18-review-001/findings.jsonl",
+      "received_sha256": "ac2711de8101111aa23a0861553cfe60489fa40393dc4806fc5e2b0bd794308a",
+      "sha256": "ac2711de8101111aa23a0861553cfe60489fa40393dc4806fc5e2b0bd794308a"
+    },
+    {
+      "source_path": "generation_raw.json",
+      "path": "data/runs/VUL4J-18-review-001/generation_raw.json",
+      "received_sha256": "4786323eaa75a904ee3a464e182a6fd2af5efcb19b81d13aa43fc6b32fb580e0",
+      "sha256": "4786323eaa75a904ee3a464e182a6fd2af5efcb19b81d13aa43fc6b32fb580e0"
+    },
+    {
+      "source_path": "request.json",
+      "path": "data/runs/VUL4J-18-review-001/request.json",
+      "received_sha256": "b88b8e5e6a1c949c5e395d60e431e342ae69b9271209cc0d169f315edecdec37",
+      "sha256": "b88b8e5e6a1c949c5e395d60e431e342ae69b9271209cc0d169f315edecdec37"
+    },
+    {
+      "source_path": "review_prompt_v1.txt",
+      "path": "data/runs/VUL4J-18-review-001/review_prompt_v1.txt",
+      "received_sha256": "a9846dfe5458c8642631e38a22467c9f4bacfea92f22296d15c86f4a66638bd6",
+      "sha256": "e3dcce357e15d5040fc52fd58c707038fb1124946d834999d898d7d082bef0ee",
+      "adjustment": "Restore original CRLF bytes from the archived request system message; exact match to prompt_sha256 in run_manifest.json. Received Git blob used LF."
+    },
+    {
+      "source_path": "run_manifest.json",
+      "path": "data/runs/VUL4J-18-review-001/run_manifest.json",
+      "received_sha256": "0d15e921916aec6ab72072bc94d34c54346f6b8e7f862c5d78844bd3f36e58c3",
+      "sha256": "0d15e921916aec6ab72072bc94d34c54346f6b8e7f862c5d78844bd3f36e58c3"
+    },
+    {
+      "source_path": "manual_annotation_001.md",
+      "path": "data/annotations/VUL4J-18-review-001/manual_annotation_001.md",
+      "received_sha256": "674bb3feb1a070303841241e353a0b2556951711797dc80d5ea6fdb24fb4197f",
+      "sha256": "674bb3feb1a070303841241e353a0b2556951711797dc80d5ea6fdb24fb4197f"
+    }
+  ]
+}

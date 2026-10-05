@@ -1,6 +1,6 @@
 # Herkunft und Bestandsprüfung
 
-Stand: 2026-10-05, nach dem zweiten Import. Laufender Plan: [WORKPLAN.md](../WORKPLAN.md); aktueller Stand: [HANDOFF.md](../HANDOFF.md). Code/Ressourcen, historische Dokumentationsbefunde und tatsächlich vorhandene Rohdaten bleiben getrennt.
+Stand: 2026-10-05, nach Archivierung des vereinbarten Entwicklungspakets. Laufender Plan: [WORKPLAN.md](../WORKPLAN.md); aktueller Stand: [HANDOFF.md](../HANDOFF.md). Code/Ressourcen, historische Dokumentationsbefunde und tatsächlich vorhandene Rohdaten bleiben getrennt.
 
 ## Aktuelle Importquelle
 
@@ -39,37 +39,56 @@ SHA-256: `feba77100f85f88b586e3c54e0e60f0fd120888dd88d894c78e3b5f107b774b2`.
 
 RQs, P/D-Abgrenzung, Feldgruppen und Vergleichsbedingungen bestimmen den neuen Plan. Literaturangaben und Neuheitsbehauptung wurden bei den Importen nicht neu geprüft; diese Prüfung bleibt vor der Hauptstudie offen.
 
-## Daten- und Evidenzinventar
+## Archivimport der sechs Entwicklungsartefakte
 
-| Artefakt | Tatsächlicher Stand | Nötige Folgearbeit |
-|---|---|---|
-| VUL4J-18-Quellpaket/Referenzen | Lokal unter `data/VUL4J-18/`, ignoriert; beim ersten Import frisch erzeugt und geprüft | Bei frischem Clone vorbereiten |
-| Aktuelles Codebook, Schema, Prompt, Vorlage | Aus `5df7760` importiert und versioniert | Zum gemeinsamen P/D-Profil weiterentwickeln |
-| Historischer JSPWiki-Review | Dokumentiert; Request, Rohantwort, Findings, Manifest fehlen weiter | Originalen Run-Ordner beschaffen, Hashes/IDs prüfen |
-| Ausgefüllte manuelle Annotation mit 13 Claims | Nur beschrieben; die importierte Vorlage ist keine ausgefüllte Annotation | `data/annotations/VUL4J-18-review-001/manual_annotation_001.md` samt zugehörigen Originalen beschaffen |
-| Decomposition-Läufe 001–003 | Nur Status/Inhaltsbefunde in Quellnotizen; Rohartefakte fehlen | Laufordner unter `data/decompositions/` samt Ressourcen-Snapshots beschaffen |
-| Differenzielle Java-PoV-Reproduktion | Protokoll vorhanden; Original-Logs/Metadaten fehlen | Historische Evidenz aus `data/pov/VUL4J-18-001/` sichern |
-| Neue P/D-Experimente und unabhängige Referenzannotation | Noch nicht vorhanden | Nach Profil-/Protokollfestlegung implementieren |
+Der Nutzer hat die ausgewählten Dateien aus dem anderen Rechner bereits in dieses Repo gepusht. Ausgangspunkt für die Einordnung ist Commit [`e24c634`](https://github.com/sebi-gr/prose-or-structure/tree/e24c6347d4fbd8a140af8d81e866f5a4fa9fe335); dort lagen die sechs Dateien im Repo-Wurzelverzeichnis. Sie sind jetzt unter ihren ursprünglichen logischen Run-/Annotationspfaden abgelegt. Insgesamt **108.158 Bytes**, keine großen Build-Verzeichnisse.
 
-Der vollständige Git-Baum von `5df7760` enthält **keine Datei unter `data/`**; die Quell-`.gitignore` enthält unverändert `/data/`. Auch die lokalen Projektordner enthalten nur das vorbereitete Fallpaket. Andere Rechner und private Gesprächsarchive wurden nicht durchsucht. Die Nachlieferung schließt die Lücke bei Implementierung und Codebook, nicht bei den empirischen Originalen.
+| Datei | Archivpfad |
+|---|---|
+| Angenommene manuelle Revision, 13 Claims | [manual_annotation_001.md](../data/annotations/VUL4J-18-review-001/manual_annotation_001.md) |
+| Originalfinding mit ID und Report | [findings.jsonl](../data/runs/VUL4J-18-review-001/findings.jsonl) |
+| Exakter historischer Request | [request.json](../data/runs/VUL4J-18-review-001/request.json) |
+| Unveränderte Provider-Antwort | [generation_raw.json](../data/runs/VUL4J-18-review-001/generation_raw.json) |
+| Ursprünglicher Review-Prompt | [review_prompt_v1.txt](../data/runs/VUL4J-18-review-001/review_prompt_v1.txt) |
+| Historisches Laufmanifest | [run_manifest.json](../data/runs/VUL4J-18-review-001/run_manifest.json) |
 
-Für die verbleibende Übernahme sind gezielt die genannten Run-/Annotations-/PoV-Artefakte samt Prüfsummen bereitzustellen. `.env`, heruntergeladene Toolchains, Maven-Caches und Build-Zwischenergebnisse gehören nicht pauschal dazu. Historische Ressourcenbytes und Daten nicht auf heutige Dateinamen/Schemawerte umschreiben.
+[resources/inherited_artifacts.json](../resources/inherited_artifacts.json) hält Quellcommit, alte/neue Pfade, empfangene und archivierte SHA-256-Werte sowie die einzige Wiederherstellung fest. Die Daten gehören zum alten What-Can-We-Verify-Entwicklungsfall; der Git-Importweg führt über den Nutzercommit in diesem Repo. `.gitignore` erlaubt genau diese sechs Dateien, `.gitattributes` verhindert ihre automatische Zeilenumbruch-Konvertierung. Alle anderen neuen Daten bleiben ignoriert.
 
-### Historischer Review und manuelle Annotation
+### Prüfergebnis: Originalreport und Annotation gehören zusammen
 
-Das frühere [Handoff](https://github.com/sebi-gr/What-Can-We-Verify/blob/8f9b25e1d5d53208f6f58dba9ffba8396a68dd5c/HANDOFF.md) beschreibt Run `0721c0a0-bba7-48c1-a63c-da196a69d97c`, Start 2026-09-23 14:31:07 UTC, Pfad `data/runs/VUL4J-18-review-001/`, Status `completed`, ein Finding. Modell `nvidia/nemotron-3-super-120b-a12b:free`, Provider Nvidia, 8192 Tokenlimit, `reasoning.enabled=false`; berichtete 7,656 Sekunden, 25.832 Prompt-/216 Completion-Tokens, null Reasoning-Tokens und gemeldete Kosten null.
+- Request- und Antwortbytes stimmen mit `request_sha256` und `response_sha256` im historischen Manifest überein. Requestparameter, Modell-/Provider-/Response-ID und Usage sind konsistent.
+- Die Rohantwort ergibt exakt das gespeicherte Finding mit ID `0721c0a0-bba7-48c1-a63c-da196a69d97c:F001`, einschließlich unverändertem Titel und Report. Der Eingabelader des aktuellen P-Decomposers akzeptiert diese Datei; kein Modellrequest nötig.
+- Der in der Annotation gespeicherte Finding-Hash `ac2711de8101111aa23a0861553cfe60489fa40393dc4806fc5e2b0bd794308a` stimmt. Eingebetteter Titel und Originalreport sind identisch mit dem Finding.
+- 13 eindeutige manuelle Claim-IDs, alle 15 Originalzitate und die Auflösbarkeit der Kontextverweise geprüft. Das ist eine Konsistenzprüfung, keine erneute Bewertung der semantischen Qualität oder Wahrheit.
+- Alle fünf aus fixierten Quellen vorbereiteten Modelldateien stimmen mit den historischen Quellhashes überein. Auch die daraus rekonstruierte vollständige User-Nachricht mit Pfaden und Originalzeilennummern entspricht dem gespeicherten Request exakt. Die zusätzliche `model_input/`-Kopie des alten Runs muss daher nicht versioniert werden.
 
-Das aktuelle Quellhandoff ergänzt 13 abgestimmte Entwicklungsclaims, mit Codex-Unterstützung und Vorwissen über Code/Fix/PoV. Das ist keine unabhängige Wahrheitsreferenz. Die Aussagen lassen sich hier ohne Originalannotation nicht prüfen. Frühere Review-Fehlversuche sind laut älteren Quellnotizen am wiederverwendeten Pfad nicht erhalten geblieben; diese Lücke bleibt bestehen.
+### Wiederherstellung des historischen Prompts
 
-### Historische automatische Zerlegung
+Die gelieferte Git-Datei `review_prompt_v1.txt` hatte LF-Zeilenumbrüche (740 Bytes, SHA-256 `a9846dfe5458c8642631e38a22467c9f4bacfea92f22296d15c86f4a66638bd6`). Der historische Request enthält dieselben Zeilen mit CRLF (751 Bytes). Dessen unveränderte Systemnachricht ergibt exakt den im Manifest gespeicherten Prompt-Hash `e3dcce357e15d5040fc52fd58c707038fb1124946d834999d898d7d082bef0ee`.
 
-Laut aktuellem Quellhandoff war Decomposition 001 ungültig; 002 und 003 waren formal gültig mit je vier wortgleichen Satz-Propositionen. Die feinere Granularität wurde nicht erreicht, in 003 waren alle Kontext-IDs leer. Letzte dokumentierte Run-ID: `c939bbd8-090a-4c51-b14d-998d1fc8653c`. Das sind übernommene Entwicklungsbefunde, keine hier erneut geprüften Messergebnisse oder allgemeine Modellaussage. Die neue OpenAI-Anbindung ist nicht als Ursache dieser historischen Ergebnisse auszugeben.
+Für das Archiv wurden diese Originalbytes direkt aus dem Request wiederhergestellt; weder Inhalt noch Manifest geändert. Die anderen fünf gelieferten Dateien sind bytegleich mit dem Eingang. Der heutige aktive Prompt `resources/review_prompt.txt` bleibt unverändert. Auch der historische Generatorhash lässt sich mit der CRLF-Fassung von `src/02_generate_findings.py` aus What-Can-We-Verify-Commit `8f9b25e` nachvollziehen; heutige OpenAI-Skripte werden nicht als damalige Implementierung ausgegeben.
 
-### Historischer PoV
+### Aussagegrenzen der historischen Daten
 
-[resources/reproduce_vul4j18.md](../resources/reproduce_vul4j18.md) bleibt unverändert. Seine lokalen Pfade beziehen sich auf das frühere Windows-Arbeitsverzeichnis, nicht auf vorhandene Dateien dieses Clones.
+Das Manifest dokumentiert Run `0721c0a0-bba7-48c1-a63c-da196a69d97c`, Start 2026-09-23 14:31:07 UTC, `completed`, ein Finding. Modell `nvidia/nemotron-3-super-120b-a12b:free`, Provider Nvidia über OpenRouter, 8192 Tokenlimit, `reasoning.enabled=false`; 7,656 Sekunden, 25.832 Prompt-/216 Completion-Tokens, null gemeldete Reasoning-Tokens und gemeldete Kosten null. Diese gespeicherten Werte wurden mit der Rohantwort abgeglichen, nicht durch eine neue Inferenz reproduziert. `cost_usd` bleibt im Originalmanifest `null`.
 
-Das Protokoll nennt erfolgreiche Builds und unveränderte Tests `WikiServletTest#testNastyDoPost` und `#testDoGet`: verwundbar zwei Assertion-Fehler, gefixt zwei bestandene Tests, ohne Errors/Skips. Das betrifft Mock-Forwarding, nicht sämtliche Report-Claims oder End-to-End-Dateizugriff. Hier wurde kein Java-Build/PoV erneut ausgeführt.
+Die Annotation vom 24.09.2026 benennt SG als Annotator, Codex-Unterstützung bei Revision/Prüfung und Vorwissen über Code/Fix/PoV. Sie ist die angenommene Entwicklungsrevision, keine unabhängige Wahrheitsreferenz. Historische Hinweise darin wie „Schema und Automation folgen“ oder „ignoriertes data/“ bleiben als Originaltext erhalten; den heutigen Stand beschreiben README und WORKPLAN.
+
+Die Annotation verweist auf `claim_codebook_v0_2.md` (Hash `e7549f8b357b25225e1eff5057b5e9c99a190234d5cd1bc58793f0506992250a`), `manual_annotation_submitted_001.md` und `annotation_review_001.md`. Diese drei zusätzlichen historischen Dateien wurden nicht geliefert. Der heutige konsolidierte Codebook-Stand ist vorhanden, ersetzt aber nicht den alten Snapshot. Die Revisionsgeschichte lässt sich damit nicht vollständig prüfen; das verhindert die Weiterarbeit mit der angenommenen Annotation nicht.
+
+## Rekonstruierbare Daten und optionale Ergänzungen
+
+| Material | Stand und Entscheidung |
+|---|---|
+| VUL4J-18-Code, Fix, PoV-Testdatei, Exportmanifest | Lokal vorhanden und geprüft; mit `src/01_prepare_case.py` aus fixierten Quellen erneut erzeugbar, ignoriert |
+| Java-Checkouts, Toolchain, Maven-Cache und Build-Ausgaben | Nicht übernommen; bei Bedarf separat neu aufsetzen. Vorbereitung allein führt keinen Java-Test aus. |
+| Historische Decomposition-Läufe 001–003 | Nicht geliefert; optional für Vergleiche, keine Voraussetzung für Profilentwicklung oder neue Extraktion |
+| Alte PoV-Rohlogs und Ergebnisdatei | Nicht geliefert; optionaler Beleg des damaligen Laufs. Protokoll vorhanden; ein neuer Lauf wäre neue Evidenz. |
+| Alte Annotationsabgabe, Review und Codebook v0.2 | Nicht geliefert; optionale Ergänzung zur Revisionsgeschichte |
+
+Laut [Quellhandoff](https://github.com/sebi-gr/What-Can-We-Verify/blob/5df7760459b741ae36bd91af4af89f6e3ecfe18d/HANDOFF.md) war Decomposition 001 ungültig, 002/003 formal gültig mit vier zu groben, wortgleichen Satz-Propositionen; in 003 waren alle Kontext-IDs leer. Letzte dokumentierte Run-ID: `c939bbd8-090a-4c51-b14d-998d1fc8653c`. Diese optionalen historischen Befunde sind mangels Rohdaten weiterhin nicht hier geprüft. Früher überschriebene Review-Versuche bleiben laut alten Notizen unvollständig dokumentiert.
+
+Das unveränderte [PoV-Protokoll](../resources/reproduce_vul4j18.md) beschreibt die damaligen Windows-Pfade und zwei erwartete Assertion-Fehler der verwundbaren gegenüber zwei bestandenen Tests der gefixten Version, ohne Errors/Skips. Getestet wurde Mock-Forwarding, nicht beliebiger Dateizugriff oder die Wahrheit aller Claims. Hier wurde kein Java-Build/PoV neu ausgeführt. Die fehlenden alten Logs blockieren das vereinbarte minimale Übergabepaket nicht.
 
 ## Fallvorbereitung: unveränderter Prüfstand
 
@@ -89,4 +108,4 @@ Der Benchmark kann Anpassungen gegenüber Upstream enthalten. Der Export ist kei
 
 Projektcode: [MIT](../LICENSE), Copyright 2026 Sebastian Grünewald. JSPWiki behält die mitgelieferten Upstream-Lizenzen/Notices. Vul4J-Dataset: [CC BY 4.0](https://github.com/tuhh-softsec/Vul4J/blob/376411da11fa705019f731404de1d0679fe73537/DATA_LICENSE). Die PDF enthält ihren Layout-Attributionshinweis.
 
-Generierte Daten bleiben zunächst unversioniert unter `data/`; aktuelle Codebook-/Schema-Ressourcen liegen versioniert unter `resources/`. Keine Geheimnisse oder privaten Gespräche übernommen. Eine dokumentierte, gezielte Archivierung/Veröffentlichung der Forschungsdaten bleibt vor der Evaluation erforderlich.
+Sechs vom Nutzer gezielt gelieferte Entwicklungsartefakte sind nun unter `data/` versioniert; alle übrigen generierten Daten bleiben ignoriert. Der gespeicherte Request enthält den öffentlichen JSPWiki-Quellkontext samt ursprünglichen Lizenzkommentaren; weitere Lizenz-/Notice-Dateien werden mit der Fallvorbereitung geladen. Aktuelle Codebook-/Schema-Ressourcen liegen unter `resources/`. Keine Zugangsdaten übernommen. Dieses kleine Entwicklungsarchiv legt noch nicht die Archivierung der späteren Hauptstudie fest.

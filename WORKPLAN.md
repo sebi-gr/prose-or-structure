@@ -6,14 +6,14 @@ Stand: 2026-10-05. Grundlage: [Projektskizze v0.1](prose_or_structure_projektski
 
 Untersucht wird, wie **P: Code → Report → Claims** und **D: Code → Claims** sich bei identischem Quellkontext und gemeinsamem Claimprofil unterscheiden. RQ1 entwickelt das Profil, RQ2 vergleicht Qualität und Aufwand, RQ3 untersucht Darstellungsfehler und die Wirkung expliziter Kontextfelder. Eine Überlegenheit von D ist keine Annahme.
 
-**Nächster Arbeitsschritt:** Das jetzt übernommene [Codebook](resources/claim_codebook.md) und [P-Extraktionsschema](resources/claim_response_schema.json) zum gemeinsamen P/D-Claimprofil weiterentwickeln. P-Decomposer und formale Validierung sind bereits implementiert; nicht neu bauen. Historischer Report, ausgefüllte 13 Claims, Decomposition-Läufe und PoV-Rohdaten fehlen weiterhin im Git-Stand und müssen separat gesichert werden; siehe [docs/PROVENANCE.md](docs/PROVENANCE.md).
+**Nächster Arbeitsschritt:** Das [Codebook](resources/claim_codebook.md) und [P-Extraktionsschema](resources/claim_response_schema.json) anhand des jetzt archivierten Originalreports und der [manuellen Annotation mit 13 Claims](data/annotations/VUL4J-18-review-001/manual_annotation_001.md) zum gemeinsamen P/D-Claimprofil weiterentwickeln. P-Decomposer und formale Validierung sind vorhanden. Das vereinbarte kleine Übergabepaket ist geprüft; zusätzliche historische Decomposition-/PoV-Rohdaten sind optional, kein Blocker für diesen Schritt.
 
 ## Meilensteine und Abschlusskriterien
 
 | Schritt | Status | Fertig, wenn |
 |---|---|---|
 | 0. Repository und geerbte Basis | Erledigt; neuer Import geprüft | Aktueller Stand mit drei Skripten übernommen, 29/29 Offline-Tests bestanden; Herkunft/Hashes, Dokumentation und CI vorhanden. |
-| 1. Entwicklungsartefakte sichern | Teilweise; Codebook/Schema vorhanden | Report samt Run-Artefakten, 13 Claims, Decomposition-Läufe und PoV-Evidenz zusätzlich übernommen und ihrer Herkunft zugeordnet; verbleibende Lücken explizit entschieden. |
+| 1. Minimales Entwicklungspaket sichern | Erledigt | Sechs ausgewählte Report-/Annotationsdateien archiviert und auf Hashes, Originaltext und Zuordnung geprüft; rekonstruierbare Daten lokal belassen, zusätzliche historische Logs optional. |
 | 2. Claimprofil und Annotation v0.1 (RQ1) | Als Nächstes | Gemeinsames Profil, Codebook, Grenzfälle und getrennte Referenzregeln an JSPWiki und wenigen weiteren Entwicklungsfällen erprobt. |
 | 3. Gepaarte P/D-Erzeugung implementieren | P-Extraktor/Validierung vorhanden; D offen | Bestehende P-Komponenten auf das gemeinsame Profil angepasst und um D ergänzt; gespeicherte Originale, Kontexttrennung und gleiches Zielprofil funktionieren. |
 | 4. Pilot vorbereiten und ausführen | Geplant | Protokoll vorab fixiert, beide Routen auf denselben 5–10 Fällen, Fehler und Annotationszeit vollständig erfasst; Vergleichbarkeit bewertet. |
@@ -24,12 +24,12 @@ Kein zusätzlicher Live-Review oder erneuter Java-Build ist Teil der Übernahme.
 
 ## 1. Vorarbeit als nachvollziehbare Entwicklungsbasis
 
-- Den historischen Run mit ID `0721c0a0-bba7-48c1-a63c-da196a69d97c` samt Request, Prompt, Quellen, Rohantwort, Findings und Manifest wiederfinden. Laut Quelldokumentation enthält er ein Finding; das ist hier nicht anhand der Rohdaten nachgeprüft.
-- Aktuelles Codebook, Schema, Decomposition-Prompt und leere Annotationsvorlage sind aus `5df7760` gesichert. Die ausgefüllte Annotation mit 13 Claims unter `data/annotations/VUL4J-18-review-001/manual_annotation_001.md` fehlt weiter. Laut Quellhandoff entstand sie mit Codex-Unterstützung und Vorwissen über Code/Fix/PoV; keine unabhängige Wahrheitsreferenz.
-- Historische Decomposition-Läufe 001–003 beschaffen. Das Quellhandoff beschreibt 001 als ungültig, 002/003 als formal gültig mit vier zu groben, wortgleichen Satz-Propositionen; Lauf 003 ohne Kontext-IDs. Das sind noch nicht anhand der Rohdaten hier geprüfte Befunde.
-- PoV-Logs, Befehlsmetadaten, Prüfsummen und Ergebnisdatei zum historischen Windows-Lauf übernehmen, soweit verfügbar. Das importierte Protokoll belegt zunächst die dokumentierte Durchführung, keine erneute lokale Prüfung.
-- Bei Wiederfund Hashes und Zuordnung zwischen Report, Claims, Codebook und Fall erfassen. Unveränderte Originale und spätere Korrekturen separat speichern.
-- Falls Originale nicht beschaffbar sind, den Verlust dokumentieren und einen neuen Entwicklungsdurchlauf ausdrücklich als solchen planen. Historische Daten niemals durch neu generierte Antworten ersetzen.
+- **Erledigt:** Run `0721c0a0-bba7-48c1-a63c-da196a69d97c` mit einem Finding, Request, Rohantwort, ursprünglichem Prompt und Manifest unter `data/runs/VUL4J-18-review-001/` archiviert. Hashes, Parameter, Provider-Metadaten und exakter Finding-Text stimmen überein.
+- **Erledigt:** Die angenommene manuelle Revision unter `data/annotations/VUL4J-18-review-001/manual_annotation_001.md` ist vorhanden. Finding-Hash, eingebetteter Originaltext, 13 eindeutige Claim-IDs, 15 Originalzitate und Kontextverweise geprüft. Annotator SG mit Codex-Unterstützung und Vorwissen über Code/Fix/PoV; Entwicklungsbeispiel, keine unabhängige Wahrheitsreferenz.
+- **Rekonstruierbar:** Die fünf Modelldateien sind lokal aus fixierten Quellen vorhanden, ihre Hashes und der vollständig rekonstruierte Requesttext passen zum historischen Lauf. Keine Übernahme kompletter Java-Checkouts, Toolchains oder Caches erforderlich. Ein Java-Neulauf wäre ein eigener, noch nicht ausgeführter Schritt.
+- **Optionales historisches Zusatzmaterial:** automatische Decomposition-Läufe 001–003 und PoV-Logs. Deren alte Zusammenfassungen sind nicht neu anhand der Rohdaten geprüft. Für das Claimprofil und neue Experimente sind sie keine Voraussetzung; neue Läufe ersetzen keine historische Evidenz.
+- **Begrenzte Revisionshistorie:** Die Annotation nennt ein damaliges Codebook v0.2, eine Originalabgabe und ein separates Review. Diese zusätzlichen Originale wurden nicht geliefert. Die angenommene Revision genügt für den nächsten Entwicklungsschritt; heutiges Codebook nicht als damaligen Snapshot ausgeben.
+- Herkunft, Hashes und die Wiederherstellung der Prompt-CRLF-Zeilenumbrüche stehen in [docs/PROVENANCE.md](docs/PROVENANCE.md) und `resources/inherited_artifacts.json`. Archivierte Originale und spätere Revisionen getrennt halten.
 
 ## 2. Gemeinsames Claimprofil und Referenzen (RQ1)
 
@@ -101,7 +101,7 @@ Anhand des Piloten Hauptstichprobe, Präzisions-/Fallzahlbegründung, Zeitplan u
 
 ## Offen, bevor neue Experimente starten
 
-- Ablage der historischen Report-, ausgefüllten Claim-, Decomposition- und PoV-Originale; aktuelles Codebook und Schema sind jetzt vorhanden.
+- Keine offene Datenübernahme als Voraussetzung für die Profilentwicklung; historische Zusatzlogs/Revisionsnotizen bleiben optional.
 - Profil-/Annotationsdetails und Auswahl zusätzlicher Entwicklungsfälle.
 - Modell/Provider, Reasoning, Budget, Wiederholungen und Baseline-Implementierungen.
 - Zweiter Annotator, Pilotbestand und spätere Hauptstichprobe.

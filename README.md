@@ -49,14 +49,16 @@ research direction of this repository.
 | Codebook, annotation template, response schema | Imported development baseline; not yet the shared P/D profile |
 | Offline regression tests | 29 tests using synthetic fixtures |
 | Historical Java-PoV reproduction | Imported protocol; original raw logs are not available here |
-| Historical JSPWiki report | Described in the source repository; original run artifacts are not available here |
-| 13 manual claims and previous decomposition runs | Described upstream; filled annotation and raw run artifacts are still absent |
+| Historical JSPWiki report | Archived finding, request, raw response, prompt, and manifest; consistency verified |
+| Manual annotation with 13 claims | Archived accepted development revision; linked to the exact report |
+| Previous automatic decomposition runs | Historical summaries only; raw run artifacts are not archived here |
 | Shared P/D claim profile, D generator, evaluation | Planned; not implemented |
 
-Missing originals are tracked in [docs/PROVENANCE.md](docs/PROVENANCE.md). They
-must not be reconstructed from summaries and presented as historical evidence.
-The repository is ready for development; it is not yet a complete experimental
-dataset or an implemented P/D comparison.
+The six-file development archive is available in every clone; source and import
+hashes are documented in [docs/PROVENANCE.md](docs/PROVENANCE.md). Additional old
+decomposition runs and PoV logs are optional historical evidence, not prerequisites
+for the next step. The repository is ready to refine the claim profile using the
+original report and annotation; it is not yet an implemented P/D comparison.
 
 ## Start here
 
@@ -162,22 +164,27 @@ usage is preserved; `cost_usd` remains `null` because billing is not calculated.
 The imported [codebook](resources/claim_codebook.md) and
 [annotation template](resources/manual_annotation_template.md) provide the
 development rules for faithful extraction. Copy the template into a new file
-under `data/annotations/` for manual work. The template is blank: it is not the
-historical annotation of 13 claims, which is still missing from GitHub.
+under `data/annotations/` for new manual work. The accepted historical
+[annotation with 13 claims](data/annotations/VUL4J-18-review-001/manual_annotation_001.md)
+and its exact [finding](data/runs/VUL4J-18-review-001/findings.jsonl) are now archived.
+Keep this original annotation unchanged; new revisions need a new file.
 
-The source documentation describes that annotation as assisted development work
-with prior knowledge of code/fix/PoV, not an independent truth reference.
+The annotation records assisted development work with prior knowledge of
+code/fix/PoV, not an independent truth reference. Its embedded original report,
+finding hash, 13 claim IDs, 15 source quotes, and context references have been
+checked. The historical codebook v0.2 and separate revision notes it names were
+not supplied; today's codebook does not substitute for that old snapshot.
 Keep exact quotes, conditions, uncertainty, and claim relationships. A sentence
 can support several distinct propositions; do not enforce a target claim count.
 
 `src/03_decompose_findings.py` can extract one finding from a saved generator
-JSONL file. Once such a file is available, replace the placeholders and select
-a fresh output directory; a new report is unnecessary for re-extraction:
+JSONL file. The following template uses the archived report; select the model
+and token limit and a fresh output directory. A new report is unnecessary:
 
 ```bash
 python3 src/03_decompose_findings.py \
-  --findings PATH_TO_FINDINGS_JSONL \
-  --finding-id FINDING_ID \
+  --findings data/runs/VUL4J-18-review-001/findings.jsonl \
+  --finding-id 0721c0a0-bba7-48c1-a63c-da196a69d97c:F001 \
   --model OPENAI_MODEL_ID \
   --max-output-tokens TOKEN_LIMIT \
   --output data/decompositions/VUL4J-18-openai-001
@@ -219,10 +226,22 @@ The preparation manifest's `pov_status: not_run` describes the export step.
 Keep reproduction evidence separately; do not change that field merely because
 an earlier reproduction is documented elsewhere.
 
-Generated cases, runs, annotations, and raw logs stay under ignored `data/`.
-A fresh clone contains the scripts and documentation, not those artifacts.
-An archival location for the study data must be selected before evaluation.
-No live model request or Java reproduction is needed for the repository setup.
+Six selected historical files are versioned under `data/runs/VUL4J-18-review-001/`
+and `data/annotations/VUL4J-18-review-001/`, totaling about 108 KB. The run is an
+OpenRouter/Nemotron development run, despite today's direct OpenAI implementation.
+Its original `review_prompt_v1.txt` name remains. The prompt's CRLF bytes were
+recovered from the archived request and match the historical manifest hash;
+the other five delivered files are unchanged. `.gitattributes` disables newline
+conversion for this archive.
+
+The run's `model_input/` copy is intentionally omitted. Preparation regenerates
+the five source files; their hashes and the reconstructed request text match the
+archive. New outputs, case downloads, Java checkouts, toolchains, and caches stay
+ignored. The Python preparation downloads the PoV source but does not execute it;
+a fresh Java reproduction requires the full benchmark and separate setup.
+Old decomposition/PoV logs are optional for continuing this development case.
+Choose the main study's data archive before evaluation. No live model request or
+Java reproduction was performed during this import.
 
 ## Repository layout and checks
 
@@ -230,9 +249,9 @@ No live model request or Java reproduction is needed for the repository setup.
 src/                    Preparation, prose-report generation, and P extraction
 tests/                  Offline tests; responses are synthetic
 resources/              Prompts, codebook, schema, template, PoV protocol, checksums
-docs/PROVENANCE.md      Import source, evidence inventory, and missing originals
+docs/PROVENANCE.md      Import sources, evidence inventory, and verification limits
 .github/workflows/      Offline checks on pushes and pull requests
-data/                   Local artifacts, ignored by Git
+data/                   Six archived originals; all other outputs ignored
 ```
 
 ```bash

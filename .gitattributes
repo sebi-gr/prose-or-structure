@@ -1,0 +1,5 @@
+# Preserve the archived evidence bytes on Windows and Unix checkouts.
+data/runs/VUL4J-18-review-001/* -text
+data/annotations/VUL4J-18-review-001/* -text
+# The original Windows prompt intentionally retains CRLF line endings.
+data/runs/VUL4J-18-review-001/review_prompt_v1.txt whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
