@@ -1,48 +1,45 @@
 # Handoff: Prose or Structure?
 
-Stand: 2026-10-05. Aktueller Plan: [WORKPLAN.md](WORKPLAN.md). Forschungsrichtung: [Projektskizze v0.1](prose_or_structure_projektskizze.pdf) vom 03.10.2026. Herkunft und vollständiges Artefaktinventar: [docs/PROVENANCE.md](docs/PROVENANCE.md).
+Stand: 2026-10-05, nach Übernahme des nachgelieferten Quellstands. Aktueller Plan: [WORKPLAN.md](WORKPLAN.md). Forschungsrichtung: [Projektskizze v0.1](prose_or_structure_projektskizze.pdf). Importnachweis und Artefaktinventar: [docs/PROVENANCE.md](docs/PROVENANCE.md).
 
 ## Ziel und Entscheidungen
 
-Neues Paper zum Vergleich **P: Code → Report → Claims** mit **D: Code → Claims**, bei identischem Codekontext und gemeinsamem Claimprofil. RQ1 betrifft das Profil, RQ2 Qualität/Aufwand, RQ3 Darstellungsfehler und Kontextfeld-Ablation. Der alte Fokus auf eine breite automatische Verifikationspipeline ist hier ersetzt.
-
-KISS bleibt verbindlich. Vorhandene Vorbereitung und Reportgenerierung werden weiterverwendet; die neuen Claim-Routen sind der nächste Implementierungsabschnitt. Keine neuen Modellläufe, keine automatische Modell-/Budgetauswahl und keine zusätzliche Provider-Abstraktion wurden für die Einrichtung eingeführt.
+Vergleich **P: Code → Report → Claims** mit **D: Code → Claims**, bei identischem Codekontext und gemeinsamem Claimprofil. RQ1 betrifft das Profil, RQ2 Qualität/Aufwand, RQ3 Darstellungsfehler und Kontextfeld-Ablation. KISS bleibt verbindlich; der alte breite Verifikationsplan wird nicht übernommen.
 
 ## Tatsächlicher Stand
 
-- Zielrepo: [sebi-gr/prose-or-structure](https://github.com/sebi-gr/prose-or-structure), Branch `main`. Den aktuellen Commit und Remote-Stand zu Sessionbeginn mit Git prüfen.
-- Importquelle: `What-Can-We-Verify`, nach Fetch `origin/main` auf `8f9b25e1d5d53208f6f58dba9ffba8396a68dd5c`. Der dortige lokale Checkout ist älter und blieb unverändert.
-- Neun übernommene Dateien stimmen bytegleich mit dem fixierten Quellstand überein; Hashes in `resources/inherited_baseline.json`. Enthalten sind beide Skripte, alle bestehenden Tests, Prompt, historisches PoV-Protokoll, leere `.env.example` und die identische MIT-Lizenz.
-- README und Workplan sind neu ausgerichtet, AGENTS angepasst, dieses Handoff neu geschrieben. PDF unverändert übernommen. Ignore-Regeln schützen Daten, lokale Schlüssel und Python-Umgebungen. `.github/workflows/checks.yml` führt die Offline-Tests und Whitespace-Prüfung auf GitHub aus.
-- `data/VUL4J-18/` wurde hier frisch vorbereitet und geprüft; es ist lokal vorhanden und ignoriert. Ein frischer Clone muss es selbst erzeugen.
-- Der Generator nutzt **OpenRouter Chat Completions**, verlangt eine explizite `:free`-Modell-ID und ein Ausgabetokenlimit, hat keine automatischen Fallbacks/Retry und liest den Key aus `.env`/Prozessumgebung. Es handelt sich nicht mehr um die ältere OpenAI-Responses-Implementierung.
-- Fall-ID und fünf erlaubte Eingabepfade sind auf VUL4J-18 festgelegt. `--model-input` allein macht das Skript nicht mehrfallfähig.
+- Zielrepo: [sebi-gr/prose-or-structure](https://github.com/sebi-gr/prose-or-structure), Branch `main`. Aktuellen Commit/Remote-Stand zu Sessionbeginn mit Git prüfen.
+- Aktuelle Importquelle: `What-Can-We-Verify`, `origin/main` auf `5df7760459b741ae36bd91af4af89f6e3ecfe18d` nach Fetch. Der alte lokale Checkout des Quellrepos blieb unverändert.
+- 15 Quelldateien übernommen: drei Pipeline-Skripte, vier Testdateien einschließlich `__init__.py`, sechs Ressourcen, leere `.env.example` und identische MIT-Lizenz. Herkunft und Hashes in `resources/inherited_baseline.json`.
+- Neue Bestandteile: `src/03_decompose_findings.py`, `resources/claim_codebook.md`, `claim_response_schema.json`, `decomposition_prompt.txt`, `manual_annotation_template.md` sowie Decomposer-Tests. Der Review-Prompt heißt jetzt `review_prompt.txt`; sein Inhalt ist unverändert. Historische Namen bleiben in Git bzw. späteren Original-Laufkopien erhalten.
+- Alle drei `src/`-Skripte sind bytegleich mit der Quelle. Lokale Anpassungen: Decomposer-Testfixture löst den temporären Basispfad auf; Linkanker der Annotationsvorlage passt zur neuen README. Beide Abweichungen sind im Importnachweis erfasst.
+- Beide Modellschritte verwenden jetzt **direkte OpenAI Chat Completions**, `OPENAI_API_KEY` aus Umgebung/`.env`, explizites Modell/Tokenlimit, JSON-Modus, `store=false`, keine Tools/Fallbacks/Retry. `--no-reasoning` sendet `reasoning_effort=none`; Modellunterstützung ist Voraussetzung. Die frühere OpenRouter-`:free`-Beschränkung entfällt. Kein Live-Aufruf wurde ausgeführt.
+- P-Decomposer sieht nur den ausgewählten Titel/Report plus Prompt, Codebook und Schema. Er prüft Format, exakte Zitate, Unicode-Codepoint-Offsets und Kontext-IDs. `completed` ist kein Qualitäts- oder Wahrheitsurteil.
+- Das geerbte Schema ist ein **P-Extraktionsschema**, noch nicht das gemeinsame P/D-Profil. Bedingungen stehen gesammelt in `qualifiers`; explizite Kontext-, Codebezugs- und Prüfaufgabenfelder müssen für die neue Studie noch konkretisiert werden.
+- `data/VUL4J-18/` ist hier lokal vorbereitet und ignoriert. Generator-Fall-ID und fünf erlaubte Dateipfade sind weiterhin fest auf VUL4J-18 begrenzt. Ein frischer Clone muss den Fall vorbereiten.
 
-**Nicht implementiert:** gemeinsames Claim-Schema, P-Extraktor, direkte D-Erzeugung, D-Überarbeitung, Baselines, Ablation und Vergleichsauswertung. Modell, Budget und Evaluationsprotokoll sind offen.
+**Noch nicht implementiert:** direkte D-Erzeugung, gemeinsames P/D-Profil, D-Überarbeitung, Baselines, Ablation und Vergleichsauswertung. Modell/Budget und Evaluationsprotokoll bleiben offen.
 
-## Fehlende Originalartefakte
+## Historische Rohdaten weiterhin nicht im Git
 
-Die Skizze berichtet einen JSPWiki-Report, 13 manuelle Claims, ein erstes Codebook und einen reproduzierten Java-PoV. Im erreichbaren Stand sind nur die Pipeline und die Dokumentation zu Review/PoV vorhanden:
+Der neue Quellcommit enthält Code und Ressourcen, aber **keine `data/`-Dateien**. Das Quellrepo ignoriert weiterhin `/data/`. Codebook und Annotationsvorlage sind jetzt vorhanden; folgende Originale fehlen weiterhin:
 
-- Review-Run `0721c0a0-bba7-48c1-a63c-da196a69d97c`: in den Quellnotizen beschrieben, Rohartefakte fehlen.
-- 13 Claims und ursprüngliches Codebook: in der Skizze genannt, Originaldateien nicht gefunden.
-- PoV: historisches Windows-Protokoll übernommen, zugehörige Logs/Metadaten fehlen.
+- Review `0721c0a0-bba7-48c1-a63c-da196a69d97c`, einschließlich Request, Rohantwort, Findings und Manifest.
+- Ausgefüllte Annotation `data/annotations/VUL4J-18-review-001/manual_annotation_001.md` mit 13 Claims. Laut Quellhandoff assistierte Entwicklung mit Vorwissen über Code/Fix/PoV, keine unabhängige Wahrheitsreferenz.
+- Historische Decomposition-Läufe 001–003. Laut Quelle: 001 ungültig; 002/003 je vier zu grobe, wortgleiche Satz-Propositionen; in 003 keine Kontext-IDs. Letzte dokumentierte Run-ID: `c939bbd8-090a-4c51-b14d-998d1fc8653c`. Hier nicht anhand der Rohdaten nachgeprüft.
+- PoV-Logs und Metadaten zu `data/pov/VUL4J-18-001/`; das historische Windows-Protokoll ist vorhanden.
 
-In beiden Projektordnern und der verfügbaren Git-Historie gesucht; Ablageort beim Nutzer angefragt. Die Einrichtung ist damit als Codebasis nutzbar, aber **keine vollständige Übernahme der empirischen Vorarbeit**. Alte Dokumentationsaussagen über lokal vorhandene Runs wurden nicht als aktueller Dateibestand übernommen. Fehlende Daten nicht erfinden oder still neu erzeugen.
+Die betroffenen Dateien müssen vom anderen Rechner separat bereitgestellt oder gezielt versioniert werden; ein weiterer normaler Commit ignorierter Daten genügt nicht. Keine pauschale Aufnahme von `.env`, Toolchains oder Caches. Fehlende Originale nicht erfinden oder durch neue Modellantworten ersetzen.
 
-## Geprüft am 05.10.2026
+## Prüfstand
 
-- macOS, Python **3.13.2**: `python3 -m unittest -v` — **15/15 bestanden, kein Skip**, einschließlich Symlink-Test. Ausschließlich synthetische Offline-Antworten.
-- Beide CLI-Hilfen funktionieren aus dem Repo-Wurzelverzeichnis.
-- Echter Vorbereitungslauf erfolgreich. Alle neun Download-Hashes geprüft; Dateien, Manifest und Dataset-Zeile bytegleich mit dem vorhandenen Export des Quellrepos. Fünf Modelldateien, 71.907 Bytes.
-- Importdateien gegen fixierte Git-Blobs und SHA-256-Nachweis geprüft; PDF unverändert.
-- 20 lokale Markdown-Verweise aufgelöst; `git diff --cached --check` ohne Befund. 18 versionierte Dateien einschließlich bestehender Lizenz geprüft; Daten, `.env`, Umgebungen und Caches ausgeschlossen, keine Treffer für die geprüften Zugangsdatenmuster.
-- Arbeitsbaum und Index des Quellrepos unverändert. Der CI-Workflow ist eingerichtet; sein jeweils aktuelles Ergebnis ist unter GitHub Actions sichtbar.
+- macOS / Python **3.13.2**: **29/29 Offline-Tests bestanden, kein Skip**. Alle drei CLI-Hilfen funktionieren. Tests verwenden synthetische Antworten, keine Inferenz.
+- Der erste Testlauf scheiterte beim Decomposer am macOS-Systemlink `/var` im temporären Verzeichnis. Nur die Testfixture verwendet jetzt den tatsächlichen Basispfad; die produktive Symlink-Sperre wurde nicht gelockert.
+- Die ursprüngliche Fallvorbereitung mit neun Download-Dateien und fünf Modelldateien (71.907 Bytes) bleibt unverändert; die entsprechende Implementierung ist identisch. Historischer Prüfstand und Manifest-Hash stehen in PROVENANCE.
+- Alle 15 Importnachweise einschließlich lokaler Anpassungen geprüft; 28 lokale Dokumentationslinks samt Ankern aufgelöst, JSON-Dateien lesbar und `git diff --cached --check` ohne Befund. 24 versionierte Dateien geprüft; keine generierten Daten, Schlüsseldateien oder Caches aufgenommen. GitHub-CI führt dieselben Offline-Tests aus; jeweils aktuelles Ergebnis unter Actions.
 
-**Nicht ausgeführt:** Live-Inferenz, neue manuelle Annotation, neuer Java-Build/PoV oder P/D-Experiment. Modellverfügbarkeit und Literatur/Neuheit wurden nicht neu geprüft. Historische Messergebnisse sind dokumentiert, nicht anhand vorhandener Rohdaten erneut validiert.
+**Nicht ausgeführt:** Live-Inferenz, neue Annotation, neuer Java-Build/PoV oder P/D-Experiment. Historische Laufbefunde sind übernommene Angaben; API-Verfügbarkeit und Extraktionsqualität wurden hier nicht live verifiziert.
 
 ## Nächster Schritt
 
-Mit **Schritten 1–2 in WORKPLAN** fortfahren: fehlende Originale sichern und Claimprofil/Annotationsregeln anhand echter Entwicklungsbeispiele präzisieren. Die Feldgruppen und methodischen Anforderungen sind im Plan vorbereitet; sie sind noch kein validiertes Codebook. Danach den kleinsten vollständigen P/D-Vergleich implementieren.
-
-Die fehlenden Originale blockieren die Prüfung der historischen Annotation, nicht die Arbeit am Profilentwurf. Zusätzliche Entwicklungsfälle, zweiter Annotator, Modell/Budget und Pilotbestand bleiben zu entscheiden.
+Mit **Schritt 2 in WORKPLAN** das vorhandene Codebook/P-Schema zum gemeinsamen Claimprofil weiterentwickeln und die getrennten Annotationsreferenzen festlegen. Parallel fehlen die Original-Laufdaten aus Schritt 1. Danach den bestehenden P-Extraktor anpassen und D ergänzen. Kein neuer Report nötig, sobald der historische Run verfügbar ist.
