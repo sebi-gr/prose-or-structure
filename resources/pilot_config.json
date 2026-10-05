@@ -1,0 +1,14 @@
+{
+  "protocol_version": "pilot-0.1",
+  "model": "gpt-5.4-mini-2026-03-17",
+  "reasoning_effort": "none",
+  "service_tier": "default",
+  "repetitions": 2,
+  "order_seed": 20261005,
+  "subset_cases": ["VUL4J-15", "VUL4J-41"],
+  "max_output_tokens": {"report": 3072, "claims": 6144, "baseline": 1024},
+  "pricing_date": "2026-10-05",
+  "usd_per_million_tokens": {"input": 0.75, "cached_input": 0.075, "output": 4.5},
+  "pricing_source": "https://developers.openai.com/api/docs/pricing",
+  "model_source": "https://developers.openai.com/api/docs/models/gpt-5.4-mini"
+}

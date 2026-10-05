@@ -13,6 +13,8 @@ from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 from uuid import uuid4
 
+import case_context
+
 # Numbered pipeline scripts are loaded by name because Python import syntax
 # does not allow identifiers starting with digits.
 prepare_case = import_module("01_prepare_case")
@@ -60,14 +62,14 @@ def load_api_key() -> str:
     return ""
 
 
-# Liest ausschließlich die fünf erlaubten Dateien als Pfad-zu-Bytes-Dictionary.
+# Liest ausschließlich die registrierten Dateien als Pfad-zu-Bytes-Dictionary.
 # Lehnt Symlinks am Eingabeverzeichnis und innerhalb der Dateipfade ab, um Referenzzugriffe zu verhindern.
-def load_sources(model_input: Path) -> dict:
+def load_sources(model_input: Path, case_id: str = CASE_ID) -> dict:
     """Read only the allowlist; reject symlinks that could expose references."""
     if model_input.is_symlink():
         raise ValueError(f"Model input must not be a symlink: {model_input}")
     files = {}
-    for name in MODEL_FILES:
+    for name in case_context.model_files(case_id):
         source = model_input
         for part in Path(name).parts:
             source = source / part
@@ -75,6 +77,19 @@ def load_sources(model_input: Path) -> dict:
                 raise ValueError(f"Symlinks are not allowed in model input: {source}")
         files[name] = source.read_bytes()
     return files
+
+
+# Prüft Pilotbytes gegen den fixierten Katalog; Entwicklungsfälle behalten den bisherigen Vertrag.
+# Variantenlabels und Referenzen gelangen nicht in Modellkontexte; Abweichungen stoppen vor dem Lauf.
+def verify_variant(files: dict, case_id: str, case_variant: str) -> None:
+    if case_id == CASE_ID:
+        return
+    case = case_context.get_case(case_id)
+    if case_variant not in case["variants"]:
+        raise ValueError("Pilot requires an explicit vulnerable or fixed variant.")
+    expected = {item["path"]: item["sha256"] for item in case["variants"][case_variant]["files"]}
+    if {path: sha256(data) for path, data in files.items()} != expected:
+        raise ValueError("Pilot source bytes do not match the pinned variant.")
 
 
 # Formatiert dieselben Quellbytes für P und D mit Pfaden und Originalzeilennummern.
@@ -141,7 +156,8 @@ def parse_findings(response: dict) -> list:
 # Optional setzt --no-reasoning reasoning_effort=none; das Modell muss diesen Wert unterstützen.
 def generate_findings(model_input: Path, output: Path, model: str,
                       max_output_tokens: int, disable_reasoning: bool = False,
-                      case_variant: str = "unspecified") -> str:
+                      case_variant: str = "unspecified", case_id: str = CASE_ID,
+                      requester=None) -> str:
     if output.exists() or output.is_symlink():
         raise FileExistsError(f"Output already exists: {output}. Choose a new --output path.")
     if not model or "/" in model or model.endswith(":free") or any(char.isspace() for char in model):
@@ -151,7 +167,8 @@ def generate_findings(model_input: Path, output: Path, model: str,
     if not isinstance(case_variant, str) or not case_variant.strip():
         raise ValueError("case-variant must be a nonempty label; it is not a truth label.")
 
-    files = load_sources(model_input)
+    files = load_sources(model_input, case_id)
+    verify_variant(files, case_id, case_variant)
     prompt = PROMPT.read_bytes()
     payload = {
         "model": model,
@@ -160,6 +177,7 @@ def generate_findings(model_input: Path, output: Path, model: str,
             {"role": "user", "content": format_sources(files)},
         ],
         "max_completion_tokens": max_output_tokens,
+        "service_tier": "default",
         "stream": False,
         "store": False,
         "response_format": {"type": "json_object"},
@@ -169,7 +187,7 @@ def generate_findings(model_input: Path, output: Path, model: str,
     body = json_bytes(payload)
     run_id = str(uuid4())
     manifest = {
-        "case_id": CASE_ID,
+        "case_id": case_id,
         "case_variant": case_variant,
         "route": "P", "stage": "report_generation", "parent_run_id": None,
         "run_id": run_id,
@@ -208,13 +226,13 @@ def generate_findings(model_input: Path, output: Path, model: str,
             raise ValueError("OPENAI_API_KEY is missing from the environment and project .env; no request was sent.")
         manifest["request_attempts"] = 1
         (output / "run_manifest.json").write_bytes(json_bytes(manifest))
-        status, request_id, raw = request_review(body, api_key)
+        status, request_id, raw = (requester or request_review)(body, api_key)
         (output / "generation_raw.json").write_bytes(raw)
         manifest.update(http_status=status, provider_request_id=request_id,
                         response_sha256=sha256(raw))
         if status != 200:
             raise ValueError(f"Provider HTTP status {status}; see generation_raw.json.")
-    except (OSError, URLError, HTTPException, ValueError) as error:
+    except (OSError, URLError, HTTPException, ValueError, RuntimeError) as error:
         manifest.update(status="run_error", error=f"{type(error).__name__}: {error}")
     else:
         try:
@@ -261,13 +279,14 @@ def main() -> None:
                         help="Output limit including reasoning; not a monetary budget.")
     parser.add_argument("--no-reasoning", action="store_true",
                         help="Send reasoning_effort=none; requires a model supporting none. Omit for model defaults.")
+    parser.add_argument("--case-id", default=CASE_ID, help="Registered source allowlist.")
     parser.add_argument("--case-variant", default="unspecified",
                         help="Recorded variant label, e.g. vulnerable; never sent to the model.")
     args = parser.parse_args()
     try:
         status = generate_findings(args.model_input, args.output, args.model,
                                    args.max_output_tokens, disable_reasoning=args.no_reasoning,
-                                   case_variant=args.case_variant)
+                                   case_variant=args.case_variant, case_id=args.case_id)
     except (OSError, ValueError) as error:
         parser.exit(1, f"Could not start review: {error}\n")
     print(f"Review status: {status}; saved at {args.output.resolve()}")

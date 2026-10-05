@@ -1,79 +1,102 @@
 # Handoff: Prose or Structure?
 
-Stand: 2026-10-05, nach Schritt 3. Maßgeblich: [WORKPLAN.md](WORKPLAN.md),
-[Projektskizze](prose_or_structure_projektskizze.pdf), [Herkunft](docs/PROVENANCE.md).
+Stand: 2026-10-05. Maßgeblich: [WORKPLAN.md](WORKPLAN.md),
+[Projektskizze](prose_or_structure_projektskizze.pdf),
+[Pilotprotokoll 0.1](docs/PILOT_PROTOCOL.md).
 
-## Ziel und nächster Schritt
+## Stand und nächste Aktion
 
-P: Code → Report → Claims und D: Code → Claims bei identischem Codekontext
-vergleichen. RQ1 entwickelt das Profil, RQ2 vergleicht Qualität/Aufwand, RQ3
-untersucht Darstellungsfehler und Kontextfelder. Keine Überlegenheit vorwegnehmen.
+Schritte 2–3 sind umgesetzt; **Schritt 4 ist technisch vorbereitet und offline
+geprüft**, aber ohne neue Modellläufe oder menschliche Pilotbewertung.
+Die beauftragte autonome Arbeit ist bis zum fehlenden API-Zugang und der noch
+nicht gewählten Kostenobergrenze fortgeführt. Die Frage nach dem Budget wurde
+bereits gestellt; keine Kostenfreigabe oder menschliche Annotation unterstellen.
 
-**Schritt 3 ist für den VUL4J-18-PoC implementiert und offline geprüft.**
-Als Nächstes Schritt 4: Pilotprotokoll festlegen, dann die erforderlichen
-Pilotergänzungen und geplanten Läufe. Modell, Budget, Reporteinheit, Fallbestand,
-Referenzen/Doppelannotation, Baselines und Fehlerregeln sind noch offen.
-Keine ungeplanten API-Aufrufe; in dieser Umsetzung wurde keiner ausgeführt.
+Nächster ausführbarer Schritt: nach bereitgestelltem `OPENAI_API_KEY` in `.env`
+oder Umgebung und gewählter USD-Grenze den fixierten Pilot einmal starten.
+Preise bei späterem Start erneut prüfen. Befehl in README; neue Ausgabepfade,
+keine automatischen Retries oder stillen Modellwechsel. Es gibt keinen aktiven
+Hintergrundlauf. Danach tatsächliche Fehler/Usage auswerten; Codeinventare müssen
+vor Einsicht der Annotatoren in Modellausgaben entstehen, nicht zwingend vor
+bloßer Generierung. Menschliche Referenzen und Doppelannotation bleiben nötig.
 
-## Ausführbare Basis
+## Vorbereiteter Versuch
 
-| Datei | Aktueller Zweck |
+- Fünf neue Fälle: VUL4J-15/64 (XXE), VUL4J-41/43/76 (Pfadverarbeitung).
+  Je vulnerable/fixed, zwölf volle Quelldateien pro Variante insgesamt, jedes
+  Kontextpaket unter 34 KB. Alle URLs/Revisionen/Hashes im Katalog.
+- P bündelt alle Findings in einer gespeicherten Reportansicht (`finding-id all`),
+  behält Originaltexte und braucht höchstens zwei Calls. Keine günstige Auswahl.
+  D prüft dieselben Codebytes direkt gegen den Katalog und ist unabhängig von P.
+- Modell `gpt-5.4-mini-2026-03-17`, Reasoning none, Default-Tier. Zwei
+  Wiederholungen mit balancierter P/D-Reihenfolge; 60 Kernaufrufe maximal.
+  D-Revision in Wiederholung 1: zehn Zusatzaufrufe. Beide Varianten 15/41:
+  acht Ablationsaufrufe sowie Satz-/VeriScore-Baselines mit variabler Satzanzahl.
+- D-Revision ist eine Zwei-Aufruf-Kontrolle, nicht tokenidentisch zu P.
+  Kontextablation entfernt das explizite Objekt, erhält aber Propositionbedingungen
+  und Kontext-IDs. VeriScore basiert auf einem lizenzierten Originalprompt,
+  Regex-Satzgrenzen und zusätzlichen Titelsatzzielen; keine exakte Reproduktion.
+- Feste Planreihenfolge, Ressourcen-/Implementierungshashes, Einzelrequests und
+  Rohantworten erhalten. Der Runner reserviert vor dem Transport konservative
+  Kosten; Budget-, HTTP-, Usage- und Transportprobleme stoppen den restlichen Lauf.
+  Formatfehler sperren nur abhängige Stufen. Keine Rechnung oder wissenschaftlichen
+  Qualitätsurteile aus geschätzten Kosten/Formatchecks ableiten.
+
+## Dateien und lokale Artefakte
+
+| Datei | Aufgabe |
 |---|---|
-| `src/01_prepare_case.py` | Unveränderter Export von fünf VUL4J-18-Quelldateien und getrennten Referenzen; kein Java-Test |
-| `src/02_generate_findings.py` | Prose-Review; vorhandener Transport, gemeinsame Quellformatierung, Route/Stufe/Variantenlabel und Finding-Hash ergänzt |
-| `src/03_decompose_findings.py` | Ein gespeichertes Finding aus geprüftem Review → Profil 0.1; nur Titel/Report im fallbezogenen Modellinput |
-| `src/04_generate_claims.py` | Direkte Profilclaims aus exakt demselben Codekontext wie der über `--review-run` bezeichnete Review |
-| `src/claim_profile.py` | Gemeinsame feste Validierung, P-Zitate/Unicode-Offsets und getrennte D-Codepositionsdiagnosen |
-| `src/review_pair.py` | Vier originale Reviewartefakte prüfen; Quellhashes und tatsächlich gesendeten Codekontext vergleichen |
+| `src/01_prepare_case.py` | Unveränderter VUL4J-18-Export |
+| `src/02_generate_findings.py` | Registrierter Codekontext → Report |
+| `src/03_decompose_findings.py` | Einzelnes Finding oder vollständiger Report → P-Claims |
+| `src/04_generate_claims.py` | Unabhängige Pilot-D-Claims; optional passende D-Revision |
+| `src/05_prepare_pilot.py` | Atomarer Export aller Pilotquellen/Referenzen |
+| `src/06_run_pilot.py` | API-freier Plan oder budgetierter Live-Lauf |
+| `src/07_prepare_annotations.py` | Zehn neutrale Code-/Leerblattpakete |
+| `src/case_context.py`, `pilot_profile.py`, `extraction_baselines.py` | Kleine konkrete Pilothelfer |
+| `docs/RELATED_WORK.md`, `resources/references.bib` | Sieben geprüfte Vorarbeiten, Abgrenzung und korrigierte GPTAid-DOI |
 
-Befehle stehen in [README.md](README.md). P benötigt neben `findings.jsonl`
-Manifest, Request und Rohantwort desselben Reviews. D benötigt den Reviewordner
-und die fünf Modelldateien; die lokale Vorbereitung stimmt mit dem historischen
-Review überein. Abweichungen stoppen vor API-Aufruf und Ausgabeverzeichnis.
-Die Fall-ID/Dateiliste bleibt bewusst auf VUL4J-18 begrenzt; XML/YAML sind weiterhin
-nur Profilentwicklungsbeispiele. Kein allgemeines Benchmark-Framework gebaut.
+Lokal vorhanden, absichtlich ignoriert:
 
-Gemeinsamer Vertrag: [Profil 0.1](resources/claim_profile.md),
-[Schema](resources/claim_profile.schema.json), [Codebook](resources/claim_codebook.md).
-Der alte aktive `claim_response_schema.json`-Vertrag ist entfernt; alte Snapshots
-und Git-Historie bleiben erhalten. `claims.jsonl` ergänzt lokale Run-/Routenfelder
-und bei P Finding-ID/Quote-Offsets; das Antwortschema beschreibt den Modelloutput.
-Keine generierten Wahrheitslabels. Falsche Codepositionen bleiben erhalten;
-D protokolliert sie nichtfatal in `validation.json`, P liest dafür keinen Code.
+- `data/pilot_cases/`: alle fünf Fälle mit beiden Varianten und getrennten
+  Lizenzen/Testquellen. Hashes geprüft; keine Java-/PoV-Ausführung.
+- `data/pilot/preflight-002/`: finaler API-freier Plan, 82 Aufgaben einschließlich
+  vier Baselinegruppen. `preflight-001` ist der erhaltene frühere Entwicklungsstand.
+- `data/annotations/pilot-001/`: zehn leere Arbeitsblätter und Codepakete,
+  Zuordnung in separatem `linkage.json`. Vier Pakete für zweite unabhängige
+  menschliche Annotation vorgewählt. Keine Urteile oder Zeiten ausgefüllt.
 
-Alle Modellschritte verwenden den vorhandenen OpenAI-Aufruf mit explizitem Modell
-und Tokenlimit, `store=false`, ohne Tools, Retry oder Repair. Fehlende Schlüssel
-senden nichts. Rohantworten und Fehler bleiben erhalten, keine Teilclaims oder
-Überschreibung. `cost_usd` bleibt ohne Abrechnung null, gemeldete Usage gespeichert.
-Unbekannte Varianten bleiben `unspecified`; `--case-variant` am Reportgenerator
-ist ausschließlich ein Metadatenlabel und gelangt nicht ins Modell.
-
-## Forschungskontext und Grenzen
-
-- P und D teilen `paired_review_run_id` und Quellhashes. P nennt den Report als `parent_run_id`; D hat keinen kausalen Reportparent. Die ursprünglichen Parentdateien für spätere Prüfung erhalten.
-- Der aktuelle Extraktor arbeitet pro Finding: P benötigt 1 + N Aufrufe bei N Findings, D einen für den Codefall. Der archivierte Ein-Finding-Fall erfüllt den Zwei-Aufruf-Entwurf. Vor Pilot Reporteinheit festlegen und alle Findings einbeziehen; keine günstige Auswahl einzelner Findings.
-- `no_findings` bedeutet keine P-Extraktion und kann D verankern. Ein fehlgeschlagener P-Review kann D aktuell nicht verankern; fehlende Routen vorab im Pilotprotokoll regeln.
-- [Annotationsprotokoll](resources/annotation_protocol.md) und [Arbeitsblatt](resources/manual_annotation_template.md) trennen Reporttreue, Codereferenz, Unsicherheit/Prüfbarkeit und Adjudikation. Neue Referenzen vor Einsicht in Ausgaben erstellen.
-- Reale Beispiele/Referenzen unter `resources/profile_development/`, Annotationen und Manifeste nie als Modellkontext verwenden. Das Codebook bleibt generisch.
-- Alle drei Profilentwicklungsfälle samt Varianten bleiben Entwicklung, nicht Holdout. Neue Beispiele sind KI-gestützte Entwürfe; keine unabhängige menschliche Referenz, Annotationzeit oder Übereinstimmung gemessen.
-- D mit Überarbeitung, Extraktionsbaselines, Ablation, Pilot-/Hauptstudienauswertung fehlen weiterhin. Fünf Profilquellen gezielt geprüft; vollständige Literatur-/Neuheitsabgrenzung offen.
-
-## Historisches Archiv erhalten
-
-Sechs Originaldateien in `data/runs/VUL4J-18-review-001/` und
-`data/annotations/VUL4J-18-review-001/`, zusammen 108.158 Bytes. Alle Hashes aus
-`resources/inherited_artifacts.json` unverändert. SG-Annotation mit 13 Claims und
-Codex-Unterstützung/Vorwissen bleibt genau erhalten. Historischer Run
-`0721c0a0-bba7-48c1-a63c-da196a69d97c` war OpenRouter/Nemotron; keine nachträglich
-kontrollierte Vergleichsstudie mit heutigen Modellen daraus ableiten.
-
-Andere Downloads/Läufe bleiben ignoriert. Zusätzliche alte Decomposition-/PoV-Logs,
-Originalabgabe/Review und damaliges Codebook v0.2 fehlen optional; heutige Dokumente
-sind kein Ersatz für diese historischen Originale.
+Ein Clone reproduziert diese Artefakte über die README-Befehle. Keine vollständigen
+Java-Repositories, Toolchains oder tausende Builddateien nötig. APIs sehen nur die
+Quell-Allowlist oder Reporttexte, niemals Labels, Referenzen oder Annotationen.
+Der annotierte Pilot und ein Forschungsdatenarchiv stehen weiterhin aus.
 
 ## Prüfstand
 
-- **60 Offline-Tests bestanden**, inklusive gemeinsamer Profilfixtures, Unicode/Zitatkonvention, Herkunft, Quellpaarung, Requesttrennung, leerer/ungültiger Ergebnisse und Fehlerpersistenz.
-- Archivierter JSPWiki-Report und reales Codepaket durch beide neuen Routen mit ausdrücklich ersetzten Modellantworten geprüft: vier P-/zwei D-Fixtureclaims, passende Hashes und gesendeter Codekontext. Temporäre Outputs entfernt; kein echter Modelllauf.
-- Vier CLI-Hilfen und Whitespace-Prüfung erfolgreich. Originalarchiv und Fremdquellen unverändert; Links und Funktionskommentare geprüft.
-- Keine neue Java-/PoV-Ausführung und keine P/D-Qualitätsmessung. Tests belegen lokale Implementierungseigenschaften, keine Live-Modellkompatibilität oder wissenschaftlichen Ergebnisse.
+- **106 Offline-Tests bestanden.** Neue Prüfungen für Katalogquellen, ganze
+  Reports, D vor/nach P, Revision, beide Ablationen, Titel-/Satzbaselines,
+  Budgetreservierungen und Fehlerisolation sowie Annotationsexport.
+- Echter Download aller zehn Kontexte erfolgreich; finaler Dry-Run und
+  Annotationsexport erfolgreich, ohne API-Zugriff.
+- Vollständiger Ablauf auf realen Codepaketen mit **82 Aufgaben und 94 synthetischen
+  Antworten** bestanden. Transport ausdrücklich ersetzt, temporäre Outputs
+  entfernt. Keine Live-Kompatibilität oder Qualitätsmessung daraus ableiten.
+- Sechs historische Archivdateien samt Hashes unverändert; alle Quellen und
+  fremden Prompts behalten eigene Lizenzen. Funktionskommentare geprüft.
+- Die geerbten JSPWiki-/Jackson-/YAML-Beispiele und alle Pilotprojekte bleiben
+  vom späteren Holdout ausgeschlossen. Projekt-/Variantenverwandtschaft beachten.
+
+## Menschliche Arbeit und wissenschaftliche Grenzen
+
+Die Code-/Reportreferenzen und Claimurteile folgen dem Annotationsprotokoll.
+Zwei unabhängige menschliche Annotationen für beide Varianten von 15/41 vor
+Adjudikation; weitere Pakete mindestens einfach annotieren, echte aktive Minuten
+und Vorwissen festhalten. Neutralnummern verbergen Labels, aber keine im Code
+sichtbaren Projektmerkmale. Keine KI-Ausgabe als menschliche Wahrheit ausgeben.
+
+Literaturvorbereitung für Schritt 5 ist vorhanden; breitere Neuheitsprüfung,
+Pilotannotation, Hauptstichprobe, statistischer Plan und Abstimmung mit Betreuung
+bleiben offen. Kein Hauptstudienlauf oder Ergebnispaper ohne diese Grundlagen.
+Das historische Archiv unter `data/runs/VUL4J-18-review-001/` und seiner Annotation
+bleibt Entwicklungsarbeit mit Vorwissen; heutige Ressourcen ersetzen keine damals
+fehlenden Rohlogs oder historischen Codebook-Versionen.

@@ -1,0 +1,815 @@
+{
+  "catalog_version": "1",
+  "created": "2026-10-05",
+  "dataset": {
+    "url": "https://raw.githubusercontent.com/tuhh-softsec/Vul4J/376411da11fa705019f731404de1d0679fe73537/dataset/vul4j_dataset.csv",
+    "sha256": "5c272508bfc6dccdc52569667457463dbe4e9d2d32bf4a7e821f4622054f51eb",
+    "revision": "376411da11fa705019f731404de1d0679fe73537"
+  },
+  "cases": [
+    {
+      "case_id": "VUL4J-15",
+      "repo": "apache/cxf",
+      "weakness": "CWE-611",
+      "case_commit": "1aa3bca721700e24cb9289e7622ce63c03d69f86",
+      "fix_commit": "d9e2a6e7260ea12efa5355ffdfbf0b2415bccd14",
+      "upstream_parent_commit": "1cdab6490f3a83599326c3bae51ae76af3b5b8fe",
+      "split": "pilot",
+      "variants": {
+        "vulnerable": {
+          "revision": "1aa3bca721700e24cb9289e7622ce63c03d69f86",
+          "repo": "tuhh-softsec/Vul4J",
+          "files": [
+            {
+              "path": "rt/rs/extensions/providers/src/main/java/org/apache/cxf/jaxrs/provider/atom/AbstractAtomProvider.java",
+              "url": "https://raw.githubusercontent.com/tuhh-softsec/Vul4J/1aa3bca721700e24cb9289e7622ce63c03d69f86/rt/rs/extensions/providers/src/main/java/org/apache/cxf/jaxrs/provider/atom/AbstractAtomProvider.java",
+              "sha256": "9a2c18ce1d7066cdcf7c8f159b1f96de58927b9cd05759fc9c680d503ff3fb21",
+              "bytes": 3900,
+              "lines": 106
+            },
+            {
+              "path": "rt/rs/extensions/providers/src/main/java/org/apache/cxf/jaxrs/provider/atom/AtomPojoProvider.java",
+              "url": "https://raw.githubusercontent.com/tuhh-softsec/Vul4J/1aa3bca721700e24cb9289e7622ce63c03d69f86/rt/rs/extensions/providers/src/main/java/org/apache/cxf/jaxrs/provider/atom/AtomPojoProvider.java",
+              "sha256": "4eee160a056141bfc4483ec95c8e8617eac7812f64c1fc9a343195b76b677f57",
+              "bytes": 26031,
+              "lines": 684
+            },
+            {
+              "path": "rt/rs/extensions/providers/src/main/java/org/apache/cxf/jaxrs/provider/atom/AtomEntryProvider.java",
+              "url": "https://raw.githubusercontent.com/tuhh-softsec/Vul4J/1aa3bca721700e24cb9289e7622ce63c03d69f86/rt/rs/extensions/providers/src/main/java/org/apache/cxf/jaxrs/provider/atom/AtomEntryProvider.java",
+              "sha256": "d9edd6d2880cf6154989ef587cf6800a1df3f6ab6a0b1e5a4c98fe367a6ba5fe",
+              "bytes": 1672,
+              "lines": 45
+            },
+            {
+              "path": "rt/rs/extensions/providers/src/main/java/org/apache/cxf/jaxrs/provider/atom/AtomFeedProvider.java",
+              "url": "https://raw.githubusercontent.com/tuhh-softsec/Vul4J/1aa3bca721700e24cb9289e7622ce63c03d69f86/rt/rs/extensions/providers/src/main/java/org/apache/cxf/jaxrs/provider/atom/AtomFeedProvider.java",
+              "sha256": "82ec4c23bd64c19a10559a27d53d847ce3a5452fd3d5396aa659bc831f36473b",
+              "bytes": 1655,
+              "lines": 43
+            }
+          ],
+          "bytes": 33258
+        },
+        "fixed": {
+          "revision": "d9e2a6e7260ea12efa5355ffdfbf0b2415bccd14",
+          "repo": "apache/cxf",
+          "files": [
+            {
+              "path": "rt/rs/extensions/providers/src/main/java/org/apache/cxf/jaxrs/provider/atom/AbstractAtomProvider.java",
+              "url": "https://raw.githubusercontent.com/apache/cxf/d9e2a6e7260ea12efa5355ffdfbf0b2415bccd14/rt/rs/extensions/providers/src/main/java/org/apache/cxf/jaxrs/provider/atom/AbstractAtomProvider.java",
+              "sha256": "b9e9835addefb7fe7c90f686a22f7978a21680454a091ef6e260684b557d7622",
+              "bytes": 4007,
+              "lines": 108
+            },
+            {
+              "path": "rt/rs/extensions/providers/src/main/java/org/apache/cxf/jaxrs/provider/atom/AtomPojoProvider.java",
+              "url": "https://raw.githubusercontent.com/apache/cxf/d9e2a6e7260ea12efa5355ffdfbf0b2415bccd14/rt/rs/extensions/providers/src/main/java/org/apache/cxf/jaxrs/provider/atom/AtomPojoProvider.java",
+              "sha256": "4eee160a056141bfc4483ec95c8e8617eac7812f64c1fc9a343195b76b677f57",
+              "bytes": 26031,
+              "lines": 684
+            },
+            {
+              "path": "rt/rs/extensions/providers/src/main/java/org/apache/cxf/jaxrs/provider/atom/AtomEntryProvider.java",
+              "url": "https://raw.githubusercontent.com/apache/cxf/d9e2a6e7260ea12efa5355ffdfbf0b2415bccd14/rt/rs/extensions/providers/src/main/java/org/apache/cxf/jaxrs/provider/atom/AtomEntryProvider.java",
+              "sha256": "d9edd6d2880cf6154989ef587cf6800a1df3f6ab6a0b1e5a4c98fe367a6ba5fe",
+              "bytes": 1672,
+              "lines": 45
+            },
+            {
+              "path": "rt/rs/extensions/providers/src/main/java/org/apache/cxf/jaxrs/provider/atom/AtomFeedProvider.java",
+              "url": "https://raw.githubusercontent.com/apache/cxf/d9e2a6e7260ea12efa5355ffdfbf0b2415bccd14/rt/rs/extensions/providers/src/main/java/org/apache/cxf/jaxrs/provider/atom/AtomFeedProvider.java",
+              "sha256": "82ec4c23bd64c19a10559a27d53d847ce3a5452fd3d5396aa659bc831f36473b",
+              "bytes": 1655,
+              "lines": 43
+            }
+          ],
+          "bytes": 33365
+        }
+      },
+      "references": [
+        {
+          "path": "licenses/LICENSE-2.0.txt",
+          "url": "https://raw.githubusercontent.com/apache/commons-configuration/342f3b3be52bbbb188ad2fe81bb19ad688012123/LICENSE.txt",
+          "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+          "bytes": 11358,
+          "purpose": "license",
+          "note": "Shared unmodified Apache-2.0 license text; CXF Java headers establish source license."
+        },
+        {
+          "path": "licenses/LICENSE.vm",
+          "url": "https://raw.githubusercontent.com/apache/cxf/d9e2a6e7260ea12efa5355ffdfbf0b2415bccd14/distribution/src/main/appended-resources/META-INF/LICENSE.vm",
+          "sha256": "66468c658bc0934a9f5407b2f7ea8f09f4a2137675ea1228afc62821768234bb",
+          "bytes": 1426,
+          "purpose": "license",
+          "note": "Upstream distribution license template, not a rendered license."
+        },
+        {
+          "path": "licenses/NOTICE",
+          "url": "https://raw.githubusercontent.com/apache/cxf/d9e2a6e7260ea12efa5355ffdfbf0b2415bccd14/distribution/src/main/appended-resources/META-INF/NOTICE",
+          "sha256": "68a51708a6707ba6be2c6c6973b68d908be60c6d5771d250e2175c415b75f5a0",
+          "bytes": 2823,
+          "purpose": "license",
+          "note": "Upstream appended notice; dependencies are not bundled in the input."
+        },
+        {
+          "path": "pov/rt/rs/extensions/providers/src/test/java/org/apache/cxf/jaxrs/provider/atom/AtomPojoProviderTest.java",
+          "url": "https://raw.githubusercontent.com/tuhh-softsec/Vul4J/1aa3bca721700e24cb9289e7622ce63c03d69f86/rt/rs/extensions/providers/src/test/java/org/apache/cxf/jaxrs/provider/atom/AtomPojoProviderTest.java",
+          "sha256": "257b8f8bcc2f11a4563aeddd883503a49c1dbb41371a53c67d22afda34c4a313",
+          "bytes": 15449,
+          "purpose": "public_benchmark_test_not_run"
+        }
+      ],
+      "dataset_row": {
+        "no": "15",
+        "vul_id": "VUL4J-15",
+        "cve_id": "CVE-2016-8739",
+        "cwe_id": "CWE-611",
+        "cwe_name": "Improper Restriction of XML External Entity Reference",
+        "owasp_id": "A4",
+        "repo_slug": "apache/cxf",
+        "human_patch": "https://github.com/apache/cxf/commit/d9e2a6e7",
+        "build_system": "Maven",
+        "compliance_level": "8",
+        "failing_tests": "org.apache.cxf.jaxrs.provider.atom.AtomPojoProviderTest#testReadEntryNoBuilders2,org.apache.cxf.jaxrs.provider.atom.AtomPojoProviderTest#testReadFeedWithoutBuilders2",
+        "compile_cmd": "mvn -pl rt/rs/extensions/providers -am -DskipTests clean install",
+        "test_all_cmd": "mvn test -pl rt/rs/extensions/providers",
+        "test_cmd": "mvn -pl rt/rs/extensions/providers -Dtest=org.apache.cxf.jaxrs.provider.atom.AtomPojoProviderTest test",
+        "cmd_options": "-Dhttps.protocols=TLSv1.2 -Denforcer.skip=true -Dcheckstyle.skip=true -Dcobertura.skip=true -DskipITs=true -Drat.skip=true -Dlicense.skip=true -Dpmd.skip=true -Dfindbugs.skip=true -Dgpg.skip=true -Dskip.npm=true -Dskip.gulp=true -Dskip.bower=true -Danimal.sniffer.skip=true -V -B",
+        "failing_module": "rt/rs/extensions/providers",
+        "src": "src/main/java",
+        "test": "src/test/java",
+        "src_classes": "target/classes",
+        "test_classes": "target/test-classes",
+        "warning": ""
+      },
+      "source_comparison": [
+        {
+          "path": "rt/rs/extensions/providers/src/main/java/org/apache/cxf/jaxrs/provider/atom/AbstractAtomProvider.java",
+          "upstream_parent_url": "https://raw.githubusercontent.com/apache/cxf/1cdab6490f3a83599326c3bae51ae76af3b5b8fe/rt/rs/extensions/providers/src/main/java/org/apache/cxf/jaxrs/provider/atom/AbstractAtomProvider.java",
+          "upstream_parent_sha256": "9a2c18ce1d7066cdcf7c8f159b1f96de58927b9cd05759fc9c680d503ff3fb21",
+          "vul4j_matches_upstream_parent": true
+        },
+        {
+          "path": "rt/rs/extensions/providers/src/main/java/org/apache/cxf/jaxrs/provider/atom/AtomPojoProvider.java",
+          "upstream_parent_url": "https://raw.githubusercontent.com/apache/cxf/1cdab6490f3a83599326c3bae51ae76af3b5b8fe/rt/rs/extensions/providers/src/main/java/org/apache/cxf/jaxrs/provider/atom/AtomPojoProvider.java",
+          "upstream_parent_sha256": "4eee160a056141bfc4483ec95c8e8617eac7812f64c1fc9a343195b76b677f57",
+          "vul4j_matches_upstream_parent": true
+        },
+        {
+          "path": "rt/rs/extensions/providers/src/main/java/org/apache/cxf/jaxrs/provider/atom/AtomEntryProvider.java",
+          "upstream_parent_url": "https://raw.githubusercontent.com/apache/cxf/1cdab6490f3a83599326c3bae51ae76af3b5b8fe/rt/rs/extensions/providers/src/main/java/org/apache/cxf/jaxrs/provider/atom/AtomEntryProvider.java",
+          "upstream_parent_sha256": "d9edd6d2880cf6154989ef587cf6800a1df3f6ab6a0b1e5a4c98fe367a6ba5fe",
+          "vul4j_matches_upstream_parent": true
+        },
+        {
+          "path": "rt/rs/extensions/providers/src/main/java/org/apache/cxf/jaxrs/provider/atom/AtomFeedProvider.java",
+          "upstream_parent_url": "https://raw.githubusercontent.com/apache/cxf/1cdab6490f3a83599326c3bae51ae76af3b5b8fe/rt/rs/extensions/providers/src/main/java/org/apache/cxf/jaxrs/provider/atom/AtomFeedProvider.java",
+          "upstream_parent_sha256": "82ec4c23bd64c19a10559a27d53d847ce3a5452fd3d5396aa659bc831f36473b",
+          "vul4j_matches_upstream_parent": true
+        }
+      ],
+      "upstream_repo": "apache/cxf",
+      "weakness_name": "Improper Restriction of XML External Entity Reference",
+      "selection_reason": "XXE: full Atom provider input path and inherited provider implementation expose parser options and the stream-to-reader change; contrasts a protective-looking option with incomplete provider evidence.",
+      "context_limits": "Abdera parser internals, CXF StaxUtils implementation, dependencies and deployed JAX-RS endpoints are absent. The fixed route calls a helper whose effectiveness cannot be proven from this bundle alone. Application input control, authentication, runtime provider, network and file permissions are unknown.",
+      "reproduction_status": "not_run",
+      "selection_status": "curated_full_file_contexts_not_executed",
+      "project_aliases": [
+        "apache/cxf"
+      ],
+      "pair_check": {
+        "identical_pathset": true,
+        "changed_context_paths": [
+          "rt/rs/extensions/providers/src/main/java/org/apache/cxf/jaxrs/provider/atom/AbstractAtomProvider.java"
+        ],
+        "changes_confined_to_upstream_fix_files": true,
+        "additional_differences": []
+      },
+      "public_build_metadata": {
+        "build_system": "Maven",
+        "compliance_level": "8",
+        "compile_cmd": "mvn -pl rt/rs/extensions/providers -am -DskipTests clean install",
+        "test_all_cmd": "mvn test -pl rt/rs/extensions/providers",
+        "test_cmd": "mvn -pl rt/rs/extensions/providers -Dtest=org.apache.cxf.jaxrs.provider.atom.AtomPojoProviderTest test",
+        "cmd_options": "-Dhttps.protocols=TLSv1.2 -Denforcer.skip=true -Dcheckstyle.skip=true -Dcobertura.skip=true -DskipITs=true -Drat.skip=true -Dlicense.skip=true -Dpmd.skip=true -Dfindbugs.skip=true -Dgpg.skip=true -Dskip.npm=true -Dskip.gulp=true -Dskip.bower=true -Danimal.sniffer.skip=true -V -B",
+        "failing_tests": "org.apache.cxf.jaxrs.provider.atom.AtomPojoProviderTest#testReadEntryNoBuilders2,org.apache.cxf.jaxrs.provider.atom.AtomPojoProviderTest#testReadFeedWithoutBuilders2",
+        "failing_module": "rt/rs/extensions/providers"
+      },
+      "upstream_patch": {
+        "url": "https://github.com/apache/cxf/commit/d9e2a6e7260ea12efa5355ffdfbf0b2415bccd14.patch",
+        "sha256": "9f694fc8ca64dc9453cc6912790faa3863b3bf381ee0f6ef20ec7845ae3b0107",
+        "bytes": 5200,
+        "purpose": "selection_and_external_reference_only"
+      },
+      "source_license": "Apache-2.0"
+    },
+    {
+      "case_id": "VUL4J-64",
+      "repo": "OpenRefine/OpenRefine",
+      "weakness": "CWE-611",
+      "case_commit": "ac6ec402181ae63f65f7323a80a964ceb3bf4307",
+      "fix_commit": "6a0d7d56e4ffb420316ce7849fde881344fbf881",
+      "upstream_parent_commit": "ddd9bf9aa80a43c68bf6d8fb4dc9d0b8bb29dcd5",
+      "split": "pilot",
+      "variants": {
+        "vulnerable": {
+          "revision": "ac6ec402181ae63f65f7323a80a964ceb3bf4307",
+          "repo": "tuhh-softsec/Vul4J",
+          "files": [
+            {
+              "path": "main/src/com/google/refine/importers/XmlImporter.java",
+              "url": "https://raw.githubusercontent.com/tuhh-softsec/Vul4J/ac6ec402181ae63f65f7323a80a964ceb3bf4307/main/src/com/google/refine/importers/XmlImporter.java",
+              "sha256": "4472b1b9904c9ed8c550dbb8ce9c3268d3bc3fe192467bf8d18244d29a62d3ee",
+              "bytes": 13655,
+              "lines": 344
+            }
+          ],
+          "bytes": 13655
+        },
+        "fixed": {
+          "revision": "6a0d7d56e4ffb420316ce7849fde881344fbf881",
+          "repo": "OpenRefine/OpenRefine",
+          "files": [
+            {
+              "path": "main/src/com/google/refine/importers/XmlImporter.java",
+              "url": "https://raw.githubusercontent.com/OpenRefine/OpenRefine/6a0d7d56e4ffb420316ce7849fde881344fbf881/main/src/com/google/refine/importers/XmlImporter.java",
+              "sha256": "41f70b7d9ee59eb2011a6e7a3e639eb3b12a3f74367549272f991384729ad2d2",
+              "bytes": 13727,
+              "lines": 345
+            }
+          ],
+          "bytes": 13727
+        }
+      },
+      "references": [
+        {
+          "path": "licenses/LICENSE.txt",
+          "url": "https://raw.githubusercontent.com/OpenRefine/OpenRefine/6a0d7d56e4ffb420316ce7849fde881344fbf881/LICENSE.txt",
+          "sha256": "36c14ab764eb7f17fec8a6d33cd2b9ecf88a41afb0e653704039db549f2401bb",
+          "bytes": 1478,
+          "purpose": "license",
+          "note": "Project license."
+        },
+        {
+          "path": "pov/main/tests/server/src/com/google/refine/tests/importers/XmlImporterTests.java",
+          "url": "https://raw.githubusercontent.com/tuhh-softsec/Vul4J/ac6ec402181ae63f65f7323a80a964ceb3bf4307/main/tests/server/src/com/google/refine/tests/importers/XmlImporterTests.java",
+          "sha256": "7ca202a4c666905cacc469ba060dcd14b86742f11a8bf6fbfacca2acdcbd0f24",
+          "bytes": 13114,
+          "purpose": "public_benchmark_test_not_run"
+        }
+      ],
+      "dataset_row": {
+        "no": "64",
+        "vul_id": "VUL4J-64",
+        "cve_id": "CVE-2018-20157",
+        "cwe_id": "CWE-611",
+        "cwe_name": "Improper Restriction of XML External Entity Reference",
+        "owasp_id": "A4",
+        "repo_slug": "OpenRefine/OpenRefine",
+        "human_patch": "https://github.com/OpenRefine/OpenRefine/commit/6a0d7d56e4ffb420316ce7849fde881344fbf881",
+        "build_system": "Maven",
+        "compliance_level": "8",
+        "failing_tests": "com.google.refine.tests.importers.XmlImporterTests#ignoresDtds",
+        "compile_cmd": "./refine build",
+        "test_all_cmd": "mvn test -pl main",
+        "test_cmd": "mvn test -pl main -Dtest=com.google.refine.tests.importers.XmlImporterTests#ignoresDtds",
+        "cmd_options": "-Dhttps.protocols=TLSv1.2 -Denforcer.skip=true -Dcheckstyle.skip=true -Dcobertura.skip=true -DskipITs=true -Drat.skip=true -Dlicense.skip=true -Dpmd.skip=true -Dfindbugs.skip=true -Dgpg.skip=true -Dskip.npm=true -Dskip.gulp=true -Dskip.bower=true -Danimal.sniffer.skip=true -V -B",
+        "failing_module": "main",
+        "src": "src",
+        "test": "tests/server/src",
+        "src_classes": "webapp/WEB-INF/classes",
+        "test_classes": "target/test-classes",
+        "warning": ""
+      },
+      "source_comparison": [
+        {
+          "path": "main/src/com/google/refine/importers/XmlImporter.java",
+          "upstream_parent_url": "https://raw.githubusercontent.com/OpenRefine/OpenRefine/ddd9bf9aa80a43c68bf6d8fb4dc9d0b8bb29dcd5/main/src/com/google/refine/importers/XmlImporter.java",
+          "upstream_parent_sha256": "9e2bbfed117f68ff425992c589f72433eeb94bc6196fafc9f18fe6a2b0399696",
+          "vul4j_matches_upstream_parent": false,
+          "difference": "Trailing whitespace only",
+          "lines": [
+            324
+          ]
+        }
+      ],
+      "upstream_repo": "OpenRefine/OpenRefine",
+      "weakness_name": "Improper Restriction of XML External Entity Reference",
+      "selection_reason": "XXE: a single complete XML importer exposes XMLInputFactory configuration, wrapper, and parse flow; a compact paired configuration change.",
+      "context_limits": "XMLInputFactory provider implementation, its effective defaults, wider importer framework and deployment are absent. Local configuration and stream flow are visible; arbitrary file/network access or unauthenticated reachability require additional evidence.",
+      "reproduction_status": "not_run",
+      "selection_status": "curated_full_file_contexts_not_executed",
+      "project_aliases": [
+        "OpenRefine/OpenRefine"
+      ],
+      "pair_check": {
+        "identical_pathset": true,
+        "changed_context_paths": [
+          "main/src/com/google/refine/importers/XmlImporter.java"
+        ],
+        "changes_confined_to_upstream_fix_files": true,
+        "additional_differences": [
+          "Vul4J snapshot versus upstream parent: trailing whitespace only at main/src/com/google/refine/importers/XmlImporter.java line(s) [324]; preserved unchanged."
+        ]
+      },
+      "public_build_metadata": {
+        "build_system": "Maven",
+        "compliance_level": "8",
+        "compile_cmd": "./refine build",
+        "test_all_cmd": "mvn test -pl main",
+        "test_cmd": "mvn test -pl main -Dtest=com.google.refine.tests.importers.XmlImporterTests#ignoresDtds",
+        "cmd_options": "-Dhttps.protocols=TLSv1.2 -Denforcer.skip=true -Dcheckstyle.skip=true -Dcobertura.skip=true -DskipITs=true -Drat.skip=true -Dlicense.skip=true -Dpmd.skip=true -Dfindbugs.skip=true -Dgpg.skip=true -Dskip.npm=true -Dskip.gulp=true -Dskip.bower=true -Danimal.sniffer.skip=true -V -B",
+        "failing_tests": "com.google.refine.tests.importers.XmlImporterTests#ignoresDtds",
+        "failing_module": "main"
+      },
+      "upstream_patch": {
+        "url": "https://github.com/OpenRefine/OpenRefine/commit/6a0d7d56e4ffb420316ce7849fde881344fbf881.patch",
+        "sha256": "8640a24a6249e53a581c18c25f5a5fdd61b6057f10cbdd12177d0e46ab813916",
+        "bytes": 2955,
+        "purpose": "selection_and_external_reference_only"
+      },
+      "source_license": "BSD-3-Clause"
+    },
+    {
+      "case_id": "VUL4J-41",
+      "repo": "codehaus-plexus/plexus-archiver",
+      "weakness": "CWE-22",
+      "case_commit": "871cdfdee32d65c02129da053684cfba3666d826",
+      "fix_commit": "58bc24e465c0842981692adbf6d75680298989de",
+      "upstream_parent_commit": "97c0d97504632a2a80b7d847bccdd9b37d27aea1",
+      "split": "pilot",
+      "variants": {
+        "vulnerable": {
+          "revision": "871cdfdee32d65c02129da053684cfba3666d826",
+          "repo": "tuhh-softsec/Vul4J",
+          "files": [
+            {
+              "path": "src/main/java/org/codehaus/plexus/archiver/AbstractUnArchiver.java",
+              "url": "https://raw.githubusercontent.com/tuhh-softsec/Vul4J/871cdfdee32d65c02129da053684cfba3666d826/src/main/java/org/codehaus/plexus/archiver/AbstractUnArchiver.java",
+              "sha256": "396317b351b167947d3d394999ac06fb5e7cd1a17da3fe968a7e2e9740974315",
+              "bytes": 9221,
+              "lines": 363
+            },
+            {
+              "path": "src/main/java/org/codehaus/plexus/archiver/zip/ZipUnArchiver.java",
+              "url": "https://raw.githubusercontent.com/tuhh-softsec/Vul4J/871cdfdee32d65c02129da053684cfba3666d826/src/main/java/org/codehaus/plexus/archiver/zip/ZipUnArchiver.java",
+              "sha256": "fcfffdd3ef65f10c38fdd05eb1eecad14c5284b1e1053b87cbc375ed368a3bc5",
+              "bytes": 950,
+              "lines": 37
+            },
+            {
+              "path": "src/main/java/org/codehaus/plexus/archiver/zip/AbstractZipUnArchiver.java",
+              "url": "https://raw.githubusercontent.com/tuhh-softsec/Vul4J/871cdfdee32d65c02129da053684cfba3666d826/src/main/java/org/codehaus/plexus/archiver/zip/AbstractZipUnArchiver.java",
+              "sha256": "297116b24421eefe13b910750d9afbc026cd30424df965681ec09f5b1ad49338",
+              "bytes": 8514,
+              "lines": 274
+            }
+          ],
+          "bytes": 18685
+        },
+        "fixed": {
+          "revision": "58bc24e465c0842981692adbf6d75680298989de",
+          "repo": "codehaus-plexus/plexus-archiver",
+          "files": [
+            {
+              "path": "src/main/java/org/codehaus/plexus/archiver/AbstractUnArchiver.java",
+              "url": "https://raw.githubusercontent.com/codehaus-plexus/plexus-archiver/58bc24e465c0842981692adbf6d75680298989de/src/main/java/org/codehaus/plexus/archiver/AbstractUnArchiver.java",
+              "sha256": "63b23b01e908b5c50fd5ba6ca20a86182947eed6fdcd342322d6612064949a7e",
+              "bytes": 9637,
+              "lines": 372
+            },
+            {
+              "path": "src/main/java/org/codehaus/plexus/archiver/zip/ZipUnArchiver.java",
+              "url": "https://raw.githubusercontent.com/codehaus-plexus/plexus-archiver/58bc24e465c0842981692adbf6d75680298989de/src/main/java/org/codehaus/plexus/archiver/zip/ZipUnArchiver.java",
+              "sha256": "fcfffdd3ef65f10c38fdd05eb1eecad14c5284b1e1053b87cbc375ed368a3bc5",
+              "bytes": 950,
+              "lines": 37
+            },
+            {
+              "path": "src/main/java/org/codehaus/plexus/archiver/zip/AbstractZipUnArchiver.java",
+              "url": "https://raw.githubusercontent.com/codehaus-plexus/plexus-archiver/58bc24e465c0842981692adbf6d75680298989de/src/main/java/org/codehaus/plexus/archiver/zip/AbstractZipUnArchiver.java",
+              "sha256": "297116b24421eefe13b910750d9afbc026cd30424df965681ec09f5b1ad49338",
+              "bytes": 8514,
+              "lines": 274
+            }
+          ],
+          "bytes": 19101
+        }
+      },
+      "references": [
+        {
+          "path": "licenses/LICENSE",
+          "url": "https://raw.githubusercontent.com/codehaus-plexus/plexus-archiver/58bc24e465c0842981692adbf6d75680298989de/LICENSE",
+          "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+          "bytes": 11358,
+          "purpose": "license",
+          "note": "Project license."
+        },
+        {
+          "path": "pov/src/test/java/org/codehaus/plexus/archiver/zip/ZipUnArchiverTest.java",
+          "url": "https://raw.githubusercontent.com/tuhh-softsec/Vul4J/871cdfdee32d65c02129da053684cfba3666d826/src/test/java/org/codehaus/plexus/archiver/zip/ZipUnArchiverTest.java",
+          "sha256": "34525c5badc28ebf2d7e88ab00c067bfad839557f926bb066c6dc1cca2b25e19",
+          "bytes": 7265,
+          "purpose": "public_benchmark_test_not_run"
+        },
+        {
+          "path": "pov/src/test/zips/zip-slip.zip",
+          "url": "https://raw.githubusercontent.com/tuhh-softsec/Vul4J/871cdfdee32d65c02129da053684cfba3666d826/src/test/zips/zip-slip.zip",
+          "sha256": "d40ad46a9b249e3eab803090ec2a51d46405a0afcbfe2a0f1ada7ac3a810f7f9",
+          "bytes": 545,
+          "purpose": "public_benchmark_test_not_run"
+        }
+      ],
+      "dataset_row": {
+        "no": "41",
+        "vul_id": "VUL4J-41",
+        "cve_id": "CVE-2018-1002200",
+        "cwe_id": "CWE-22",
+        "cwe_name": "Improper Limitation of a Pathname to a Restricted Directory ('Path Traversal')",
+        "owasp_id": "A5",
+        "repo_slug": "codehaus-plexus/plexus-archiver",
+        "human_patch": "https://github.com/codehaus-plexus/plexus-archiver/commit/58bc24e465c0842981692adbf6d75680298989de",
+        "build_system": "Maven",
+        "compliance_level": "8",
+        "failing_tests": "org.codehaus.plexus.archiver.zip.ZipUnArchiverTest#testExtractingZipWithEntryOutsideDestDirThrowsException",
+        "compile_cmd": "mvn -DskipTests clean install",
+        "test_all_cmd": "mvn test",
+        "test_cmd": "mvn test -Dtest=org.codehaus.plexus.archiver.zip.ZipUnArchiverTest#testExtractingZipWithEntryOutsideDestDirThrowsException",
+        "cmd_options": "-Dhttps.protocols=TLSv1.2 -Denforcer.skip=true -Dcheckstyle.skip=true -Dcobertura.skip=true -DskipITs=true -Drat.skip=true -Dlicense.skip=true -Dpmd.skip=true -Dfindbugs.skip=true -Dgpg.skip=true -Dskip.npm=true -Dskip.gulp=true -Dskip.bower=true -Danimal.sniffer.skip=true -V -B",
+        "failing_module": "root",
+        "src": "src/main/java",
+        "test": "src/test/java",
+        "src_classes": "target/classes",
+        "test_classes": "target/test-classes",
+        "warning": ""
+      },
+      "source_comparison": [
+        {
+          "path": "src/main/java/org/codehaus/plexus/archiver/AbstractUnArchiver.java",
+          "upstream_parent_url": "https://raw.githubusercontent.com/codehaus-plexus/plexus-archiver/97c0d97504632a2a80b7d847bccdd9b37d27aea1/src/main/java/org/codehaus/plexus/archiver/AbstractUnArchiver.java",
+          "upstream_parent_sha256": "396317b351b167947d3d394999ac06fb5e7cd1a17da3fe968a7e2e9740974315",
+          "vul4j_matches_upstream_parent": true
+        },
+        {
+          "path": "src/main/java/org/codehaus/plexus/archiver/zip/ZipUnArchiver.java",
+          "upstream_parent_url": "https://raw.githubusercontent.com/codehaus-plexus/plexus-archiver/97c0d97504632a2a80b7d847bccdd9b37d27aea1/src/main/java/org/codehaus/plexus/archiver/zip/ZipUnArchiver.java",
+          "upstream_parent_sha256": "fcfffdd3ef65f10c38fdd05eb1eecad14c5284b1e1053b87cbc375ed368a3bc5",
+          "vul4j_matches_upstream_parent": true
+        },
+        {
+          "path": "src/main/java/org/codehaus/plexus/archiver/zip/AbstractZipUnArchiver.java",
+          "upstream_parent_url": "https://raw.githubusercontent.com/codehaus-plexus/plexus-archiver/97c0d97504632a2a80b7d847bccdd9b37d27aea1/src/main/java/org/codehaus/plexus/archiver/zip/AbstractZipUnArchiver.java",
+          "upstream_parent_sha256": "297116b24421eefe13b910750d9afbc026cd30424df965681ec09f5b1ad49338",
+          "vul4j_matches_upstream_parent": true
+        }
+      ],
+      "upstream_repo": "codehaus-plexus/plexus-archiver",
+      "weakness_name": "Improper Limitation of a Pathname to a Restricted Directory ('Path Traversal')",
+      "selection_reason": "Path traversal: full zip extraction classes expose entry names, destination resolution, file writes, and fixed canonical-prefix check; checks remain scoped to their exact semantics.",
+      "context_limits": "External Plexus FileUtils and archive/dependency implementations, deployment and attacker control of input archives are absent. The fixed string-prefix containment check is not a blanket safety label; path-component boundaries, symlinks, destination form and platform behavior need separate analysis.",
+      "reproduction_status": "not_run",
+      "selection_status": "curated_full_file_contexts_not_executed",
+      "project_aliases": [
+        "codehaus-plexus/plexus-archiver"
+      ],
+      "pair_check": {
+        "identical_pathset": true,
+        "changed_context_paths": [
+          "src/main/java/org/codehaus/plexus/archiver/AbstractUnArchiver.java"
+        ],
+        "changes_confined_to_upstream_fix_files": true,
+        "additional_differences": []
+      },
+      "public_build_metadata": {
+        "build_system": "Maven",
+        "compliance_level": "8",
+        "compile_cmd": "mvn -DskipTests clean install",
+        "test_all_cmd": "mvn test",
+        "test_cmd": "mvn test -Dtest=org.codehaus.plexus.archiver.zip.ZipUnArchiverTest#testExtractingZipWithEntryOutsideDestDirThrowsException",
+        "cmd_options": "-Dhttps.protocols=TLSv1.2 -Denforcer.skip=true -Dcheckstyle.skip=true -Dcobertura.skip=true -DskipITs=true -Drat.skip=true -Dlicense.skip=true -Dpmd.skip=true -Dfindbugs.skip=true -Dgpg.skip=true -Dskip.npm=true -Dskip.gulp=true -Dskip.bower=true -Danimal.sniffer.skip=true -V -B",
+        "failing_tests": "org.codehaus.plexus.archiver.zip.ZipUnArchiverTest#testExtractingZipWithEntryOutsideDestDirThrowsException",
+        "failing_module": "root"
+      },
+      "upstream_patch": {
+        "url": "https://github.com/codehaus-plexus/plexus-archiver/commit/58bc24e465c0842981692adbf6d75680298989de.patch",
+        "sha256": "dd9c38a202d8e5f89e4a407e328eda10dab56669c08e3e2a583224c2e40264b6",
+        "bytes": 3542,
+        "purpose": "selection_and_external_reference_only"
+      },
+      "source_license": "Apache-2.0"
+    },
+    {
+      "case_id": "VUL4J-43",
+      "repo": "eclipse/rdf4j",
+      "weakness": "CWE-22",
+      "case_commit": "46515cb07c6a3c0587a012ff52c24d5111e15662",
+      "fix_commit": "df15a4d7a8f2789c043b27c9eafe1b30316cfa79",
+      "upstream_parent_commit": "f63510ba14910fee4a5489f584fd2fd2da5b42e5",
+      "split": "pilot",
+      "variants": {
+        "vulnerable": {
+          "revision": "46515cb07c6a3c0587a012ff52c24d5111e15662",
+          "repo": "tuhh-softsec/Vul4J",
+          "files": [
+            {
+              "path": "util/src/main/java/org/eclipse/rdf4j/common/io/ZipUtil.java",
+              "url": "https://raw.githubusercontent.com/tuhh-softsec/Vul4J/46515cb07c6a3c0587a012ff52c24d5111e15662/util/src/main/java/org/eclipse/rdf4j/common/io/ZipUtil.java",
+              "sha256": "c35bf0f1581204d9f5d6f757a96e2c58b907c31a4862b2a926004152b033b336",
+              "bytes": 2856,
+              "lines": 106
+            },
+            {
+              "path": "util/src/main/java/org/eclipse/rdf4j/common/io/IOUtil.java",
+              "url": "https://raw.githubusercontent.com/tuhh-softsec/Vul4J/46515cb07c6a3c0587a012ff52c24d5111e15662/util/src/main/java/org/eclipse/rdf4j/common/io/IOUtil.java",
+              "sha256": "c986c66d63b6037f6a4176bbcaa98e2181e57d17092f87e062b8a201d37a2ea3",
+              "bytes": 15662,
+              "lines": 589
+            }
+          ],
+          "bytes": 18518
+        },
+        "fixed": {
+          "revision": "df15a4d7a8f2789c043b27c9eafe1b30316cfa79",
+          "repo": "eclipse-rdf4j/rdf4j",
+          "files": [
+            {
+              "path": "util/src/main/java/org/eclipse/rdf4j/common/io/ZipUtil.java",
+              "url": "https://raw.githubusercontent.com/eclipse-rdf4j/rdf4j/df15a4d7a8f2789c043b27c9eafe1b30316cfa79/util/src/main/java/org/eclipse/rdf4j/common/io/ZipUtil.java",
+              "sha256": "5c3cd8bc80350d93366777a92d9039ba3efc40fd937651e1e993338de1563417",
+              "bytes": 3226,
+              "lines": 108
+            },
+            {
+              "path": "util/src/main/java/org/eclipse/rdf4j/common/io/IOUtil.java",
+              "url": "https://raw.githubusercontent.com/eclipse-rdf4j/rdf4j/df15a4d7a8f2789c043b27c9eafe1b30316cfa79/util/src/main/java/org/eclipse/rdf4j/common/io/IOUtil.java",
+              "sha256": "c986c66d63b6037f6a4176bbcaa98e2181e57d17092f87e062b8a201d37a2ea3",
+              "bytes": 15662,
+              "lines": 589
+            }
+          ],
+          "bytes": 18888
+        }
+      },
+      "references": [
+        {
+          "path": "licenses/edl-v1.0.txt",
+          "url": "https://raw.githubusercontent.com/eclipse-rdf4j/rdf4j/df15a4d7a8f2789c043b27c9eafe1b30316cfa79/edl-v1.0.txt",
+          "sha256": "ddbc15d6df4f36620507eebb4575f91888d234490f89eca8757e89abacfd3319",
+          "bytes": 1586,
+          "purpose": "license",
+          "note": "Eclipse Distribution License v1.0; source headers use this license."
+        },
+        {
+          "path": "licenses/notice.md",
+          "url": "https://raw.githubusercontent.com/eclipse-rdf4j/rdf4j/df15a4d7a8f2789c043b27c9eafe1b30316cfa79/notice.md",
+          "sha256": "deb9cc12726079079c791b5d5badab19a4856af686327bdb67dd86a69310f363",
+          "bytes": 7881,
+          "purpose": "license",
+          "note": "Project notices."
+        },
+        {
+          "path": "licenses/about.md",
+          "url": "https://raw.githubusercontent.com/eclipse-rdf4j/rdf4j/df15a4d7a8f2789c043b27c9eafe1b30316cfa79/about.md",
+          "sha256": "98d02389bab24160fe5ced1b9a939cc679327ec32a9c8f61c6142425a6011101",
+          "bytes": 3592,
+          "purpose": "license",
+          "note": "Project licensing information."
+        },
+        {
+          "path": "pov/util/src/test/java/org/eclipse/rdf4j/common/io/ZipUtilTest.java",
+          "url": "https://raw.githubusercontent.com/tuhh-softsec/Vul4J/46515cb07c6a3c0587a012ff52c24d5111e15662/util/src/test/java/org/eclipse/rdf4j/common/io/ZipUtilTest.java",
+          "sha256": "8a527a14833a3185600a53b818901109746a0264ec973abe2b9766d88ccc9e19",
+          "bytes": 2145,
+          "purpose": "public_benchmark_test_not_run"
+        }
+      ],
+      "dataset_row": {
+        "no": "43",
+        "vul_id": "VUL4J-43",
+        "cve_id": "CVE-2018-20227",
+        "cwe_id": "CWE-22",
+        "cwe_name": "Improper Limitation of a Pathname to a Restricted Directory ('Path Traversal')",
+        "owasp_id": "A5",
+        "repo_slug": "eclipse/rdf4j",
+        "human_patch": "https://github.com/eclipse/rdf4j/commit/df15a4d7a8f2789c043b27c9eafe1b30316cfa79",
+        "build_system": "Maven",
+        "compliance_level": "8",
+        "failing_tests": "org.eclipse.rdf4j.common.io.ZipUtilTest#testWriteEntryPathTraversing",
+        "compile_cmd": "mvn -DskipTests clean install; mvn -pl util test-compile",
+        "test_all_cmd": "mvn test -pl util",
+        "test_cmd": "mvn test -pl util -Dtest=org.eclipse.rdf4j.common.io.ZipUtilTest#testWriteEntryPathTraversing",
+        "cmd_options": "-Dhttps.protocols=TLSv1.2 -Denforcer.skip=true -Dcheckstyle.skip=true -Dcobertura.skip=true -DskipITs=true -Drat.skip=true -Dlicense.skip=true -Dpmd.skip=true -Dfindbugs.skip=true -Dgpg.skip=true -Dskip.npm=true -Dskip.gulp=true -Dskip.bower=true -Danimal.sniffer.skip=true -V -B",
+        "failing_module": "util",
+        "src": "src/main/java",
+        "test": "src/test/java",
+        "src_classes": "target/classes",
+        "test_classes": "target/test-classes",
+        "warning": ""
+      },
+      "source_comparison": [
+        {
+          "path": "util/src/main/java/org/eclipse/rdf4j/common/io/ZipUtil.java",
+          "upstream_parent_url": "https://raw.githubusercontent.com/eclipse-rdf4j/rdf4j/f63510ba14910fee4a5489f584fd2fd2da5b42e5/util/src/main/java/org/eclipse/rdf4j/common/io/ZipUtil.java",
+          "upstream_parent_sha256": "c35bf0f1581204d9f5d6f757a96e2c58b907c31a4862b2a926004152b033b336",
+          "vul4j_matches_upstream_parent": true
+        },
+        {
+          "path": "util/src/main/java/org/eclipse/rdf4j/common/io/IOUtil.java",
+          "upstream_parent_url": "https://raw.githubusercontent.com/eclipse-rdf4j/rdf4j/f63510ba14910fee4a5489f584fd2fd2da5b42e5/util/src/main/java/org/eclipse/rdf4j/common/io/IOUtil.java",
+          "upstream_parent_sha256": "c986c66d63b6037f6a4176bbcaa98e2181e57d17092f87e062b8a201d37a2ea3",
+          "vul4j_matches_upstream_parent": true
+        }
+      ],
+      "upstream_repo": "eclipse-rdf4j/rdf4j",
+      "weakness_name": "Improper Limitation of a Pathname to a Restricted Directory ('Path Traversal')",
+      "selection_reason": "Path traversal: complete ZipUtil and IOUtil expose zip entry-to-file write flow and fixed Path.startsWith check; similar weakness to Plexus in a different project and implementation.",
+      "context_limits": "ZIP/JDK runtime behavior, external callers, destination setup and attacker control of archives are not provided. Fixed canonical output versus destination Path behavior depends on the exact destination form; the fixed variant is a control for the selected patch, not a safe-program label.",
+      "reproduction_status": "not_run",
+      "selection_status": "curated_full_file_contexts_not_executed",
+      "project_aliases": [
+        "eclipse-rdf4j/rdf4j",
+        "eclipse/rdf4j"
+      ],
+      "pair_check": {
+        "identical_pathset": true,
+        "changed_context_paths": [
+          "util/src/main/java/org/eclipse/rdf4j/common/io/ZipUtil.java"
+        ],
+        "changes_confined_to_upstream_fix_files": true,
+        "additional_differences": []
+      },
+      "public_build_metadata": {
+        "build_system": "Maven",
+        "compliance_level": "8",
+        "compile_cmd": "mvn -DskipTests clean install; mvn -pl util test-compile",
+        "test_all_cmd": "mvn test -pl util",
+        "test_cmd": "mvn test -pl util -Dtest=org.eclipse.rdf4j.common.io.ZipUtilTest#testWriteEntryPathTraversing",
+        "cmd_options": "-Dhttps.protocols=TLSv1.2 -Denforcer.skip=true -Dcheckstyle.skip=true -Dcobertura.skip=true -DskipITs=true -Drat.skip=true -Dlicense.skip=true -Dpmd.skip=true -Dfindbugs.skip=true -Dgpg.skip=true -Dskip.npm=true -Dskip.gulp=true -Dskip.bower=true -Danimal.sniffer.skip=true -V -B",
+        "failing_tests": "org.eclipse.rdf4j.common.io.ZipUtilTest#testWriteEntryPathTraversing",
+        "failing_module": "util"
+      },
+      "upstream_patch": {
+        "url": "https://github.com/eclipse-rdf4j/rdf4j/commit/df15a4d7a8f2789c043b27c9eafe1b30316cfa79.patch",
+        "sha256": "8bee00f853c918a98dd6eeaa0a9a265ab0aa2b35cf563e17abd56a46a97c6ce9",
+        "bytes": 5792,
+        "purpose": "selection_and_external_reference_only"
+      },
+      "source_license": "EDL-1.0"
+    },
+    {
+      "case_id": "VUL4J-76",
+      "repo": "square/retrofit",
+      "weakness": "CWE-22",
+      "case_commit": "1308185f318ba057dd480e318432ba09048d3c2c",
+      "fix_commit": "b9a7f6ad72073ddd40254c0058710e87a073047d",
+      "upstream_parent_commit": "5088b0df6f2c52fcead426dafbb04214225e0cc7",
+      "split": "pilot",
+      "variants": {
+        "vulnerable": {
+          "revision": "1308185f318ba057dd480e318432ba09048d3c2c",
+          "repo": "tuhh-softsec/Vul4J",
+          "files": [
+            {
+              "path": "retrofit/src/main/java/retrofit2/RequestBuilder.java",
+              "url": "https://raw.githubusercontent.com/tuhh-softsec/Vul4J/1308185f318ba057dd480e318432ba09048d3c2c/retrofit/src/main/java/retrofit2/RequestBuilder.java",
+              "sha256": "35ba7d415f8181024bcbd0cf0b230dd3246fa123967858ceb5cef7c2061737a6",
+              "bytes": 8468,
+              "lines": 252
+            },
+            {
+              "path": "retrofit/src/main/java/retrofit2/ParameterHandler.java",
+              "url": "https://raw.githubusercontent.com/tuhh-softsec/Vul4J/1308185f318ba057dd480e318432ba09048d3c2c/retrofit/src/main/java/retrofit2/ParameterHandler.java",
+              "sha256": "d23d60ac3250696ee3b379682a11aa05a0702d8103c040cf6b046403a1951425",
+              "bytes": 12201,
+              "lines": 362
+            }
+          ],
+          "bytes": 20669
+        },
+        "fixed": {
+          "revision": "b9a7f6ad72073ddd40254c0058710e87a073047d",
+          "repo": "lysine-dev/retrofit",
+          "files": [
+            {
+              "path": "retrofit/src/main/java/retrofit2/RequestBuilder.java",
+              "url": "https://raw.githubusercontent.com/lysine-dev/retrofit/b9a7f6ad72073ddd40254c0058710e87a073047d/retrofit/src/main/java/retrofit2/RequestBuilder.java",
+              "sha256": "2c3521e2660ecb6b481d981f6f553586835f00b4e57d90351d8b0f959642ce9a",
+              "bytes": 9629,
+              "lines": 274
+            },
+            {
+              "path": "retrofit/src/main/java/retrofit2/ParameterHandler.java",
+              "url": "https://raw.githubusercontent.com/lysine-dev/retrofit/b9a7f6ad72073ddd40254c0058710e87a073047d/retrofit/src/main/java/retrofit2/ParameterHandler.java",
+              "sha256": "d23d60ac3250696ee3b379682a11aa05a0702d8103c040cf6b046403a1951425",
+              "bytes": 12201,
+              "lines": 362
+            }
+          ],
+          "bytes": 21830
+        }
+      },
+      "references": [
+        {
+          "path": "licenses/LICENSE.txt",
+          "url": "https://raw.githubusercontent.com/lysine-dev/retrofit/b9a7f6ad72073ddd40254c0058710e87a073047d/LICENSE.txt",
+          "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+          "bytes": 11358,
+          "purpose": "license",
+          "note": "Project license."
+        },
+        {
+          "path": "pov/retrofit/src/test/java/retrofit2/RequestFactoryTest.java",
+          "url": "https://raw.githubusercontent.com/tuhh-softsec/Vul4J/1308185f318ba057dd480e318432ba09048d3c2c/retrofit/src/test/java/retrofit2/RequestFactoryTest.java",
+          "sha256": "a9b35e591574113497d67e64b77f5d2f4e513a87ed40a50dc6e6f3d1873b1ae7",
+          "bytes": 90284,
+          "purpose": "public_benchmark_test_not_run"
+        }
+      ],
+      "dataset_row": {
+        "no": "76",
+        "vul_id": "VUL4J-76",
+        "cve_id": "CVE-2018-1000850",
+        "cwe_id": "CWE-22",
+        "cwe_name": "Improper Limitation of a Pathname to a Restricted Directory ('Path Traversal')",
+        "owasp_id": "A5",
+        "repo_slug": "square/retrofit",
+        "human_patch": "https://github.com/square/retrofit/commit/b9a7f6ad72073ddd40254c0058710e87a073047d",
+        "build_system": "Maven",
+        "compliance_level": "8",
+        "failing_tests": "retrofit2.RequestFactoryTest#pathParametersAndPathTraversal,retrofit2.RequestFactoryTest#encodedPathParametersAndPathTraversal,retrofit2.RequestFactoryTest#dotDotsOkayWhenNotFullPathSegment",
+        "compile_cmd": "mvn -DskipTests clean install",
+        "test_all_cmd": "mvn test -pl retrofit",
+        "test_cmd": "mvn test -pl retrofit -Dtest=retrofit2.RequestFactoryTest",
+        "cmd_options": "-Dhttps.protocols=TLSv1.2 -Denforcer.skip=true -Dcheckstyle.skip=true -Dcobertura.skip=true -DskipITs=true -Drat.skip=true -Dlicense.skip=true -Dpmd.skip=true -Dfindbugs.skip=true -Dgpg.skip=true -Dskip.npm=true -Dskip.gulp=true -Dskip.bower=true -Danimal.sniffer.skip=true -V -B",
+        "failing_module": "retrofit",
+        "src": "src/main/java",
+        "test": "src/test/java",
+        "src_classes": "target/classes",
+        "test_classes": "target/test-classes",
+        "warning": ""
+      },
+      "source_comparison": [
+        {
+          "path": "retrofit/src/main/java/retrofit2/RequestBuilder.java",
+          "upstream_parent_url": "https://raw.githubusercontent.com/lysine-dev/retrofit/5088b0df6f2c52fcead426dafbb04214225e0cc7/retrofit/src/main/java/retrofit2/RequestBuilder.java",
+          "upstream_parent_sha256": "35ba7d415f8181024bcbd0cf0b230dd3246fa123967858ceb5cef7c2061737a6",
+          "vul4j_matches_upstream_parent": true
+        },
+        {
+          "path": "retrofit/src/main/java/retrofit2/ParameterHandler.java",
+          "upstream_parent_url": "https://raw.githubusercontent.com/lysine-dev/retrofit/5088b0df6f2c52fcead426dafbb04214225e0cc7/retrofit/src/main/java/retrofit2/ParameterHandler.java",
+          "upstream_parent_sha256": "d23d60ac3250696ee3b379682a11aa05a0702d8103c040cf6b046403a1951425",
+          "vul4j_matches_upstream_parent": true
+        }
+      ],
+      "upstream_repo": "lysine-dev/retrofit",
+      "weakness_name": "Improper Limitation of a Pathname to a Restricted Directory ('Path Traversal')",
+      "selection_reason": "Path traversal: RequestBuilder and ParameterHandler expose path parameter conversion, encoding, URL replacement, and the fixed dot-segment check; client URL construction contrasts with filesystem extraction.",
+      "context_limits": "OkHttp HttpUrl implementation, actual API declarations, converter implementations and remote server authorization are absent. Dot-segment handling and local encoding are visible; remote endpoint effects or an application exploit are not established by the bundle.",
+      "reproduction_status": "not_run",
+      "selection_status": "curated_full_file_contexts_not_executed",
+      "project_aliases": [
+        "lysine-dev/retrofit",
+        "square/retrofit"
+      ],
+      "pair_check": {
+        "identical_pathset": true,
+        "changed_context_paths": [
+          "retrofit/src/main/java/retrofit2/RequestBuilder.java"
+        ],
+        "changes_confined_to_upstream_fix_files": true,
+        "additional_differences": []
+      },
+      "public_build_metadata": {
+        "build_system": "Maven",
+        "compliance_level": "8",
+        "compile_cmd": "mvn -DskipTests clean install",
+        "test_all_cmd": "mvn test -pl retrofit",
+        "test_cmd": "mvn test -pl retrofit -Dtest=retrofit2.RequestFactoryTest",
+        "cmd_options": "-Dhttps.protocols=TLSv1.2 -Denforcer.skip=true -Dcheckstyle.skip=true -Dcobertura.skip=true -DskipITs=true -Drat.skip=true -Dlicense.skip=true -Dpmd.skip=true -Dfindbugs.skip=true -Dgpg.skip=true -Dskip.npm=true -Dskip.gulp=true -Dskip.bower=true -Danimal.sniffer.skip=true -V -B",
+        "failing_tests": "retrofit2.RequestFactoryTest#pathParametersAndPathTraversal,retrofit2.RequestFactoryTest#encodedPathParametersAndPathTraversal,retrofit2.RequestFactoryTest#dotDotsOkayWhenNotFullPathSegment",
+        "failing_module": "retrofit"
+      },
+      "upstream_patch": {
+        "url": "https://github.com/lysine-dev/retrofit/commit/b9a7f6ad72073ddd40254c0058710e87a073047d.patch",
+        "sha256": "19670055db4e4697e75fe244fda009ff2dd1e29af494e2013413d0fbe2ee84de",
+        "bytes": 7317,
+        "purpose": "selection_and_external_reference_only"
+      },
+      "source_license": "Apache-2.0"
+    }
+  ],
+  "future_holdout_excluded_projects": [
+    "apache/jspwiki",
+    "FasterXML/jackson-dataformat-xml",
+    "apache/commons-configuration",
+    "OpenRefine/OpenRefine",
+    "apache/cxf",
+    "codehaus-plexus/plexus-archiver",
+    "eclipse-rdf4j/rdf4j",
+    "eclipse/rdf4j",
+    "lysine-dev/retrofit",
+    "square/retrofit"
+  ]
+}

@@ -10,3 +10,5 @@ data/runs/VUL4J-18-review-001/generation_raw.json -whitespace
 resources/profile_development/code/* -text -whitespace
 resources/profile_development/*LICENSE*.txt -text
 resources/profile_development/*NOTICE*.txt -text
+resources/baselines/veriscore_extraction_non_qa.txt -text -whitespace
+resources/baselines/VERISCORE_LICENSE -text

@@ -11,6 +11,7 @@ from uuid import uuid4
 
 import claim_profile
 import review_pair
+import pilot_profile
 
 generator = import_module("02_generate_findings")
 json_bytes = generator.json_bytes
@@ -26,7 +27,7 @@ require_text = claim_profile.require_text
 parse_response = claim_profile.parse_response
 
 
-# Lädt genau die explizite JSONL-Datei und wählt eine eindeutige Finding-ID.
+# Lädt die explizite JSONL-Datei und wählt eine Finding-ID oder bündelt mit all sämtliche Findings.
 # Verlangt Generatorfelder, lehnt Symlink-Pfade/doppelte IDs ab und liest keine Nachbardateien.
 # Liefert die Originalbytes der Datei sowie das ausgewählte Finding zurück.
 def load_finding(path: Path, finding_id: str) -> tuple:
@@ -36,6 +37,7 @@ def load_finding(path: Path, finding_id: str) -> tuple:
     raw = path.read_bytes()
     selected = None
     ids = set()
+    findings = []
     for number, line in enumerate(raw.decode("utf-8").split("\n"), 1):
         if not line.strip():
             continue
@@ -46,8 +48,15 @@ def load_finding(path: Path, finding_id: str) -> tuple:
         if finding["finding_id"] in ids:
             raise ValueError("Duplicate finding_id in input.")
         ids.add(finding["finding_id"])
+        findings.append(finding)
         if finding["finding_id"] == finding_id:
             selected = finding
+    if finding_id == "all" and findings:
+        # Original title/report substrings remain unchanged; only section delimiters are added.
+        selected = {"finding_id": "all", "title": "Complete security review",
+                    "report": "\n\n".join(
+                        f"[Finding {index}]\nTitle: {item['title']}\nReport:\n{item['report']}"
+                        for index, item in enumerate(findings, 1))}
     if selected is None:
         raise ValueError("Selected finding_id was not found; no request sent.")
     return raw, selected
@@ -59,13 +68,14 @@ def validate_claims(document: dict, finding: dict) -> list:
     return claim_profile.validate_claims(document, "P", finding)
 
 
-# Zerlegt ein ausgewähltes Finding in einem neuen Laufverzeichnis mit einem OpenAI-Modell.
+# Zerlegt ein ausgewähltes Finding oder den vollständigen Report in einem neuen Laufverzeichnis mit einem OpenAI-Modell.
 # Speichert Originaleingabe, Codebook/Prompt/Schema, Request, Rohantwort, Validierung und gültige Claims.
 # Prüft den zugehörigen gespeicherten Review als Provenienz; nur Titel/Report gelangen ins Modell.
 # Nutzt den bestehenden Transport, ohne Quellcodeanalyse oder Referenzannotation.
 # Kein Retry/Repair; bei Fehlern bleiben Artefakte erhalten, ohne partielle gültige Claims auszugeben.
 def decompose_findings(findings_path: Path, finding_id: str, output: Path, model: str,
-                       max_output_tokens: int, disable_reasoning: bool = False) -> str:
+                       max_output_tokens: int, disable_reasoning: bool = False,
+                       no_context_fields: bool = False, requester=None) -> str:
     if output.exists() or output.is_symlink():
         raise FileExistsError(f"Output already exists: {output}. Choose a new --output path.")
     if not model or "/" in model or model.endswith(":free") or any(char.isspace() for char in model):
@@ -77,7 +87,11 @@ def decompose_findings(findings_path: Path, finding_id: str, output: Path, model
     if input_bytes != parent["findings_bytes"]:
         raise ValueError("Input findings differ from the paired review findings.jsonl.")
     parent_manifest = parent["manifest"]
-    resources = {path.name: path.read_bytes() for path in (PROMPT, CODEBOOK, SCHEMA)}
+    resources = pilot_profile.resources(PROMPT, no_context_fields)
+    if finding_id == "all":
+        resources[PROMPT.name] += ("\nThe input is the complete review: all original finding titles and reports, "
+                                  "in order. The generic title and [Finding N], Title:, Report: delimiters "
+                                  "are assembly metadata, not security claims. Cover every original finding.\n").encode()
     system = (resources[PROMPT.name].decode("utf-8")
               + "\n\nCODEBOOK\n" + resources[CODEBOOK.name].decode("utf-8")
               + "\n\nRESPONSE SCHEMA\n" + resources[SCHEMA.name].decode("utf-8"))
@@ -89,6 +103,7 @@ def decompose_findings(findings_path: Path, finding_id: str, output: Path, model
                 {key: finding[key] for key in ("title", "report")}, ensure_ascii=False)},
         ],
         "max_completion_tokens": max_output_tokens,
+        "service_tier": "default",
         "stream": False,
         "store": False,
         "response_format": {"type": "json_object"},
@@ -100,6 +115,8 @@ def decompose_findings(findings_path: Path, finding_id: str, output: Path, model
     manifest = {
         "run_id": run_id, "finding_id": finding_id,
         "route": "P", "stage": "report_decomposition",
+        "report_unit": "all_findings_v1" if finding_id == "all" else "single_finding",
+        "profile_variant": "no_context_fields" if no_context_fields else "full",
         "case_id": parent_manifest["case_id"],
         "case_variant": parent_manifest.get("case_variant", "unspecified"),
         "parent_run_id": parent_manifest["run_id"],
@@ -119,6 +136,7 @@ def decompose_findings(findings_path: Path, finding_id: str, output: Path, model
         "implementation_sha256": {
             path.name: sha256(path.read_bytes()) for path in (
                 Path(__file__), Path(claim_profile.__file__), Path(review_pair.__file__),
+                Path(pilot_profile.__file__), Path(generator.case_context.__file__),
                 Path(generator.__file__), Path(generator.prepare_case.__file__))},
         "request_sha256": sha256(body), "timeout_seconds": generator.TIMEOUT_SECONDS,
         "request_attempts": 0, "status": "running", "usage": None, "cost_usd": None,
@@ -142,7 +160,7 @@ def decompose_findings(findings_path: Path, finding_id: str, output: Path, model
         phase = "request"
         manifest["request_attempts"] = 1
         (output / "run_manifest.json").write_bytes(json_bytes(manifest))
-        status, request_id, raw = generator.request_review(body, api_key)
+        status, request_id, raw = (requester or generator.request_review)(body, api_key)
         (output / "decomposition_raw.json").write_bytes(raw)
         manifest.update(http_status=status, provider_request_id=request_id, response_sha256=sha256(raw))
         if status != 200:
@@ -158,7 +176,7 @@ def decompose_findings(findings_path: Path, finding_id: str, output: Path, model
             raise RuntimeError("Provider reported an error; see decomposition_raw.json.")
         document = parse_response(response)
         manifest["finish_reason"] = "stop"
-        claims = validate_claims(document, finding)
+        claims = pilot_profile.validate(document, "P", finding, no_context_fields)
         validation.update(status="passed", claim_count=len(claims))
         phase = "save"
         rows = [{"profile_version": PROFILE_VERSION, "route": "P", "run_id": run_id,
@@ -190,15 +208,16 @@ def decompose_findings(findings_path: Path, finding_id: str, output: Path, model
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--findings", type=Path, required=True, help="Saved findings.jsonl beside its original manifest, request and raw response.")
-    parser.add_argument("--finding-id", required=True, help="Exactly one finding_id from that file.")
+    parser.add_argument("--finding-id", required=True, help="A finding_id, or all for one extraction of the complete report.")
     parser.add_argument("--output", type=Path, required=True, help="New run directory under data/.")
     parser.add_argument("--model", required=True, help="Explicit OpenAI model ID.")
     parser.add_argument("--max-output-tokens", type=int, required=True, help="Output budget including reasoning.")
     parser.add_argument("--no-reasoning", action="store_true", help="Send reasoning_effort=none; requires a model supporting none.")
+    parser.add_argument("--no-context-fields", action="store_true", help="Planned context-field ablation.")
     args = parser.parse_args()
     try:
         status = decompose_findings(args.findings, args.finding_id, args.output, args.model,
-                                    args.max_output_tokens, args.no_reasoning)
+                                    args.max_output_tokens, args.no_reasoning, args.no_context_fields)
     except (OSError, ValueError) as error:
         parser.exit(1, f"Could not start decomposition: {error}\n")
     print(f"Decomposition status: {status}; saved at {args.output.resolve()}")

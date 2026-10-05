@@ -1,0 +1,23 @@
+{
+  "upstream": "https://github.com/Yixiao-Song/VeriScore",
+  "commit": "8714bca27b944b9659d6a966cdb92fb6fff8f72d",
+  "license": "Apache-2.0",
+  "paper": "https://aclanthology.org/2024.findings-emnlp.552/",
+  "retrieved_on": "2026-10-05",
+  "files": [
+    {
+      "file": "veriscore_extraction_non_qa.txt",
+      "source_path": "prompt/extraction_non_qa_template.txt",
+      "url": "https://raw.githubusercontent.com/Yixiao-Song/VeriScore/8714bca27b944b9659d6a966cdb92fb6fff8f72d/prompt/extraction_non_qa_template.txt",
+      "bytes": 13817,
+      "sha256": "b9dbfec642e9c1782db812eb043b8a780b2164562ed589b383becfc2e4d5c37e"
+    },
+    {
+      "file": "VERISCORE_LICENSE",
+      "source_path": "LICENSE",
+      "url": "https://raw.githubusercontent.com/Yixiao-Song/VeriScore/8714bca27b944b9659d6a966cdb92fb6fff8f72d/LICENSE",
+      "bytes": 11357,
+      "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+    }
+  ]
+}

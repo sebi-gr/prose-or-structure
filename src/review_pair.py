@@ -6,6 +6,7 @@ from pathlib import Path
 import re
 
 import claim_profile
+import case_context
 
 generator = import_module("02_generate_findings")
 
@@ -19,23 +20,24 @@ def read_artifact(path: Path) -> bytes:
     return path.read_bytes()
 
 
-# Prüft einen gespeicherten erfolgreichen VUL4J-18-Report anhand seiner Originalartefakte.
+# Prüft einen gespeicherten erfolgreichen registrierten Report anhand seiner Originalartefakte.
 # Liest nur Manifest, Request, Rohantwort und Findings; sendet nichts und verändert keine Dateien.
 # Der historische OpenRouter-Review braucht keine nachträglich erfundenen Metadatenfelder.
 def load_review(review_run: Path) -> dict:
     manifest_bytes = read_artifact(review_run / "run_manifest.json")
     manifest = json.loads(manifest_bytes, object_pairs_hook=claim_profile.unique_object)
-    if not isinstance(manifest, dict) or manifest.get("case_id") != generator.CASE_ID:
-        raise ValueError("Expected a saved VUL4J-18 review manifest.")
+    if not isinstance(manifest, dict):
+        raise ValueError("Expected a saved review manifest.")
+    allowed_files = case_context.model_files(manifest.get("case_id"))
     if manifest.get("status") not in ("completed", "no_findings"):
         raise ValueError("Review must have completed or produced no_findings.")
     run_id = manifest.get("run_id")
     claim_profile.require_text(run_id, "Review run_id")
     source_hashes = manifest.get("source_sha256")
-    if (not isinstance(source_hashes, dict) or set(source_hashes) != set(generator.MODEL_FILES)
+    if (not isinstance(source_hashes, dict) or set(source_hashes) != set(allowed_files)
             or any(not isinstance(h, str) or not re.fullmatch(r"[0-9a-f]{64}", h)
                    for h in source_hashes.values())):
-        raise ValueError("Review must record hashes for exactly the five allowed source files.")
+        raise ValueError("Review must record hashes for exactly the registered source files.")
     if "case_variant" in manifest:
         claim_profile.require_text(manifest["case_variant"], "Review case_variant")
 
