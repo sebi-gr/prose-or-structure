@@ -39,15 +39,18 @@ When resolving 'this value' or similar references, also cite the supporting
 passage. Context IDs refer to claims in this response, not to code positions.
 They preserve needed context; they are not a proof graph.
 
-Use qualifiers to describe uncertainty, negation, conditions, actor and scope;
-state when these are not specified. They must also remain in the proposition.
-Use family_reason to justify the category. subtype must be null except for
+Return profile_version "0.1" and route "P". Every claim must contain exactly:
+claim_id, proposition, family, subtype, family_reason, context, source_quotes,
+code_refs, context_claim_ids, verification. subtype must be null except for
 exploitability_impact, which requires exploitability, impact or unclear.
-Do not output truth labels, review-status fields or correction histories.
 
-Every claim must contain exactly these eight keys: claim_id, proposition,
-family, subtype, family_reason, source_quotes, qualifiers, context_claim_ids.
-Never use a phrase from the finding as a JSON key or add keys for individual
-conditions. Put all qualifiers together in the single qualifiers string and
-retain them in the proposition. Before returning, check every claim for missing
-or extra keys; use null for subtype when required and [] for absent context IDs.
+Use the common codebook's six context fields; null means not stated, not false.
+Keep those qualifications in the proposition too. Copy code references only as
+asserted in the report; do not repair lines or expand partial filenames using
+outside knowledge. Missing reference details are null; absent code_refs are [].
+
+Keep the derived verification question, required evidence and any explicitly
+unconfirmed additional assumptions in verification. These are not claims that
+the evidence or conditions already exist. Do not output truth labels, confidence
+scores, review status, offsets, correction histories, or extra keys.
+Check all required fields before returning; do not repair the finding itself.

@@ -1,6 +1,6 @@
 # Handoff: Prose or Structure?
 
-Stand: 2026-10-05, nach Schritt 2. Maßgeblich: [WORKPLAN.md](WORKPLAN.md),
+Stand: 2026-10-05, nach Schritt 3. Maßgeblich: [WORKPLAN.md](WORKPLAN.md),
 [Projektskizze](prose_or_structure_projektskizze.pdf), [Herkunft](docs/PROVENANCE.md).
 
 ## Ziel und nächster Schritt
@@ -9,66 +9,71 @@ P: Code → Report → Claims und D: Code → Claims bei identischem Codekontext
 vergleichen. RQ1 entwickelt das Profil, RQ2 vergleicht Qualität/Aufwand, RQ3
 untersucht Darstellungsfehler und Kontextfelder. Keine Überlegenheit vorwegnehmen.
 
-**Schritt 2 ist als Entwicklungs-PoC erledigt. Als Nächstes Schritt 3:** Den
-vorhandenen P-Extraktor samt Validierung auf das gemeinsame Profil umstellen und
-einen kleinen D-Schritt ergänzen. Zuerst den archivierten Report verwenden;
-kein neuer Report nötig. Nur den jeweils beauftragten Schritt implementieren.
+**Schritt 3 ist für den VUL4J-18-PoC implementiert und offline geprüft.**
+Als Nächstes Schritt 4: Pilotprotokoll festlegen, dann die erforderlichen
+Pilotergänzungen und geplanten Läufe. Modell, Budget, Reporteinheit, Fallbestand,
+Referenzen/Doppelannotation, Baselines und Fehlerregeln sind noch offen.
+Keine ungeplanten API-Aufrufe; in dieser Umsetzung wurde keiner ausgeführt.
 
-## Verbindlicher Entwicklungsstand
+## Ausführbare Basis
 
-- [Profil 0.1](resources/claim_profile.md) und [Schema](resources/claim_profile.schema.json): Aussage, sechs einfache Kontexttexte, Code-/Reportbezüge, lokale Kontext-IDs, getrennte Prüfaufgabe mit benötigter Evidenz und Zusatzannahmen. Vorhandene Evidenz und Wahrheitsurteile stehen separat.
-- [Codebook](resources/claim_codebook.md): generische Regeln für P/D; nur erfundene Beispiele. Fehlend (`null`), explizite Negation und ausdrücklich unbekannt unterscheiden; Bedingungen und Alternativen bleiben in der Proposition.
-- [Annotationsprotokoll](resources/annotation_protocol.md) mit [Arbeitsblatt](resources/manual_annotation_template.md): getrennte Report-/Codereferenz, semantische Coverage, offene Fragen, Unsicherheit/Prüfbarkeit, Doppelannotation und Adjudikation.
-- [Entwicklungsdurchgang](resources/profile_development/README.md): historische 13 JSPWiki-Claims eingeordnet, zwei zusätzliche Codefälle (VUL4J-47/Jackson XML, VUL4J-9/YAML), getrennte Referenzinventare und zehn ausgewählte JSON-Beispielclaims. Quellen/Revisionen/Hashes und Apache-Lizenzen liegen bei; 19 KB Quell-/Lizenzmaterial.
-- Die neuen Beispiele/Urteile sind KI-gestützte redaktionelle Entwürfe, keine unabhängige menschliche Referenz und keine Modellmessung. Keine neue Java-/PoV-Ausführung. Alle drei Fälle samt Varianten bleiben Entwicklung, nicht Holdout.
-- Fünf Profilquellen gezielt geprüft; Begründung im Profil. Vollständige Literaturabgrenzung, Security-Baselines und Neuheitsbewertung bleiben offen.
+| Datei | Aktueller Zweck |
+|---|---|
+| `src/01_prepare_case.py` | Unveränderter Export von fünf VUL4J-18-Quelldateien und getrennten Referenzen; kein Java-Test |
+| `src/02_generate_findings.py` | Prose-Review; vorhandener Transport, gemeinsame Quellformatierung, Route/Stufe/Variantenlabel und Finding-Hash ergänzt |
+| `src/03_decompose_findings.py` | Ein gespeichertes Finding aus geprüftem Review → Profil 0.1; nur Titel/Report im fallbezogenen Modellinput |
+| `src/04_generate_claims.py` | Direkte Profilclaims aus exakt demselben Codekontext wie der über `--review-run` bezeichnete Review |
+| `src/claim_profile.py` | Gemeinsame feste Validierung, P-Zitate/Unicode-Offsets und getrennte D-Codepositionsdiagnosen |
+| `src/review_pair.py` | Vier originale Reviewartefakte prüfen; Quellhashes und tatsächlich gesendeten Codekontext vergleichen |
 
-Reale Beispiele, Referenzinventare, Annotationen und Quellenmanifeste **nicht an
-Modelle senden**. Nur das generische Codebook ist Teil des bisherigen P-Requests.
-Falsche Codepositionen in beiden Routen als Inhalt erhalten und separat bewerten;
-P-Zitate müssen exakt zum Report passen. Keine zusätzlichen Referenzfakten in P.
+Befehle stehen in [README.md](README.md). P benötigt neben `findings.jsonl`
+Manifest, Request und Rohantwort desselben Reviews. D benötigt den Reviewordner
+und die fünf Modelldateien; die lokale Vorbereitung stimmt mit dem historischen
+Review überein. Abweichungen stoppen vor API-Aufruf und Ausgabeverzeichnis.
+Die Fall-ID/Dateiliste bleibt bewusst auf VUL4J-18 begrenzt; XML/YAML sind weiterhin
+nur Profilentwicklungsbeispiele. Kein allgemeines Benchmark-Framework gebaut.
 
-## Was bereits ausführbar ist
+Gemeinsamer Vertrag: [Profil 0.1](resources/claim_profile.md),
+[Schema](resources/claim_profile.schema.json), [Codebook](resources/claim_codebook.md).
+Der alte aktive `claim_response_schema.json`-Vertrag ist entfernt; alte Snapshots
+und Git-Historie bleiben erhalten. `claims.jsonl` ergänzt lokale Run-/Routenfelder
+und bei P Finding-ID/Quote-Offsets; das Antwortschema beschreibt den Modelloutput.
+Keine generierten Wahrheitslabels. Falsche Codepositionen bleiben erhalten;
+D protokolliert sie nichtfatal in `validation.json`, P liest dafür keinen Code.
 
-Die drei Skripte stammen unverändert aus What-Can-We-Verify `5df7760`:
+Alle Modellschritte verwenden den vorhandenen OpenAI-Aufruf mit explizitem Modell
+und Tokenlimit, `store=false`, ohne Tools, Retry oder Repair. Fehlende Schlüssel
+senden nichts. Rohantworten und Fehler bleiben erhalten, keine Teilclaims oder
+Überschreibung. `cost_usd` bleibt ohne Abrechnung null, gemeldete Usage gespeichert.
+Unbekannte Varianten bleiben `unspecified`; `--case-variant` am Reportgenerator
+ist ausschließlich ein Metadatenlabel und gelangt nicht ins Modell.
 
-- `01_prepare_case.py`: fixierter VUL4J-18-Export, fünf erlaubte Modelldateien plus getrennte Referenzen. Lokal vorbereitet; in neuen Clones regenerieren. Kein allgemeiner Fallloader und kein Java-Test.
-- `02_generate_findings.py`: Prose-Report aus genau diesem Paket.
-- `03_decompose_findings.py`: ein ausgewähltes gespeichertes Finding, kein Code, keine Nachbarfindings. Format-/Zitat-/Unicode-Offset-/Kontext-ID-Prüfung vorhanden.
+## Forschungskontext und Grenzen
 
-**Umstellungsgrenze:** `claim_response_schema.json` und der alte P-Prompt bleiben
-operativ bei `schema_version: "1"` (acht Felder, freies `qualifiers`). Das neue
-`claim_profile.schema.json` mit `profile_version: "0.1"` ist der Vertrag für
-Schritt 3, noch kein auswählbarer Laufmodus. Nur die generischen Codebook-Regeln
-sind bereits präzisiert. Bei der Umstellung alten Vertrag ersetzen, keine zweite
-Pipeline pflegen. Bestehende Tests für Kontexttrennung/Originale weiterverwenden.
-
-Beide vorhandenen Modellschritte verwenden direkten OpenAI-Zugriff mit
-`OPENAI_API_KEY`, explizitem Modell/Tokenlimit, JSON-Modus, `store=false`, ohne
-Tools/Retry/Repair. `--no-reasoning` setzt `reasoning_effort=none`, sofern unterstützt.
-Modell, Budget, Wiederholungen und Pilotprotokoll sind nicht festgelegt;
-keine ungeplanten Live-Läufe. Neue XML/YAML-Fixtures sind keine vom CLI bereits
-unterstützten Fälle und kein gepaarter Versuch.
+- P und D teilen `paired_review_run_id` und Quellhashes. P nennt den Report als `parent_run_id`; D hat keinen kausalen Reportparent. Die ursprünglichen Parentdateien für spätere Prüfung erhalten.
+- Der aktuelle Extraktor arbeitet pro Finding: P benötigt 1 + N Aufrufe bei N Findings, D einen für den Codefall. Der archivierte Ein-Finding-Fall erfüllt den Zwei-Aufruf-Entwurf. Vor Pilot Reporteinheit festlegen und alle Findings einbeziehen; keine günstige Auswahl einzelner Findings.
+- `no_findings` bedeutet keine P-Extraktion und kann D verankern. Ein fehlgeschlagener P-Review kann D aktuell nicht verankern; fehlende Routen vorab im Pilotprotokoll regeln.
+- [Annotationsprotokoll](resources/annotation_protocol.md) und [Arbeitsblatt](resources/manual_annotation_template.md) trennen Reporttreue, Codereferenz, Unsicherheit/Prüfbarkeit und Adjudikation. Neue Referenzen vor Einsicht in Ausgaben erstellen.
+- Reale Beispiele/Referenzen unter `resources/profile_development/`, Annotationen und Manifeste nie als Modellkontext verwenden. Das Codebook bleibt generisch.
+- Alle drei Profilentwicklungsfälle samt Varianten bleiben Entwicklung, nicht Holdout. Neue Beispiele sind KI-gestützte Entwürfe; keine unabhängige menschliche Referenz, Annotationzeit oder Übereinstimmung gemessen.
+- D mit Überarbeitung, Extraktionsbaselines, Ablation, Pilot-/Hauptstudienauswertung fehlen weiterhin. Fünf Profilquellen gezielt geprüft; vollständige Literatur-/Neuheitsabgrenzung offen.
 
 ## Historisches Archiv erhalten
 
-- `data/runs/VUL4J-18-review-001/`: Finding, Request, Rohantwort, Originalprompt und Manifest.
-- `data/annotations/VUL4J-18-review-001/manual_annotation_001.md`: angenommene SG-Revision mit 13 Claims und Codex-Unterstützung/Vorwissen.
-- Genau diese sechs Dateien unter `data/` versioniert, insgesamt 108.158 Bytes; andere Downloads/Läufe ignoriert. `inherited_artifacts.json` hält Hashes und Importweg fest. Keine Originale überschreiben.
-- Historischer Run `0721c0a0-bba7-48c1-a63c-da196a69d97c`, OpenRouter/Nemotron; entspricht nicht dem heutigen Anbieter. Prompt-CRLF wurden beim Import aus dem Request exakt wiederhergestellt.
-- Die fünf lokalen JSPWiki-Quelldateien passen zu den historischen Hashes; der gesamte Requesttext wurde beim Import rekonstruiert. Zusätzliche Quellkopie unnötig.
-- Alte Decomposition-Rohdaten, PoV-Logs, ursprüngliche Annotationsabgabe/Review und damaliges Codebook v0.2 fehlen optional. Das heutige Codebook ist kein Ersatzsnapshot.
+Sechs Originaldateien in `data/runs/VUL4J-18-review-001/` und
+`data/annotations/VUL4J-18-review-001/`, zusammen 108.158 Bytes. Alle Hashes aus
+`resources/inherited_artifacts.json` unverändert. SG-Annotation mit 13 Claims und
+Codex-Unterstützung/Vorwissen bleibt genau erhalten. Historischer Run
+`0721c0a0-bba7-48c1-a63c-da196a69d97c` war OpenRouter/Nemotron; keine nachträglich
+kontrollierte Vergleichsstudie mit heutigen Modellen daraus ableiten.
 
-## Prüfstand und Grenzen
+Andere Downloads/Läufe bleiben ignoriert. Zusätzliche alte Decomposition-/PoV-Logs,
+Originalabgabe/Review und damaliges Codebook v0.2 fehlen optional; heutige Dokumente
+sind kein Ersatz für diese historischen Originale.
 
-29/29 Offline-Regressionstests bestanden (macOS/Python 3.13.2). Die vier
-Profilbeispiele wurden einmalig mit JSON Schema Draft 2020-12 validiert,
-einschließlich negativer Formatproben; keine neue Projektabhängigkeit.
-Exakte P-Zitate, Kontext-IDs, Codezeilen, Quell-/Archivhashes und lokale Links
-geprüft. Die bestehenden Tests prüfen noch den alten ausführbaren P-Vertrag;
-Profilvalidierung wird erst mit Schritt 3 Teil der Pipeline/Regressionstests.
+## Prüfstand
 
-Keine Messwerte zur P/D-Qualität, menschlichen Übereinstimmung oder Annotationzeit.
-Profil und Familien bleiben vorläufig. Vor Pilot: Modell/Budget, Fallbestand,
-Referenzen, Doppelannotator, Blindierung und Fehlerregeln festlegen. Der Pilot
-umfasst vorgeschlagene 5–10 neue Fälle; Hauptstichprobe erst daraus begründen.
+- **60 Offline-Tests bestanden**, inklusive gemeinsamer Profilfixtures, Unicode/Zitatkonvention, Herkunft, Quellpaarung, Requesttrennung, leerer/ungültiger Ergebnisse und Fehlerpersistenz.
+- Archivierter JSPWiki-Report und reales Codepaket durch beide neuen Routen mit ausdrücklich ersetzten Modellantworten geprüft: vier P-/zwei D-Fixtureclaims, passende Hashes und gesendeter Codekontext. Temporäre Outputs entfernt; kein echter Modelllauf.
+- Vier CLI-Hilfen und Whitespace-Prüfung erfolgreich. Originalarchiv und Fremdquellen unverändert; Links und Funktionskommentare geprüft.
+- Keine neue Java-/PoV-Ausführung und keine P/D-Qualitätsmessung. Tests belegen lokale Implementierungseigenschaften, keine Live-Modellkompatibilität oder wissenschaftlichen Ergebnisse.

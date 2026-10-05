@@ -6,57 +6,24 @@ from importlib import import_module
 from http.client import HTTPException
 import json
 from pathlib import Path
-import re
 import time
 from uuid import uuid4
+
+import claim_profile
+import review_pair
 
 generator = import_module("02_generate_findings")
 json_bytes = generator.json_bytes
 sha256 = generator.sha256
 RESOURCES = Path(__file__).resolve().parents[1] / "resources"
 PROMPT = RESOURCES / "decomposition_prompt.txt"
-CODEBOOK = RESOURCES / "claim_codebook.md"
-SCHEMA = RESOURCES / "claim_response_schema.json"
-SCHEMA_VERSION = "1"
-FAMILIES = ("location", "data_flow", "protection_precondition",
-            "exploitability_impact", "other", "unclear")
-CLAIM_FIELDS = {"claim_id", "proposition", "family", "subtype", "family_reason",
-                "source_quotes", "qualifiers", "context_claim_ids"}
-CLAIM_ID = re.compile(r"C[0-9]{2,}[a-z]?")
-
-
-# Übernimmt JSON-Objektpaare ohne doppelte Schlüssel; verhindert stilles Überschreiben.
-# Wird beim Laden von Finding- und Modell-JSON verwendet, ohne Inhalte zu korrigieren.
-def unique_object(pairs: list) -> dict:
-    result = {}
-    for key, value in pairs:
-        if key in result:
-            raise ValueError("Duplicate JSON object key.")
-        result[key] = value
-    return result
-
-
-# Prüft die exakt erlaubten Objektfelder; unbekannte Felder sind kein stiller Zusatz.
-# Benennt fehlende und zusätzliche Felder; verändert oder repariert die Eingabe nicht.
-def require_keys(value: object, expected: set, label: str) -> None:
-    if not isinstance(value, dict):
-        raise ValueError(f"{label}: expected a JSON object.")
-    differences = []
-    missing = sorted(expected - set(value))
-    unexpected = sorted(set(value) - expected)
-    if missing:
-        differences.append(f"missing fields {json.dumps(missing)}")
-    if unexpected:
-        differences.append(f"unexpected fields {json.dumps(unexpected)}")
-    if differences:
-        raise ValueError(f"{label}: {'; '.join(differences)}.")
-
-
-# Prüft nichtleere Texte, ohne Leerzeichen oder Formulierungen zu verändern.
-# Der Feldname dient nur zur verständlichen Fehlermeldung.
-def require_text(value: object, label: str) -> None:
-    if not isinstance(value, str) or not value.strip():
-        raise ValueError(f"{label}: expected nonempty text.")
+CODEBOOK = claim_profile.CODEBOOK
+SCHEMA = claim_profile.SCHEMA
+PROFILE_VERSION = claim_profile.PROFILE_VERSION
+unique_object = claim_profile.unique_object
+require_keys = claim_profile.require_keys
+require_text = claim_profile.require_text
+parse_response = claim_profile.parse_response
 
 
 # Lädt genau die explizite JSONL-Datei und wählt eine eindeutige Finding-ID.
@@ -86,91 +53,16 @@ def load_finding(path: Path, finding_id: str) -> tuple:
     return raw, selected
 
 
-# Akzeptiert nur eine regulär beendete Textantwort ohne Refusal oder Toolaufrufe.
-# Dekodiert deren JSON, ohne abgebrochene Antworten zu reparieren oder Reasoning zu übernehmen.
-def parse_response(response: dict) -> dict:
-    choices = response.get("choices")
-    if not isinstance(choices, list) or len(choices) != 1 or not isinstance(choices[0], dict):
-        raise ValueError("Expected exactly one completion.")
-    choice = choices[0]
-    if choice.get("finish_reason") == "length":
-        raise ValueError("Output token limit reached (finish_reason=length); response is incomplete.")
-    if choice.get("error") or choice.get("finish_reason") != "stop":
-        raise ValueError("Completion did not finish normally.")
-    message = choice.get("message")
-    if (not isinstance(message, dict) or message.get("role") != "assistant"
-            or message.get("refusal") or message.get("tool_calls")
-            or not isinstance(message.get("content"), str)):
-        raise ValueError("Refusal, tool call or non-text output; not an empty claim list.")
-    return json.loads(message["content"], object_pairs_hook=unique_object)
-
-
-# Prüft den festen v1-Vertrag, IDs, Familien, Zitate und Kontextreferenzen.
-# Berechnet Zitat-Offsets in nullbasierten Unicode-Codepoints (Ende exklusiv), ohne Normalisierung.
-# Liefert neue Claim-Dictionaries; Bedeutungstreue, Vollständigkeit und Wahrheit werden nicht geprüft.
+# Prüft das gemeinsame Profil für P und löst exakte Reportzitate auf.
+# Delegiert dieselben Strukturregeln wie D; greift nicht auf Quellcode zu.
 def validate_claims(document: dict, finding: dict) -> list:
-    require_keys(document, {"schema_version", "claims"}, "Response")
-    if document["schema_version"] != SCHEMA_VERSION or not isinstance(document["claims"], list):
-        raise ValueError("Expected schema_version '1' and a claims list.")
-    result = []
-    ids = set()
-    for index, claim in enumerate(document["claims"]):
-        label = f"claims[{index}]"
-        require_keys(claim, CLAIM_FIELDS, label)
-        for key in ("claim_id", "proposition", "family", "family_reason", "qualifiers"):
-            require_text(claim[key], f"{label}.{key}")
-        if not CLAIM_ID.fullmatch(claim["claim_id"]) or claim["claim_id"] in ids:
-            raise ValueError(f"{label}: invalid or duplicate claim_id.")
-        ids.add(claim["claim_id"])
-        if claim["family"] not in FAMILIES:
-            raise ValueError(f"{label}: unknown family.")
-        if claim["family"] == "exploitability_impact":
-            if claim["subtype"] not in ("exploitability", "impact", "unclear"):
-                raise ValueError(f"{label}: exploitability_impact requires a subtype.")
-        elif claim["subtype"] is not None:
-            raise ValueError(f"{label}: subtype must be null for this family.")
-        references = claim["context_claim_ids"]
-        if not isinstance(references, list):
-            raise ValueError(f"{label}: context_claim_ids must be a list.")
-        for reference in references:
-            if not isinstance(reference, str) or not CLAIM_ID.fullmatch(reference):
-                raise ValueError(f"{label}: invalid context claim ID.")
-        if len(set(references)) != len(references) or claim["claim_id"] in references:
-            raise ValueError(f"{label}: duplicate or self context reference.")
-        quotes = claim["source_quotes"]
-        if not isinstance(quotes, list) or not quotes:
-            raise ValueError(f"{label}: source_quotes must be a nonempty list.")
-        resolved = []
-        seen_quotes = set()
-        for quote in quotes:
-            require_keys(quote, {"field", "quote", "occurrence"}, f"{label}.source_quotes")
-            if quote["field"] not in ("title", "report"):
-                raise ValueError(f"{label}: quote field must be title or report.")
-            require_text(quote["quote"], f"{label}.quote")
-            occurrence = quote["occurrence"]
-            if type(occurrence) is not int or occurrence < 1:
-                raise ValueError(f"{label}: quote occurrence must be a positive integer.")
-            identity = (quote["field"], quote["quote"], occurrence)
-            if identity in seen_quotes:
-                raise ValueError(f"{label}: duplicate source quote.")
-            seen_quotes.add(identity)
-            source = finding[quote["field"]]
-            start = -1
-            for _ in range(occurrence):
-                start = source.find(quote["quote"], start + 1)
-                if start < 0:
-                    raise ValueError(f"{label}: exact quote occurrence not found in {quote['field']}.")
-            resolved.append({**quote, "start": start, "end": start + len(quote["quote"])})
-        result.append({**claim, "source_quotes": resolved})
-    for claim in result:
-        if any(reference not in ids for reference in claim["context_claim_ids"]):
-            raise ValueError(f"{claim['claim_id']}: unresolved context claim ID.")
-    return result
+    return claim_profile.validate_claims(document, "P", finding)
 
 
 # Zerlegt ein ausgewähltes Finding in einem neuen Laufverzeichnis mit einem OpenAI-Modell.
 # Speichert Originaleingabe, Codebook/Prompt/Schema, Request, Rohantwort, Validierung und gültige Claims.
-# Nutzt nur Key-Lader/HTTP-Aufruf/Serialisierung des Generators; kein Quellcode- oder Referenzzugriff.
+# Prüft den zugehörigen gespeicherten Review als Provenienz; nur Titel/Report gelangen ins Modell.
+# Nutzt den bestehenden Transport, ohne Quellcodeanalyse oder Referenzannotation.
 # Kein Retry/Repair; bei Fehlern bleiben Artefakte erhalten, ohne partielle gültige Claims auszugeben.
 def decompose_findings(findings_path: Path, finding_id: str, output: Path, model: str,
                        max_output_tokens: int, disable_reasoning: bool = False) -> str:
@@ -181,6 +73,10 @@ def decompose_findings(findings_path: Path, finding_id: str, output: Path, model
     if max_output_tokens < 1:
         raise ValueError("A positive max-output-tokens value is required.")
     input_bytes, finding = load_finding(findings_path, finding_id)
+    parent = review_pair.load_review(findings_path.parent)
+    if input_bytes != parent["findings_bytes"]:
+        raise ValueError("Input findings differ from the paired review findings.jsonl.")
+    parent_manifest = parent["manifest"]
     resources = {path.name: path.read_bytes() for path in (PROMPT, CODEBOOK, SCHEMA)}
     system = (resources[PROMPT.name].decode("utf-8")
               + "\n\nCODEBOOK\n" + resources[CODEBOOK.name].decode("utf-8")
@@ -202,7 +98,17 @@ def decompose_findings(findings_path: Path, finding_id: str, output: Path, model
     body = json_bytes(payload)
     run_id = str(uuid4())
     manifest = {
-        "run_id": run_id, "finding_id": finding_id, "schema_version": SCHEMA_VERSION,
+        "run_id": run_id, "finding_id": finding_id,
+        "route": "P", "stage": "report_decomposition",
+        "case_id": parent_manifest["case_id"],
+        "case_variant": parent_manifest.get("case_variant", "unspecified"),
+        "parent_run_id": parent_manifest["run_id"],
+        "paired_review_run_id": parent_manifest["run_id"],
+        "profile_version": PROFILE_VERSION,
+        "codebook_version": claim_profile.CODEBOOK_VERSION,
+        "source_sha256": parent_manifest["source_sha256"],
+        "review_manifest_sha256": sha256(parent["manifest_bytes"]),
+        "review_request_sha256": sha256(parent["request_bytes"]),
         "started_at": datetime.now(timezone.utc).isoformat(),
         "provider": "openai", "endpoint": generator.ENDPOINT,
         "model_requested": model,
@@ -212,7 +118,8 @@ def decompose_findings(findings_path: Path, finding_id: str, output: Path, model
         "resource_sha256": {name: sha256(content) for name, content in resources.items()},
         "implementation_sha256": {
             path.name: sha256(path.read_bytes()) for path in (
-                Path(__file__), Path(generator.__file__), Path(generator.prepare_case.__file__))},
+                Path(__file__), Path(claim_profile.__file__), Path(review_pair.__file__),
+                Path(generator.__file__), Path(generator.prepare_case.__file__))},
         "request_sha256": sha256(body), "timeout_seconds": generator.TIMEOUT_SECONDS,
         "request_attempts": 0, "status": "running", "usage": None, "cost_usd": None,
     }
@@ -223,6 +130,7 @@ def decompose_findings(findings_path: Path, finding_id: str, output: Path, model
     started = time.monotonic()
     phase = "setup"
     try:
+        (output / "review_manifest.json").write_bytes(parent["manifest_bytes"])
         for name, content in resources.items():
             (output / name).write_bytes(content)
         (output / "findings_input.jsonl").write_bytes(input_bytes)
@@ -253,8 +161,8 @@ def decompose_findings(findings_path: Path, finding_id: str, output: Path, model
         claims = validate_claims(document, finding)
         validation.update(status="passed", claim_count=len(claims))
         phase = "save"
-        rows = [{"schema_version": SCHEMA_VERSION, "run_id": run_id, "finding_id": finding_id,
-                 **claim, "verification_status": "not_evaluated"} for claim in claims]
+        rows = [{"profile_version": PROFILE_VERSION, "route": "P", "run_id": run_id,
+                 "finding_id": finding_id, **claim} for claim in claims]
         temporary = output / "claims.jsonl.tmp"
         temporary.write_bytes("".join(json.dumps(row, ensure_ascii=False) + "\n"
                                       for row in rows).encode("utf-8"))
@@ -281,7 +189,7 @@ def decompose_findings(findings_path: Path, finding_id: str, output: Path, model
 # Meldet gespeicherte Fehler mit Exit-Code 1; erfolgreich bedeutet nur formal gültige Claims.
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--findings", type=Path, required=True, help="Saved generator findings.jsonl.")
+    parser.add_argument("--findings", type=Path, required=True, help="Saved findings.jsonl beside its original manifest, request and raw response.")
     parser.add_argument("--finding-id", required=True, help="Exactly one finding_id from that file.")
     parser.add_argument("--output", type=Path, required=True, help="New run directory under data/.")
     parser.add_argument("--model", required=True, help="Explicit OpenAI model ID.")

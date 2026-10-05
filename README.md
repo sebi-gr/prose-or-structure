@@ -36,30 +36,26 @@ they are not automatically safe programs.
 
 The reusable baseline comes from
 [What Can We Verify? at `5df7760`](https://github.com/sebi-gr/What-Can-We-Verify/tree/5df7760459b741ae36bd91af4af89f6e3ecfe18d).
-All three scripts, the current prompts, codebook, schema, annotation template,
-and tests are imported. The import record preserves the original hashes. Step 2
-refines the codebook and annotation template; the three scripts remain unchanged.
-The P/D study plan remains the research direction of this repository.
+The import record preserves the original hashes. The current code extends that
+baseline with the shared profile and a direct route for the JSPWiki development
+case. Preparation and the existing API transport are reused.
 
 | Component | Available here |
 |---|---|
-| Pinned VUL4J-18 preparation | Executable; five source/configuration files, separate references, hashes |
-| Prose-report generator | Executable; one direct OpenAI request, stored inputs, raw response, and run metadata |
-| P extractor and format validation | Executable; selected report only, exact quotes/offsets, claim IDs and context references |
-| Shared claim profile, codebook and annotation protocol | Version 0.1 specified and exercised on three development cases; not yet wired into the scripts |
-| Current P response schema | Executable legacy contract, separate from the shared profile |
-| Offline regression tests | 29 tests using synthetic fixtures |
-| Historical Java-PoV reproduction | Imported protocol; original raw logs are not available here |
-| Historical JSPWiki report | Archived finding, request, raw response, prompt, and manifest; consistency verified |
-| Manual annotation with 13 claims | Archived accepted development revision; linked to the exact report |
-| Previous automatic decomposition runs | Historical summaries only; raw run artifacts are not archived here |
-| Shared-profile integration, D generator, evaluation | Next: step 3; not implemented |
+| Pinned VUL4J-18 preparation | Five source/configuration files, separate references, hashes |
+| Prose-report generator | One request, preserved inputs/response, run and variant metadata |
+| P extractor | One selected saved finding; profile 0.1, exact quote offsets, no code in its request |
+| D generator | Direct profile 0.1 claims from the verified identical P source context |
+| Shared validation | Fields, conditions, local IDs, quotes; nonfatal D code-location diagnostics |
+| Pairing checks | Original review artifacts checked; source hashes and actual sent code context must match |
+| Offline regression tests | 60 tests with synthetic responses and archived development fixtures |
+| Historical JSPWiki report and annotation | Six immutable originals, including the accepted 13-claim revision |
+| Pilot, D revision control, baselines, ablation, evaluation | Planned; no comparison results yet |
 
-The six-file development archive is available in every clone; source and import
-hashes are documented in [docs/PROVENANCE.md](docs/PROVENANCE.md). Additional old
-decomposition runs and PoV logs are optional historical evidence, not prerequisites
-for the next step. Step 2 is complete as a development PoC; the repository is
-ready to implement the paired routes, not yet to report a P/D comparison.
+Steps 2 and 3 are complete for the small development PoC. The next step is to
+fix the pilot protocol before live comparison runs. No new model request or
+Java/PoV run was made during implementation. Additional old decomposition/PoV
+logs remain optional; [provenance](docs/PROVENANCE.md) records the available evidence.
 
 ## Shared profile and annotation
 
@@ -77,9 +73,9 @@ editorial examples, not model outputs, independent human ground truth or new
 PoV executions. All three cases remain development data. Case-specific references
 and examples must never be injected into generation prompts.
 
-Step 3 will integrate this profile. Until then, the existing P script still uses
-`claim_response_schema.json` with `schema_version: "1"`; the new profile schema
-is a design contract, not a second selectable runtime mode.
+Both claim scripts now use profile 0.1. The old P response schema was replaced;
+its history and old run snapshots remain unchanged. There is one active profile
+and no automatic conversion of old claims.
 
 ## Start here
 
@@ -95,6 +91,7 @@ python3 -m unittest -v
 python3 src/01_prepare_case.py --help
 python3 src/02_generate_findings.py --help
 python3 src/03_decompose_findings.py --help
+python3 src/04_generate_claims.py --help
 ```
 
 Prepare the development case with internet access to `raw.githubusercontent.com`:
@@ -146,10 +143,11 @@ the placeholders below. This is a command template, not a selected study model:
 python3 src/02_generate_findings.py \
   --model OPENAI_MODEL_ID \
   --max-output-tokens TOKEN_LIMIT \
+  --case-variant vulnerable \
   --output data/runs/VUL4J-18-openai-001
 ```
 
-Both model steps now call the direct OpenAI Chat Completions endpoint and reject
+All model steps call the direct OpenAI Chat Completions endpoint and reject
 OpenRouter IDs. This imported change removes the old free-model restriction;
 live calls can incur costs. No live call was made during the import. Select an
 explicit compatible model, preferably a snapshot where available. Model access,
@@ -159,6 +157,10 @@ prompts, budgets, and repetitions for the study remain undecided.
 default applies. Requests use JSON mode and `store=false`. The output token limit
 is not a monetary budget, and the historical OpenRouter run retains its original
 provider and settings.
+
+`--case-variant` records an explicit provenance label, never model context or a
+truth judgment. It defaults to `unspecified`; inherited runs without the field
+keep that value rather than gaining an inferred label.
 
 One request is made with a 180-second timeout and no automatic retry, repair,
 follow-up, or tools. The prompt requests a JSON envelope containing titles and
@@ -213,26 +215,81 @@ python3 src/03_decompose_findings.py \
 
 The request includes only the selected title/report,
 [decomposition prompt](resources/decomposition_prompt.txt), codebook, and
-[response schema](resources/claim_response_schema.json). It excludes neighboring
+[shared response schema](resources/claim_profile.schema.json). It excludes neighboring
 findings, code, reference files, annotations, and the finding ID. The explicit
 input JSONL is preserved in full on disk, but other findings are not sent.
 Symlinks in the input path or its ancestors are rejected.
 
-The inherited response contract uses `schema_version: "1"`, proposition,
-family/subtype/reason, a free-text `qualifiers` field, exact source quotes with
-one-based occurrence numbers, and local context IDs. Local validation resolves
-quotes to zero-based Unicode-codepoint offsets (exclusive end), validates fields
-and references, then adds run/finding IDs and `verification_status: not_evaluated`.
-It does not validate granularity, coverage, semantic fidelity, or truth.
-The dedicated context, code-reference and verification-task fields are now
-specified in profile 0.1. Integrating them into this script is step 3.
+P requires the associated `run_manifest.json`, `request.json` and
+`generation_raw.json` beside the findings file. Before any request, it checks
+original hashes and that the finding text/IDs match the recorded response.
+These artifacts provide local provenance; their source text, review prompt,
+metadata and other findings are not sent to the extractor.
 
-Outputs include `findings_input.jsonl`, `finding.json`, all three resource
-snapshots, `request.json`, `decomposition_raw.json` when received,
-`run_manifest.json`, and `validation.json`. `claims.jsonl` exists only after the
-whole output validates. An empty result is `no_claims`; invalid output and run
-errors are retained without partial claims, repair, or retry. As with the
-generator, `completed` means format-valid and `cost_usd` stays `null`.
+The common response has `profile_version: "0.1"`, `route: "P"` or `"D"`, and
+`claims`. Every claim contains the proposition, provisional family/subtype/reason,
+six explicit context fields, report quotes, code references, context IDs and a
+separate verification question/evidence requirements/assumptions. A small shared
+stdlib validator enforces the fixed contract; no JSON Schema runtime is needed.
+P quotes resolve to zero-based Unicode-codepoint offsets with an exclusive end.
+The saved JSONL adds route/run/profile metadata and, for P, finding ID and offsets.
+No truth status is generated. Format validity does not establish claim truth.
+
+P saves `findings_input.jsonl`, `finding.json`, `review_manifest.json`, resource
+snapshots, request, raw response when received, manifest and validation result.
+`claims.jsonl` appears only after the entire response validates. Empty output is
+`no_claims`; malformed output is `invalid_output`; request/setup failures are
+`run_error`. There are no partial claims, repair calls or retries.
+
+## Direct claims on the same context
+
+Prepare the five source files first. Then the D command can use the archived
+review as its context anchor; replace model/budget placeholders before a live run:
+
+```bash
+python3 src/04_generate_claims.py \
+  --model-input data/VUL4J-18/model_input \
+  --review-run data/runs/VUL4J-18-review-001 \
+  --model OPENAI_MODEL_ID \
+  --max-output-tokens TOKEN_LIMIT \
+  --output data/direct/VUL4J-18-openai-001
+```
+
+D checks all five source hashes against the saved review and reconstructs the
+exact numbered user message that P's report generator received. A mismatch stops
+before an output directory or API request is created. Extra files are excluded
+by the same fixed allowlist. The D request contains only these source bytes in
+the numbered view plus its generic prompt, codebook and shared response schema;
+it contains no prose report, findings, fix, reference annotation or manifest.
+
+D stores its source/resource snapshots, `review_manifest.json`, request,
+`generation_raw.json`, manifest, validation and validated claims. Both routes
+record case/variant, route/stage, run IDs, profile/codebook versions and resource
+hashes, source/input hashes, model/parameters, timing and reported usage. P links
+its report as `parent_run_id`; both use `paired_review_run_id` to identify the
+same context anchor. D has no causal report parent. Billing is not computed:
+`cost_usd` remains null and provider usage is retained.
+
+D's `validation.json` includes `code_ref_checks`: `resolved`, `unresolved_path`,
+`out_of_range`, or `no_position`. These are nonfatal diagnostics. Claims with
+incorrect source locations remain available for annotation, as do incorrect
+locations quoted by P. A resolved range proves neither a symbol nor a claim.
+P does not inspect code to validate claimed positions.
+
+This is a development pairing, not a retrospective controlled experiment with
+the old OpenRouter model. Current extraction operates **per finding**: P uses
+one report call plus one extraction call for each of its N findings (**1 + N**);
+D uses one call for the whole code context. The archived case has one finding,
+matching the sketch's two-call P route. All findings must be included in any
+case-level comparison. Before the pilot, fix the report unit to preserve the
+proposed two-call design or explicitly account for additional extraction calls;
+do not select only convenient findings. A review with `no_findings` needs no
+P extraction and can still anchor D. A failed review cannot currently anchor D;
+the pilot must predefine missing-route handling.
+
+The scripts remain specific to VUL4J-18. The XML/YAML development examples are
+not additional executable cases. D revision/budget control, baseline extraction,
+context-field ablation and study-level aggregation belong to pilot preparation.
 
 ## Evidence and reproducibility
 
@@ -267,7 +324,7 @@ Java reproduction was performed during this import.
 ## Repository layout and checks
 
 ```text
-src/                    Preparation, prose-report generation, and P extraction
+src/                    Preparation, P/D scripts, shared profile and pairing checks
 tests/                  Offline tests; responses are synthetic
 resources/              Prompts, codebook, schema, template, PoV protocol, checksums
 docs/PROVENANCE.md      Import sources, evidence inventory, and verification limits
@@ -282,7 +339,8 @@ git diff --check
 
 The tests cover reference isolation, preserved bytes and hashes, overwrite
 protection, failure handling, model-ID checks, `.env` loading, reasoning control,
-and claim format/quotes/offsets/references. On Windows the symlink test explicitly skips if the privilege is
+shared profile fields/quotes/offsets/references, identical P/D source context,
+parent-artifact integrity and nonfatal code-location diagnostics. On Windows the symlink test explicitly skips if the privilege is
 unavailable. Tests do not establish live API compatibility or research results.
 
 Our code is under [MIT](LICENSE). Curated XML/YAML source fixtures retain their

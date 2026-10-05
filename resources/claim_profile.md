@@ -1,19 +1,25 @@
 # Gemeinsames Claimprofil
 
-**Version 0.1 · 2026-10-05 · Entwicklungsvertrag für Schritt 3.**
+**Version 0.1 · 2026-10-05 · Gemeinsamer ausführbarer Vertrag für P und D.**
 Das [Schema](claim_profile.schema.json) beschreibt dieselbe Ausgabe für P und D.
-Es ist noch nicht an die Skripte angeschlossen. Der ausführbare P-Extraktor nutzt
-weiter `claim_response_schema.json` mit `schema_version: "1"`. Das sind zwei
-verschiedene Zwecke, keine alternativ wählbaren Studienformate; Schritt 3 ersetzt
-den alten Antwortvertrag. Keine automatische verlustfreie Migration behaupten.
+`03_decompose_findings.py` und `04_generate_claims.py` nutzen denselben Validator
+in `src/claim_profile.py`. Der alte P-Antwortvertrag (`schema_version: "1"`)
+wurde ersetzt; seine Historie bleibt in Git und historischen Laufkopien erhalten.
+Keine automatische verlustfreie Migration alter Claims durchführen.
 
 ## Einheit und Felder
 
-Eine Datei enthält `profile_version: "0.1"`, `route: "P" | "D"` und `claims`.
+Die Modellantwort enthält `profile_version: "0.1"`, `route: "P" | "D"` und `claims`.
 Ein Claim ist eine eigenständig beurteilbare Proposition mit erhaltenem Kontext,
 nicht automatisch ein Satz, eine Zeile oder ein Schwachstellenlabel. Leere
 `claims` sind ein gültiges leeres Ergebnis. Die [Codebook-Regeln](claim_codebook.md)
 gelten für beide Routen; nur P hat eine Reporttreue-Anforderung.
+
+Die Rohantwort bleibt unverändert erhalten. `claims.jsonl` speichert nach der
+Validierung je Claim zusätzlich Profilversion, Route und Run-ID, bei P die
+Finding-ID und berechnete Quote-Offsets. Dieses lokale Speicherformat ist vom
+Antwortschema zu unterscheiden. Es enthält keine Wahrheitslabels. Lauf- und
+Parent-Metadaten sowie Herkunftshashes stehen im Manifest.
 
 | Feld je Claim | Bedeutung |
 |---|---|
@@ -51,7 +57,7 @@ bleiben. Textfelder statt Rechte-Ontologie oder Logiksprache reichen für den Po
 
 - P zitiert `title` oder `report` unverändert mit `quote` und einsbasiertem
   `occurrence`. Überlappende Treffer zählen nach Startposition. Die Software
-  berechnet später `start`/`end` als nullbasierte Unicode-Codepoints, Ende exklusiv;
+  berechnet `start`/`end` als nullbasierte Unicode-Codepoints, Ende exklusiv;
   das Modell berechnet keine Offsets. Dieselbe Passage darf mehrere Claims tragen.
   Bei „this value“ auch die den Bezug auflösende Passage zitieren.
 - D erhält keine künstlichen Reportzitate. Seine Codebezüge stammen aus dem
@@ -90,9 +96,9 @@ Adjudikation gehören **nicht** in die Generatorausgabe, sondern in die
 [Annotation](annotation_protocol.md). Insbesondere ist ein Codebezug kein
 Wahrheitsurteil. Kein `confidence`-Score, Verifier, Toolplan oder SACM-Graph nötig.
 
-## Kleinste Validierung in Schritt 3
+## Implementierte Validierung
 
-1. JSON-Schema: Version, Route, exakte Schlüssel, Typen, Familien/Subtypen,
+1. Fester Vertrag entsprechend dem JSON-Schema: Version, Route, exakte Schlüssel, Typen, Familien/Subtypen,
    vollständige Kontextfelder, P-Zitate/D-Leerliste; kein Teilergebnis bei Fehlern.
 2. Lokale Semantik: eindeutige IDs, vorhandene Kontextziele, keine Selbstbezüge;
    Zeilenpaare entweder beide `null` oder geordnet; mindestens Pfad oder Symbol.
@@ -100,11 +106,17 @@ Wahrheitsurteil. Kein `confidence`-Score, Verifier, Toolplan oder SACM-Graph nö
    und Zeilen gegen das tatsächlich gelieferte Paket abgleichen. Nicht auflösbare
    Codebezüge separat protokollieren, bei beiden Routen als Inhalt erhalten und
    später bewerten; sie sind kein harter Formatfehler und werden nicht korrigiert.
+   D speichert `code_ref_checks` in `validation.json`: `resolved`, `unresolved_path`,
+   `out_of_range` oder `no_position`. `resolved` bestätigt nur Pfad/Zeilenbereich,
+   weder Symbolauflösung noch Wahrheit. P liest dafür keinen Quellcode.
 4. Erwartete Route gegen Laufkonfiguration prüfen; Input- und Ressourcenhashes,
    Run-/Finding-ID und berechnete Offsets separat speichern. Unicode-Konvention
    und bestehende Kontexttrennung weiterverwenden.
 
 Diese Prüfungen beweisen weder Wahrheit noch Abdeckung oder gute Atomizität.
+Der kleine Validator implementiert nur dieses feste Profil mit der Standardbibliothek,
+keinen allgemeinen JSON-Schema-Interpreter. Vor D überprüft `review_pair.py`
+zusätzlich Dateihashes und identischen gesendeten Codekontext des P-Reviews.
 Die [Entwicklungsbeispiele](profile_development/README.md) erproben das Format
 an drei Fällen; sie sind keine verblindete Referenz oder Vergleichsmessung.
 

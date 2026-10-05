@@ -77,6 +77,17 @@ def load_sources(model_input: Path) -> dict:
     return files
 
 
+# Formatiert dieselben Quellbytes für P und D mit Pfaden und Originalzeilennummern.
+# Gibt nur den Modellkontext zurück; keine Referenzdateien oder Metadaten werden ergänzt.
+def format_sources(files: dict) -> str:
+    sections = []
+    for name, content in files.items():
+        lines = content.decode("utf-8").splitlines(keepends=True)
+        numbered = "".join(f"{number}: {line}" for number, line in enumerate(lines, 1))
+        sections.append(f"FILE: {name}\n{numbered}\nEND FILE\n")
+    return "\n".join(sections)
+
+
 # Sendet den vorbereiteten Request einmal an OpenAI; der Key steht nur im HTTP-Header.
 # Gibt HTTP-Status, Request-ID und rohe Antwortbytes zurück, auch bei HTTP-Fehlern.
 # Wiederholt den Aufruf nicht; Netzwerkfehler werden an den Aufrufer weitergegeben.
@@ -129,26 +140,24 @@ def parse_findings(response: dict) -> list:
 # Hält auch leere Ergebnisse und Fehler im Manifest fest und gibt den Laufstatus zurück.
 # Optional setzt --no-reasoning reasoning_effort=none; das Modell muss diesen Wert unterstützen.
 def generate_findings(model_input: Path, output: Path, model: str,
-                      max_output_tokens: int, disable_reasoning: bool = False) -> str:
+                      max_output_tokens: int, disable_reasoning: bool = False,
+                      case_variant: str = "unspecified") -> str:
     if output.exists() or output.is_symlink():
         raise FileExistsError(f"Output already exists: {output}. Choose a new --output path.")
     if not model or "/" in model or model.endswith(":free") or any(char.isspace() for char in model):
         raise ValueError("Select an explicit OpenAI model ID (without an OpenRouter prefix or :free suffix).")
     if max_output_tokens < 1:
         raise ValueError("A positive max-output-tokens value is required.")
+    if not isinstance(case_variant, str) or not case_variant.strip():
+        raise ValueError("case-variant must be a nonempty label; it is not a truth label.")
 
     files = load_sources(model_input)
     prompt = PROMPT.read_bytes()
-    sections = []
-    for name, content in files.items():
-        lines = content.decode("utf-8").splitlines(keepends=True)
-        numbered = "".join(f"{number}: {line}" for number, line in enumerate(lines, 1))
-        sections.append(f"FILE: {name}\n{numbered}\nEND FILE\n")
     payload = {
         "model": model,
         "messages": [
             {"role": "system", "content": prompt.decode("utf-8")},
-            {"role": "user", "content": "\n".join(sections)},
+            {"role": "user", "content": format_sources(files)},
         ],
         "max_completion_tokens": max_output_tokens,
         "stream": False,
@@ -161,6 +170,8 @@ def generate_findings(model_input: Path, output: Path, model: str,
     run_id = str(uuid4())
     manifest = {
         "case_id": CASE_ID,
+        "case_variant": case_variant,
+        "route": "P", "stage": "report_generation", "parent_run_id": None,
         "run_id": run_id,
         "started_at": datetime.now(timezone.utc).isoformat(),
         "provider": "openai",
@@ -223,7 +234,8 @@ def generate_findings(model_input: Path, output: Path, model: str,
             findings_file.write_bytes("".join(rows).encode("utf-8"))
             findings_file.rename(output / "findings.jsonl")
             manifest.update(status="completed" if findings else "no_findings",
-                            finding_count=len(findings))
+                            finding_count=len(findings),
+                            findings_sha256=sha256((output / "findings.jsonl").read_bytes()))
         except (ValueError, KeyError, TypeError, AttributeError) as error:
             manifest.update(status="invalid_output", error=f"{type(error).__name__}: {error}")
         except (OSError, RuntimeError) as error:
@@ -249,10 +261,13 @@ def main() -> None:
                         help="Output limit including reasoning; not a monetary budget.")
     parser.add_argument("--no-reasoning", action="store_true",
                         help="Send reasoning_effort=none; requires a model supporting none. Omit for model defaults.")
+    parser.add_argument("--case-variant", default="unspecified",
+                        help="Recorded variant label, e.g. vulnerable; never sent to the model.")
     args = parser.parse_args()
     try:
         status = generate_findings(args.model_input, args.output, args.model,
-                                   args.max_output_tokens, disable_reasoning=args.no_reasoning)
+                                   args.max_output_tokens, disable_reasoning=args.no_reasoning,
+                                   case_variant=args.case_variant)
     except (OSError, ValueError) as error:
         parser.exit(1, f"Could not start review: {error}\n")
     print(f"Review status: {status}; saved at {args.output.resolve()}")

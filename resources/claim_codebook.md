@@ -4,8 +4,7 @@ Version 0.1 des gemeinsamen P/D-Profils, 2026-10-05. Arbeitsregeln für
 Propositionen und ihre Zerlegung; die Kategorien bleiben vorläufig.
 P erfasst Behauptungen im Finding, D formuliert Behauptungen aus dem gelieferten
 Code. Wahrheit und Qualität bewertet anschließend eine getrennte Annotation.
-Das mitgelieferte Antwortschema bestimmt die Felder: Der bestehende P-Extraktor
-verwendet bis zur Umstellung weiterhin seinen achtteiligen Antwortvertrag.
+Das gemeinsame Antwortschema bestimmt die Felder für beide Routen.
 Dieses Codebook enthält nur generische Regeln und erfundene Beispiele.
 
 ## Ziel und Ablauf
@@ -140,3 +139,25 @@ in die Proposition noch in deren sprachliche Unsicherheit zurückgeschrieben.
 Für neue Modellläufe speichert das Skript die verwendeten Ressourcenbytes und
 Hashes im Laufverzeichnis. Formatvalidierung prüft keine inhaltliche Granularität.
 Der erste annotierte Fall bleibt Entwicklungsmaterial, keine unabhängige Evaluation.
+
+## Gemeinsame Profilfelder
+
+`context` hat sechs Text-oder-null-Felder: `actor` (Akteur und Rechte),
+`preconditions` (nicht als erfüllt zu behauptende Voraussetzungen), `negation`
+(Verneinung mit Bezugsgegenstand), `modality` (sprachliche Möglichkeit/Gewissheit),
+`quantifier` (Quantor und Bezugsobjekt), `scope` (Pfad/Version/Konfiguration).
+`null` heißt nicht angegeben; ausdrücklich unbekannt und explizit verneint
+als Text erhalten. Eine kategorische Aussage ohne Modalwort hat `modality: null`.
+Diese Aspekte müssen auch in der Proposition erhalten bleiben.
+
+`code_refs` enthält genannte Pfade/Symbole und gegebenenfalls einsbasierte,
+inklusive Zeilenbereiche. Nicht genannte Angaben sind `null`; mindestens Pfad
+oder Symbol, Zeilen entweder beide `null` oder Start/Ende angegeben. Keine Pfade
+oder Zeilen erfinden. P übernimmt ausschließlich Reportangaben; D verwendet
+Bezüge zum gelieferten Code. Bezüge sind keine bestätigte Evidenz.
+
+`verification.question` und `required_evidence` sind eine abgeleitete Prüfaufgabe
+und die dafür benötigte Evidenz. `assumptions` ist eine Liste zusätzlicher,
+unbestätigter Arbeitsannahmen, normalerweise `[]`. Explizite Originalbedingungen
+gehören in die Proposition und `context.preconditions`. Keine vorhandene Evidenz
+oder Wahrheitslabels ausgeben. Eine Prüfaufgabe korrigiert keinen Reportclaim.

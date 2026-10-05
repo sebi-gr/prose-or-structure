@@ -137,3 +137,34 @@ neue menschliche Annotation, keine unabhängige Ground Truth, kein API-Aufruf
 und kein Java-Build/PoV. Der bekannte Report sowie Fix-/Datasetkenntnis beeinflussen
 die Entwicklungsauswahl; diese Beispiele sind nicht verblindet oder zurückgehalten.
 Alle sechs historischen Artefakte bleiben bytegleich zu `inherited_artifacts.json`.
+
+## Umsetzung des gemeinsamen Profils, Schritt 3
+
+Am 05.10.2026 wurde P auf Profil 0.1 umgestellt und die direkte D-Erzeugung
+ergänzt. Die importierten Skripte 02/03 und der aktive P-Prompt wurden dabei
+bewusst geändert; ursprüngliche Importhashes bleiben historische Nachweise.
+Der Vorbereitungscode und der API-Transport sind unverändert. Ein gemeinsamer
+Quellformatter bewahrt den bisherigen Requesttext; ein kleiner gemeinsamer
+Validator ersetzt den alten achtteiligen P-Vertrag. D und Paarungsprüfung nutzen
+keine zusätzlichen Laufzeitabhängigkeiten. Das alte aktive Antwortschema ist
+entfernt, über Git aber vollständig nachvollziehbar.
+
+`review_pair.py` prüft Originalrequest-/Antwortbytes gegen das Manifest und
+Findingtext/IDs gegen die Rohantwort. D prüft außerdem die fünf Quellhashes und
+die exakt rekonstruierte User-Nachricht. Der historische Review funktioniert
+auch ohne nachträglich hinzugefügten Finding-Hash oder Variantenlabel; unbekannte
+Varianten heißen in neuen Kindläufen `unspecified`. Originalmanifest unverändert.
+
+60 Offline-Tests prüfen Profil, Paarung und Fehlerverhalten; ein zusätzlicher
+Smoke-Test verwendete den archivierten JSPWiki-Report und das echte fünfteilige
+Codepaket mit ausdrücklich ersetzten API-Antworten aus den Entwicklungsfixtures.
+Vier P- und zwei D-Beispielclaims wurden formal akzeptiert. Das sind keine neu
+generierten Claims oder Vergleichsresultate. Temporäre Ausgaben wurden entfernt;
+kein HTTP-Modellaufruf, Java-Build oder PoV. Die sechs Archivdateien und die
+Apache-Quell-/Lizenzfixtures bleiben bytegleich zu ihren Herkunftsnachweisen.
+
+Die neuen Laufmanifeste speichern Ressourcen-/Implementierungshashes, Route/Stufe,
+Fall/Variante, Parent-/Paar-ID, Modellparameter, Usage und Zeit. Nicht ausgewiesene
+Kosten bleiben null. Alte Claimdateien werden weder automatisch migriert noch
+überschrieben. Profil 0.1 ist jetzt operativ; Aussagen des vorherigen Abschnitts
+beschreiben den Zustand unmittelbar nach Schritt 2.

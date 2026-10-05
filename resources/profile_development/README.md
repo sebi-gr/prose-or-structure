@@ -142,7 +142,7 @@ Zusatzannahmen über Angreiferrechte bleiben von Originalaussage und Evidenz get
 
 Die Beispiele benötigen keine neue Ontologie: vollständige Propositionen,
 expliziter Kontext, getrennte Report-/Codebezüge und abgeleitete Prüfaufgaben
-reichen als vorläufiger Vertrag. Schritt 3 kann diesen Vertrag in P und D umsetzen.
+reichen als vorläufiger Vertrag. Schritt 3 hat diesen Vertrag inzwischen in P und D umgesetzt.
 Vor Pilot/Evaluation bleiben unabhängige menschliche Annotation, vorab fixierte
 Referenzen und dokumentierte Adjudikation erforderlich; dieser Durchgang ersetzt sie nicht.
 
@@ -151,5 +151,5 @@ Formale Prüfung am 05.10.2026: vier JSON-Ausgaben mit zehn Claims gegen Draft
 Ausgaben beider Routen akzeptiert. Originalzitate/Offsets mit dem vorhandenen
 P-Validator geprüft; Kontext-IDs, Codezeilen, Quellausschnitte, Lizenz-/Archivhashes
 und lokale Dokumentlinks abgeglichen. Schema-Prüfung einmalig mit temporär
-installiertem `jsonschema`; keine neue Laufzeitabhängigkeit. Die 29 bestehenden
-Offline-Tests bestehen, prüfen aber noch den alten ausführbaren P-Vertrag.
+installiertem `jsonschema`; keine neue Laufzeitabhängigkeit. Dies war der Prüfstand von Schritt 2. Seit Schritt 3 prüfen gemeinsame
+Offline-Tests auch diese Fixtures mit dem ausführbaren Profilvalidator.

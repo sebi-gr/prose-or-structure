@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Prose or Structure shared claim profile 0.1 (step 3 contract)",
+  "title": "Prose or Structure shared claim response profile 0.1",
   "type": "object",
   "additionalProperties": false,
   "required": ["profile_version", "route", "claims"],

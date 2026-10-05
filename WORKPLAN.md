@@ -6,11 +6,10 @@ Stand: 2026-10-05. Grundlage: [Projektskizze v0.1](prose_or_structure_projektski
 
 Untersucht wird, wie **P: Code → Report → Claims** und **D: Code → Claims** sich bei identischem Quellkontext und gemeinsamem Claimprofil unterscheiden. RQ1 entwickelt das Profil, RQ2 vergleicht Qualität und Aufwand, RQ3 untersucht Darstellungsfehler und die Wirkung expliziter Kontextfelder. Eine Überlegenheit von D ist keine Annahme.
 
-**Nächster Arbeitsschritt: Schritt 3.** P-Extraktor und Validierung auf das
-[gemeinsame Profil 0.1](resources/claim_profile.md) umstellen und den kleinen
-D-Schritt ergänzen. Dafür zuerst den archivierten Report nutzen; keinen neuen
-Report erzeugen. Schritt 2 ist als Entwicklungs-PoC abgeschlossen, keine
-abgeschlossene Validierung von RQ1 oder unabhängige menschliche Referenzstudie.
+**Nächster Arbeitsschritt: Schritt 4, Pilotprotokoll.** Gemeinsames Profil und
+gepaarte P/D-Erzeugung sind für den VUL4J-18-PoC implementiert und offline geprüft.
+Vor Live-Läufen Modell/Budget, Fallbestand, vollständige P-Reporteinhaltseinheit,
+Referenzen und Fehlerregeln fixieren. Keine Vergleichsergebnisse vorwegnehmen.
 
 ## Meilensteine und Abschlusskriterien
 
@@ -19,12 +18,12 @@ abgeschlossene Validierung von RQ1 oder unabhängige menschliche Referenzstudie.
 | 0. Repository und geerbte Basis | Erledigt; neuer Import geprüft | Aktueller Stand mit drei Skripten übernommen, 29/29 Offline-Tests bestanden; Herkunft/Hashes, Dokumentation und CI vorhanden. |
 | 1. Minimales Entwicklungspaket sichern | Erledigt | Sechs ausgewählte Report-/Annotationsdateien archiviert und auf Hashes, Originaltext und Zuordnung geprüft; rekonstruierbare Daten lokal belassen, zusätzliche historische Logs optional. |
 | 2. Claimprofil und Annotation v0.1 (RQ1) | Erledigt als Entwicklungs-PoC | Gemeinsames Profil, Codebook, Grenzfälle und getrennte Referenzregeln an JSPWiki und wenigen weiteren Entwicklungsfällen erprobt. |
-| 3. Gepaarte P/D-Erzeugung implementieren | P-Extraktor/Validierung vorhanden; D offen | Bestehende P-Komponenten auf das gemeinsame Profil angepasst und um D ergänzt; gespeicherte Originale, Kontexttrennung und gleiches Zielprofil funktionieren. |
+| 3. Gepaarte P/D-Erzeugung implementieren | Erledigt für den VUL4J-18-PoC, offline geprüft | Bestehende P-Komponenten auf das gemeinsame Profil angepasst und um D ergänzt; gespeicherte Originale, Kontexttrennung und gleiches Zielprofil funktionieren. |
 | 4. Pilot vorbereiten und ausführen | Geplant | Protokoll vorab fixiert, beide Routen auf denselben 5–10 Fällen, Fehler und Annotationszeit vollständig erfasst; Vergleichbarkeit bewertet. |
 | 5. Hauptstudie planen und einfrieren | Nach Pilot | Fallzahl, zurückgehaltene Fälle, Baselines, Budgetkontrolle, Ablation, Annotation und Auswertung begründet festgelegt; engste Vorarbeiten geprüft. |
 | 6. Hauptstudie und Paper | Später | Gepaarte Ergebnisse, Unsicherheit, Fehleranalyse, Limitationen und reproduzierbare Forschungsartefakte vorhanden. |
 
-Kein zusätzlicher Live-Review oder erneuter Java-Build ist Teil der Übernahme. Der vorhandene Code implementiert Fallvorbereitung, Reportgenerierung und P-Extraktion mit Format-/Zitat-/Referenzprüfung. Das gemeinsame P/D-Profil ist spezifiziert; seine Anbindung, D und Vergleichsauswertung fehlen noch. Der neue Quellstand verwendet direkt OpenAI statt OpenRouter; Modell und Studienbudget bleiben offen.
+Kein zusätzlicher Live-Review oder erneuter Java-Build ist Teil der Übernahme. Der vorhandene Code implementiert Fallvorbereitung, Reportgenerierung und P-Extraktion mit Format-/Zitat-/Referenzprüfung. Das gemeinsame P/D-Profil und D sind jetzt angebunden; Vergleichsauswertung und Pilot stehen aus. Der neue Quellstand verwendet direkt OpenAI statt OpenRouter; Modell und Studienbudget bleiben offen.
 
 ## 1. Vorarbeit als nachvollziehbare Entwicklungsbasis
 
@@ -57,7 +56,7 @@ neuen menschlichen Annotationen, Modellläufe oder PoV-Reproduktionen. Die histo
 Annotation bleibt unverändert. Alle drei Fälle samt Varianten gehören fortan zur
 Entwicklung, nicht zur zurückgehaltenen Evaluation. Realbeispiele/Referenzen stehen
 außerhalb des an Modelle gesendeten Codebooks. Die allgemeine Codebook-Präzisierung
-ist schon aktiv; der ausführbare P-Antwortvertrag bleibt bis Schritt 3 bei Version 1.
+war bereits aktiv; der alte P-Antwortvertrag wurde anschließend in Schritt 3 ersetzt.
 
 Validierung: vier Beispiele gegen Draft-2020-12-Schema geprüft, negative
 Formatbeispiele abgelehnt; Zitate, lokale IDs, Zeilen/Hashes und originale
@@ -67,15 +66,29 @@ zweite menschliche Annotation und Übereinstimmung sind weiterhin offen.
 
 ## 3. Kleinster vollständiger P/D-Versuch
 
-Vorhandenen Reportgenerator weiterverwenden. Zuerst einen bereits gespeicherten Report für P extrahieren; dafür keinen neuen Report erzeugen. D erhält exakt das Quellpaket des zugehörigen P-Reports, ohne Referenzwissen. Alte PoC-Ausgaben dienen der Entwicklung und sind keine nachträglich kontrollierte Vergleichsstudie.
+**Ergebnis:** Bestehenden Reportgenerator beibehalten, P auf Profil 0.1 umgestellt
+und `04_generate_claims.py` für D ergänzt. `claim_profile.py` ist der gemeinsame
+kleine Validator; kein allgemeines Framework und keine neue Abhängigkeit.
+Der alte aktive P-Antwortvertrag ist entfernt, historische Artefakte bleiben erhalten.
 
-Den vorhandenen P-Extraktor (`src/03_decompose_findings.py`) und seine Validierung auf das vereinbarte gemeinsame Profil anpassen; D als kleinen Schritt ergänzen. Gleiche Felder und Definitionen für beide Routen, routenspezifische Herkunftsfelder zulassen. Keine Wahrheitslabels vom Generator als Referenzbewertung verwenden.
+- P verwendet ein ausgewähltes gespeichertes Finding, prüft dessen Herkunft anhand des ursprünglichen Reviews und sendet nur Titel/Report plus generische Anweisungen.
+- D prüft mit `review_pair.py` die Originalartefakte, alle fünf Quellhashes und den tatsächlich gesendeten nummerierten Codekontext des Reviews vor dem Request. Referenzmaterial und Reportinhalte fehlen in seinem Request.
+- Laufmetadaten speichern Fall/Variante, Route/Stufe, Run-/Parent-/Paar-ID, Versionen/Hashes, Modell/Parameter, Originale, Laufzeit und Usage. Unbekannte Variantendaten bleiben `unspecified`, Kosten ohne Abrechnung `null`.
+- Beide Routen prüfen dasselbe Profil, eindeutige IDs und Kontextbezüge; P löst exakte Zitate/Unicode-Offsets auf. D protokolliert Codepositionen als nichtfatale Diagnosen; falsche Positionen bleiben zur Inhaltsbewertung erhalten. Keine generierten Wahrheitslabels.
+- Leere Claims, Formatfehler und technische Fehler getrennt; keine Teilclaims, automatische Reparatur, Retry oder Überschreibung vorhandener Läufe.
+- 60 Offline-Tests einschließlich durchgängiger synthetischer P/D-Paarung sowie ein Smoke-Test mit archiviertem Report, realem JSPWiki-Code und ausdrücklich ersetzten Modellantworten bestanden. Kein echter API-Aufruf oder neuer Java-/PoV-Lauf.
 
-Je Lauf Route/Stufe, Fall/Variante, Run- und Parent-IDs, Schema-/Codebook-/Promptversion, Code-/Inputhashes, Modell/Provider, gesetzte Parameter, Rohantwort, Status, Laufzeit und verfügbare Token-/Kostenangaben speichern. Claim-IDs, Zitatbezüge und Beziehungen prüfen. Eine gültige Codeposition oder ein exaktes Zitat ist kein Wahrheitsnachweis.
+**Umfangsgrenze:** P extrahiert weiterhin pro Finding. Der archivierte Review hat
+eines, also entspricht der PoC P mit zwei Aufrufen und D mit einem. Bei N Findings
+wären es für P 1 + N; alle Findings gehören in die Fallbewertung. Vor dem Pilot
+die Reporteinheit für den Zwei-Aufruf-Entwurf festlegen oder den zusätzlichen
+Aufwand explizit ins Protokoll aufnehmen. Nicht nachträglich Findings auswählen.
+D kann einen leeren erfolgreichen Review als Anker nutzen, einen fehlgeschlagenen
+Review noch nicht; Umgang mit fehlenden Routen vorab festlegen.
 
-Bereits getestete P-Eigenschaften: keine Quell-/Referenzbytes oder Nachbarfindings im Request, unveränderte Originalantworten, exakte Zitate/Offsets und Kontext-IDs, keine Teilclaims bei Fehlern. Für die nächste Implementierung insbesondere identische Quellbytes für P/D und das gemeinsame Profil prüfen. Leere Ergebnisse, Formatfehler und Requestfehler weiter trennen. Reparaturregel vor Versuchen festlegen; Generator und Decomposer haben keine automatische Reparatur oder Wiederholung.
-
-Die bestehende Fall-ID und Dateiliste sind hart auf VUL4J-18 begrenzt. Erst für den nächsten konkreten Fall einen expliziten Fallkontext ergänzen; kein allgemeines Benchmark-Framework vorab bauen.
+Fall-ID/Dateiliste bleiben bewusst VUL4J-18-spezifisch. Erst für den nächsten
+konkreten Pilotfall erweitern. Historischer OpenRouter-Report plus heutige Routen
+sind Entwicklungsmaterial und keine kontrollierte Vergleichsstudie.
 
 ## 4. Pilotprotokoll (RQ2/RQ3)
 
@@ -84,6 +97,7 @@ Vorgeschlagen sind **5–10 gepaarte Codefälle** aus zunächst **2–3 Schwachs
 Vor dem Pilot dokumentieren:
 
 - Ein-/Ausschlusskriterien, reproduzierbare Revisionen, Quellpakete, Fall-/Varianten-IDs und Grenzen jedes Kontexts.
+- P-Reporteinheit/Anzahl Extraktionsaufrufe und Verhalten bei leeren/fehlgeschlagenen Reviews; vollständige Fallabdeckung sicherstellen.
 - Modellversion soweit verfügbar, Provider, Prompts, Formatvorgaben, Reasoning, Tokenbudget, Wiederholungen, Laufreihenfolge und Ausfall-/Reparaturregeln. Der geerbte direkte OpenAI-Aufruf ist die aktuelle Implementierung, keine endgültige Modell-/Budgetauswahl; die frühere `:free`-Beschränkung entfällt.
 - P-Extraktionsvergleiche: einfache Satzaufteilung, ein vorhandener allgemeiner Claim-Extraktionsansatz und die codebookgestützte Variante. Den externen Ansatz nach Kompatibilitätsprüfung auswählen, keine Baseline als bereits implementiert ausgeben.
 - D als direkte Schema-Prompting-Baseline; zusätzlich D mit einem Überarbeitungsschritt als Budgetkontrolle. Gleich viele Aufrufe garantieren kein gleiches Budget: tatsächliche Tokens, Laufzeit und Kosten über die gesamte Route erfassen.
@@ -111,7 +125,7 @@ Anhand des Piloten Hauptstichprobe, Präzisions-/Fallzahlbegründung, Zeitplan u
 ## Offen, bevor neue Experimente starten
 
 - Keine offene Datenübernahme als Voraussetzung für die Profilentwicklung; historische Zusatzlogs/Revisionsnotizen bleiben optional.
-- Profil 0.1 in Schritt 3 anbinden; Grenzfälle und Annotationsaufwand anschließend im Pilot überprüfen.
+- Pilotprotokoll samt Reporteinheit, Fehlerregeln und zusätzlichen ausführbaren Fällen festlegen; Grenzfälle/Annotationsaufwand im Pilot prüfen.
 - Modell/Provider, Reasoning, Budget, Wiederholungen und Baseline-Implementierungen.
 - Zweiter Annotator, Pilotbestand und spätere Hauptstichprobe.
 

@@ -18,7 +18,11 @@ def claim_fixture():
     return {
         "claim_id": "C01", "proposition": "A synthetic assertion, possibly conditional.",
         "family": "other", "subtype": None, "family_reason": "Synthetic fixture.",
-        "qualifiers": "Possible; condition not specified.",
+        "context": {"actor": None, "preconditions": "if enabled", "negation": "not established",
+                    "modality": "could", "quantifier": None, "scope": None},
+        "code_refs": [],
+        "verification": {"question": "Does this occur if enabled?",
+                         "required_evidence": ["Relevant code and configuration"], "assumptions": []},
         "source_quotes": [{"field": "report", "quote": "aba", "occurrence": 2}],
         "context_claim_ids": [],
     }
@@ -29,7 +33,7 @@ def response_fixture(claims):
         "id": "synthetic-response", "model": "test-model",
         "usage": {"prompt_tokens": 10, "completion_tokens": 20},
         "choices": [{"finish_reason": "stop", "message": {
-            "role": "assistant", "content": json.dumps({"schema_version": "1", "claims": claims}),
+            "role": "assistant", "content": json.dumps({"profile_version": "0.1", "route": "P", "claims": claims}),
         }}],
     }
 
@@ -45,10 +49,28 @@ class DecomposeFindingsTests(unittest.TestCase):
                         "report": "🙂 ababa.\r\nCould occur if enabled; not established."}
         self.input = self.root / "findings.jsonl"
         self.input.write_bytes((json.dumps(self.finding, ensure_ascii=False) + "\r\n").encode())
+        self.save_review()
         self.output = self.root / "run"
         key = patch.object(decomposer.generator, "load_api_key", return_value="synthetic-test-key")
         key.start()
         self.addCleanup(key.stop)
+
+    def save_review(self):
+        findings = [json.loads(line) for line in self.input.read_text().split("\n") if line.strip()]
+        source = {name: b"SYNTHETIC_SOURCE_NOT_FOR_P\r\n" for name in decomposer.generator.MODEL_FILES}
+        request = {"messages": [{"role": "system", "content": "SYNTHETIC_REVIEW_SYSTEM"},
+                                {"role": "user", "content": decomposer.generator.format_sources(source)}]}
+        raw = {"choices": [{"finish_reason": "stop", "message": {"role": "assistant", "content":
+               json.dumps({"findings": [{key: f[key] for key in ("title", "report")} for f in findings]})}}]}
+        request_bytes = json.dumps(request).encode()
+        raw_bytes = json.dumps(raw).encode()
+        (self.root / "request.json").write_bytes(request_bytes)
+        (self.root / "generation_raw.json").write_bytes(raw_bytes)
+        manifest = {"case_id": "VUL4J-18", "case_variant": "synthetic", "run_id": "synthetic",
+                    "status": "completed", "request_sha256": decomposer.sha256(request_bytes),
+                    "response_sha256": decomposer.sha256(raw_bytes),
+                    "source_sha256": {name: decomposer.sha256(data) for name, data in source.items()}}
+        (self.root / "run_manifest.json").write_text(json.dumps(manifest))
 
     def run_decomposition(self, **kwargs):
         return decomposer.decompose_findings(self.input, self.finding["finding_id"],
@@ -62,8 +84,9 @@ class DecomposeFindingsTests(unittest.TestCase):
         for name in ("model_input", "reference", "annotations"):
             (self.root / name).mkdir()
             (self.root / name / "secret.txt").write_text(marker)
-        other = {"finding_id": "other", "title": marker, "report": marker}
+        other = {"finding_id": "synthetic:F002", "title": marker, "report": marker}
         self.input.write_bytes(self.input.read_bytes() + (json.dumps(other) + "\n").encode())
+        self.save_review()
         raw = json.dumps(response_fixture([claim_fixture()])).encode() + b"\n "
         with patch.object(decomposer.generator, "request_review", return_value=(200, "request-id", raw)) as request:
             with patch.object(decomposer.generator, "load_sources", side_effect=AssertionError("No code context")):
@@ -72,6 +95,8 @@ class DecomposeFindingsTests(unittest.TestCase):
         sent = request.call_args.args[0]
         payload = json.loads(sent)
         self.assertNotIn(marker, sent.decode())
+        self.assertNotIn("SYNTHETIC_SOURCE_NOT_FOR_P", sent.decode())
+        self.assertNotIn("SYNTHETIC_REVIEW_SYSTEM", sent.decode())
         self.assertNotIn(self.finding["finding_id"], sent.decode())
         self.assertEqual(json.loads(payload["messages"][1]["content"]),
                          {key: self.finding[key] for key in ("title", "report")})
@@ -97,7 +122,15 @@ class DecomposeFindingsTests(unittest.TestCase):
         self.assertEqual(row["proposition"], claim_fixture()["proposition"])
         self.assertEqual(row["finding_id"], self.finding["finding_id"])
         self.assertEqual(row["run_id"], manifest["run_id"])
-        self.assertEqual(row["verification_status"], "not_evaluated")
+        self.assertNotIn("verification_status", row)
+        self.assertEqual(row["profile_version"], "0.1")
+        self.assertEqual(row["route"], "P")
+        self.assertEqual(manifest["parent_run_id"], "synthetic")
+        self.assertEqual(manifest["paired_review_run_id"], "synthetic")
+        self.assertEqual(manifest["case_variant"], "synthetic")
+        self.assertEqual(manifest["stage"], "report_decomposition")
+        self.assertEqual((self.output / "review_manifest.json").read_bytes(),
+                         (self.root / "run_manifest.json").read_bytes())
         self.assertEqual(row["source_quotes"][0]["start"], 4)  # codepoints, not UTF-8/UTF-16
         self.assertEqual(row["source_quotes"][0]["end"], 7)
         for path in self.output.iterdir():
@@ -107,7 +140,7 @@ class DecomposeFindingsTests(unittest.TestCase):
         first = claim_fixture()
         second = {**deepcopy(first), "claim_id": "C02", "context_claim_ids": ["C01"],
                   "source_quotes": [{"field": "report", "quote": ".\r\nCould", "occurrence": 1}]}
-        document = {"schema_version": "1", "claims": [first, second]}
+        document = {"profile_version": "0.1", "route": "P", "claims": [first, second]}
         original = deepcopy(document)
         claims = decomposer.validate_claims(document, self.finding)
         self.assertEqual(document, original)
@@ -128,7 +161,7 @@ class DecomposeFindingsTests(unittest.TestCase):
                    "family": family, "proposition": proposition,
                    "source_quotes": [{"field": "report", "quote": sentence, "occurrence": 1}]}
                   for index, (family, proposition) in enumerate(assertions, 1)]
-        result = decomposer.validate_claims({"schema_version": "1", "claims": claims}, finding)
+        result = decomposer.validate_claims({"profile_version": "0.1", "route": "P", "claims": claims}, finding)
         self.assertEqual(len(result), 3)
         for original, resolved in zip(claims, result):
             self.assertEqual(resolved["proposition"], original["proposition"])
@@ -147,7 +180,7 @@ class DecomposeFindingsTests(unittest.TestCase):
     def test_invalid_claim_contract_and_quotes_rejected(self):
         variants = [
             {"proposition": " "}, {"family": "invented"}, {"family_reason": 4},
-            {"qualifiers": []}, {"claim_id": "C1"}, {"subtype": "impact"},
+            {"context": []}, {"claim_id": "C1"}, {"subtype": "impact"},
             {"family": "exploitability_impact", "subtype": None},
             {"context_claim_ids": ["C01"]}, {"context_claim_ids": ["C02"]},
             {"context_claim_ids": [True]}, {"context_claim_ids": ["C02", "C02"]},
@@ -163,10 +196,10 @@ class DecomposeFindingsTests(unittest.TestCase):
         for variant in variants:
             with self.subTest(variant=variant):
                 with self.assertRaises(ValueError):
-                    decomposer.validate_claims({"schema_version": "1", "claims": [
+                    decomposer.validate_claims({"profile_version": "0.1", "route": "P", "claims": [
                         {**claim_fixture(), **variant}]}, self.finding)
-        for document in ([], {"claims": []}, {"schema_version": "2", "claims": []},
-                         {"schema_version": "1", "claims": [claim_fixture(), claim_fixture()]}):
+        for document in ([], {"claims": []}, {"profile_version": "2", "route": "P", "claims": []},
+                         {"profile_version": "0.1", "route": "P", "claims": [claim_fixture(), claim_fixture()]}):
             with self.subTest(document=document), self.assertRaises(ValueError):
                 decomposer.validate_claims(document, self.finding)
 
@@ -225,7 +258,7 @@ class DecomposeFindingsTests(unittest.TestCase):
             response["choices"][0]["finish_reason"] = reason
             variants.append(json.dumps(response).encode())
         for field, value in (("refusal", "refused"), ("tool_calls", [{}]), ("content", None),
-                             ("content", '{"schema_version":"1","claims":[],"claims":[]}')):
+                             ("content", '{"profile_version":"0.1","route":"P","claims":[],"claims":[]}')):
             response = response_fixture([])
             response["choices"][0]["message"][field] = value
             variants.append(json.dumps(response).encode())
