@@ -68,6 +68,8 @@ Die gelieferte Git-Datei `review_prompt_v1.txt` hatte LF-Zeilenumbrüche (740 By
 
 Für das Archiv wurden diese Originalbytes direkt aus dem Request wiederhergestellt; weder Inhalt noch Manifest geändert. Die anderen fünf gelieferten Dateien sind bytegleich mit dem Eingang. Der heutige aktive Prompt `resources/review_prompt.txt` bleibt unverändert. Auch der historische Generatorhash lässt sich mit der CRLF-Fassung von `src/02_generate_findings.py` aus What-Can-We-Verify-Commit `8f9b25e` nachvollziehen; heutige OpenAI-Skripte werden nicht als damalige Implementierung ausgegeben.
 
+Die Provider-Rohantwort enthält führende Leerzeilen mit Leerzeichen. Diese Bytes gehören zum geprüften Antwort-Hash und werden nicht bereinigt. `.gitattributes` nimmt ausschließlich `generation_raw.json` von der Whitespace-Prüfung aus und erlaubt für den historischen Prompt CRLF; die Formatprüfung für Projektcode und Dokumentation bleibt aktiv. Dies berücksichtigt auch den flachen CI-Checkout, bei dem Git den gesamten Baum statt nur Umbenennungen prüfen kann.
+
 ### Aussagegrenzen der historischen Daten
 
 Das Manifest dokumentiert Run `0721c0a0-bba7-48c1-a63c-da196a69d97c`, Start 2026-09-23 14:31:07 UTC, `completed`, ein Finding. Modell `nvidia/nemotron-3-super-120b-a12b:free`, Provider Nvidia über OpenRouter, 8192 Tokenlimit, `reasoning.enabled=false`; 7,656 Sekunden, 25.832 Prompt-/216 Completion-Tokens, null gemeldete Reasoning-Tokens und gemeldete Kosten null. Diese gespeicherten Werte wurden mit der Rohantwort abgeglichen, nicht durch eine neue Inferenz reproduziert. `cost_usd` bleibt im Originalmanifest `null`.
