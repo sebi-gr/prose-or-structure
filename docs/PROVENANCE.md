@@ -25,7 +25,7 @@ Stand: 2026-10-05, nach Archivierung des vereinbarten Entwicklungspakets. Laufen
 - Decomposer-Testfixture: temporären Basispfad mit `resolve()` auflösen. Der macOS-Systemlink `/var` löste sonst bereits vor den fachlichen Tests die produktive Symlink-Sperre aus. Keine Änderung an dieser Sperre oder an den Pipeline-Skripten.
 - Annotationsvorlage: README-Linkanker an die Dokumentation dieses Repos angepasst.
 
-Die übrigen 13 Dateien sind bytegleich zur Quelle. Der Nachweis beschreibt diesen Importzeitpunkt; spätere Änderungen werden über Git nachvollzogen. Der alte `review_prompt_v1.txt` heißt nun wie upstream `review_prompt.txt`, mit identischen Bytes. Historische Laufkopien dürfen deswegen nicht umbenannt werden.
+Beim Import waren die übrigen 13 Dateien bytegleich zur Quelle. Der Nachweis beschreibt diesen Importzeitpunkt; spätere Änderungen werden über Git nachvollzogen. Der alte `review_prompt_v1.txt` heißt nun wie upstream `review_prompt.txt`, mit identischen Bytes. Historische Laufkopien dürfen deswegen nicht umbenannt werden.
 
 Die neue Quelle stellt beide Modellschritte von OpenRouter auf direkte OpenAI Chat Completions um. Diese zusammengehörige Änderung einschließlich `.env.example` und Tests wurde übernommen; kein Live-Aufruf und keine Schlüsselübernahme. Neue Aufrufe haben keine `:free`-Beschränkung. Der historische Nemotron-Review bleibt ein OpenRouter-Lauf.
 
@@ -37,7 +37,7 @@ Die [vierseitige PDF](../prose_or_structure_projektskizze.pdf), Version 0.1 vom 
 
 SHA-256: `feba77100f85f88b586e3c54e0e60f0fd120888dd88d894c78e3b5f107b774b2`.
 
-RQs, P/D-Abgrenzung, Feldgruppen und Vergleichsbedingungen bestimmen den neuen Plan. Literaturangaben und Neuheitsbehauptung wurden bei den Importen nicht neu geprüft; diese Prüfung bleibt vor der Hauptstudie offen.
+RQs, P/D-Abgrenzung, Feldgruppen und Vergleichsbedingungen bestimmen den neuen Plan. Literaturangaben und Neuheitsbehauptung wurden bei den Importen nicht neu geprüft. Schritt 2 prüft fünf Profilquellen gezielt; vollständige Literatur- und Neuheitsabgrenzung bleiben vor der Hauptstudie offen.
 
 ## Archivimport der sechs Entwicklungsartefakte
 
@@ -111,3 +111,29 @@ Der Benchmark kann Anpassungen gegenüber Upstream enthalten. Der Export ist kei
 Projektcode: [MIT](../LICENSE), Copyright 2026 Sebastian Grünewald. JSPWiki behält die mitgelieferten Upstream-Lizenzen/Notices. Vul4J-Dataset: [CC BY 4.0](https://github.com/tuhh-softsec/Vul4J/blob/376411da11fa705019f731404de1d0679fe73537/DATA_LICENSE). Die PDF enthält ihren Layout-Attributionshinweis.
 
 Sechs vom Nutzer gezielt gelieferte Entwicklungsartefakte sind nun unter `data/` versioniert; alle übrigen generierten Daten bleiben ignoriert. Der gespeicherte Request enthält den öffentlichen JSPWiki-Quellkontext samt ursprünglichen Lizenzkommentaren; weitere Lizenz-/Notice-Dateien werden mit der Fallvorbereitung geladen. Aktuelle Codebook-/Schema-Ressourcen liegen unter `resources/`. Keine Zugangsdaten übernommen. Dieses kleine Entwicklungsarchiv legt noch nicht die Archivierung der späteren Hauptstudie fest.
+
+## Profilentwicklung, Schritt 2
+
+Am 05.10.2026 wurden das gemeinsame [Profil](../resources/claim_profile.md),
+Schema und Annotationsprotokoll erstellt; Codebook und Arbeitsblatt bewusst
+weiterentwickelt. Die Importhashes bleiben als historische Herkunft erhalten;
+der aktuelle Ressourcenstand ist über Git und bei neuen Läufen über deren
+Snapshots nachvollziehbar. Die drei Python-Skripte, beide Prompts und der alte
+P-Antwortvertrag wurden dabei nicht geändert.
+
+[Entwicklungsfälle](../resources/profile_development/README.md) und
+[sources.json](../resources/profile_development/sources.json) dokumentieren die
+gezielt ausgewählten Vul4J-47-/Vul4J-9-Quellen: fixierte Upstream-/Benchmark-SHAs,
+volle Quellhashes und archivierte Bytes/Zeilen. Jackson ist ein unveränderter
+Ausschnitt (84–144), YAML eine unveränderte vollständige Datei. Beide gesamten
+Originaldateien wurden bytegleich mit den fixierten Vul4J-Snapshots verglichen.
+Die 19.000 Bytes Quell-/Lizenzmaterial bleiben unter Apache 2.0; LICENSE und
+Notices liegen bei. Die Git-Attribute schützen Originalbytes und nehmen nur die
+beiden Fremdquellen mit absichtlichen Leerzeichen von der Whitespace-Prüfung aus.
+
+Die neuen JSON-Beispiele und Referenztabellen wurden durch Codex anhand dieser
+Quellen und des historischen JSPWiki-Materials redaktionell erstellt. Keine
+neue menschliche Annotation, keine unabhängige Ground Truth, kein API-Aufruf
+und kein Java-Build/PoV. Der bekannte Report sowie Fix-/Datasetkenntnis beeinflussen
+die Entwicklungsauswahl; diese Beispiele sind nicht verblindet oder zurückgehalten.
+Alle sechs historischen Artefakte bleiben bytegleich zu `inherited_artifacts.json`.

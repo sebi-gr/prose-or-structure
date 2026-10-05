@@ -6,7 +6,11 @@ Stand: 2026-10-05. Grundlage: [Projektskizze v0.1](prose_or_structure_projektski
 
 Untersucht wird, wie **P: Code → Report → Claims** und **D: Code → Claims** sich bei identischem Quellkontext und gemeinsamem Claimprofil unterscheiden. RQ1 entwickelt das Profil, RQ2 vergleicht Qualität und Aufwand, RQ3 untersucht Darstellungsfehler und die Wirkung expliziter Kontextfelder. Eine Überlegenheit von D ist keine Annahme.
 
-**Nächster Arbeitsschritt:** Das [Codebook](resources/claim_codebook.md) und [P-Extraktionsschema](resources/claim_response_schema.json) anhand des jetzt archivierten Originalreports und der [manuellen Annotation mit 13 Claims](data/annotations/VUL4J-18-review-001/manual_annotation_001.md) zum gemeinsamen P/D-Claimprofil weiterentwickeln. P-Decomposer und formale Validierung sind vorhanden. Das vereinbarte kleine Übergabepaket ist geprüft; zusätzliche historische Decomposition-/PoV-Rohdaten sind optional, kein Blocker für diesen Schritt.
+**Nächster Arbeitsschritt: Schritt 3.** P-Extraktor und Validierung auf das
+[gemeinsame Profil 0.1](resources/claim_profile.md) umstellen und den kleinen
+D-Schritt ergänzen. Dafür zuerst den archivierten Report nutzen; keinen neuen
+Report erzeugen. Schritt 2 ist als Entwicklungs-PoC abgeschlossen, keine
+abgeschlossene Validierung von RQ1 oder unabhängige menschliche Referenzstudie.
 
 ## Meilensteine und Abschlusskriterien
 
@@ -14,13 +18,13 @@ Untersucht wird, wie **P: Code → Report → Claims** und **D: Code → Claims*
 |---|---|---|
 | 0. Repository und geerbte Basis | Erledigt; neuer Import geprüft | Aktueller Stand mit drei Skripten übernommen, 29/29 Offline-Tests bestanden; Herkunft/Hashes, Dokumentation und CI vorhanden. |
 | 1. Minimales Entwicklungspaket sichern | Erledigt | Sechs ausgewählte Report-/Annotationsdateien archiviert und auf Hashes, Originaltext und Zuordnung geprüft; rekonstruierbare Daten lokal belassen, zusätzliche historische Logs optional. |
-| 2. Claimprofil und Annotation v0.1 (RQ1) | Als Nächstes | Gemeinsames Profil, Codebook, Grenzfälle und getrennte Referenzregeln an JSPWiki und wenigen weiteren Entwicklungsfällen erprobt. |
+| 2. Claimprofil und Annotation v0.1 (RQ1) | Erledigt als Entwicklungs-PoC | Gemeinsames Profil, Codebook, Grenzfälle und getrennte Referenzregeln an JSPWiki und wenigen weiteren Entwicklungsfällen erprobt. |
 | 3. Gepaarte P/D-Erzeugung implementieren | P-Extraktor/Validierung vorhanden; D offen | Bestehende P-Komponenten auf das gemeinsame Profil angepasst und um D ergänzt; gespeicherte Originale, Kontexttrennung und gleiches Zielprofil funktionieren. |
 | 4. Pilot vorbereiten und ausführen | Geplant | Protokoll vorab fixiert, beide Routen auf denselben 5–10 Fällen, Fehler und Annotationszeit vollständig erfasst; Vergleichbarkeit bewertet. |
 | 5. Hauptstudie planen und einfrieren | Nach Pilot | Fallzahl, zurückgehaltene Fälle, Baselines, Budgetkontrolle, Ablation, Annotation und Auswertung begründet festgelegt; engste Vorarbeiten geprüft. |
 | 6. Hauptstudie und Paper | Später | Gepaarte Ergebnisse, Unsicherheit, Fehleranalyse, Limitationen und reproduzierbare Forschungsartefakte vorhanden. |
 
-Kein zusätzlicher Live-Review oder erneuter Java-Build ist Teil der Übernahme. Der vorhandene Code implementiert Fallvorbereitung, Reportgenerierung und P-Extraktion mit Format-/Zitat-/Referenzprüfung. D, das gemeinsame P/D-Profil und Vergleichsauswertung fehlen noch. Der neue Quellstand verwendet direkt OpenAI statt OpenRouter; Modell und Studienbudget bleiben offen.
+Kein zusätzlicher Live-Review oder erneuter Java-Build ist Teil der Übernahme. Der vorhandene Code implementiert Fallvorbereitung, Reportgenerierung und P-Extraktion mit Format-/Zitat-/Referenzprüfung. Das gemeinsame P/D-Profil ist spezifiziert; seine Anbindung, D und Vergleichsauswertung fehlen noch. Der neue Quellstand verwendet direkt OpenAI statt OpenRouter; Modell und Studienbudget bleiben offen.
 
 ## 1. Vorarbeit als nachvollziehbare Entwicklungsbasis
 
@@ -33,28 +37,33 @@ Kein zusätzlicher Live-Review oder erneuter Java-Build ist Teil der Übernahme.
 
 ## 2. Gemeinsames Claimprofil und Referenzen (RQ1)
 
-Ein kleines Profil aus Literatur und manueller Kodierung entwickeln. CAE/SACM dienen laut Skizze als begriffliche Grundlage; keine vollständige SACM-Implementierung und keine Lean-Formalisierung. Folgende Feldgruppen sind Arbeitsanforderungen, noch kein verabschiedetes JSON-Schema:
+**Ergebnis vom 05.10.2026:**
 
-| Feldgruppe | Zu konkretisieren |
-|---|---|
-| Aussage | Claim-ID, Proposition, vorläufiger Typ; unabhängig bewertbare Aussagen trennen |
-| Bedingungen und Umfang | Akteur/Rechte, Voraussetzungen, Negation, Modalität, Quantoren, betroffene Version/Konfiguration |
-| Herkunft und Beziehungen | Codebezüge; Reportfundstelle bei P; ausdrücklich benannte Beziehungen zu anderen Claims |
-| Prüfbezug | Benötigte Evidenz/Prüfaufgabe getrennt von Aussage, Annahmen und vorhandenen Belegen |
+- [Profil 0.1](resources/claim_profile.md) und [JSON-Schema](resources/claim_profile.schema.json): gemeinsame Aussagefelder, sechs einfache Kontexttexte, P-Zitate/D-Leerliste, Codebezüge, lokale Kontext-IDs und getrennte Prüfaufgabe mit benötigter Evidenz/Zusatzannahmen.
+- [Codebook](resources/claim_codebook.md): keine Zielclaimzahl; Bedingungen, Aussagekraft und Alternativen erhalten; nicht erwähnt, explizit verneint und ausdrücklich unbekannt unterscheiden. Kategorien bleiben vorläufig.
+- [Annotationsprotokoll](resources/annotation_protocol.md) und [Arbeitsblatt](resources/manual_annotation_template.md): Reportreferenz und Codereferenz getrennt; semantische Mehrfachzuordnung, begrenzte Coverage-Einheiten, offene Fragen, Unsicherheit und Prüfbarkeit sowie unabhängige Doppelannotation/Adjudikation geregelt.
+- [Entwicklungsdurchgang](resources/profile_development/README.md): JSPWiki/VUL4J-18 mit den 13 historischen Claims sowie VUL4J-47 (Jackson XML) und VUL4J-9 (YAML-Laden). Zehn ausgewählte Profilclaims in vier JSON-Beispielen, getrennte Referenzinventare, Grenzfälle und Quellen mit fixierten Revisionen/Hashes. Zusätzliche Quellen-/Lizenzdateien umfassen nur 19 KB.
+- CAE/SACM, DecompScore, VeriScore und DnDScore gezielt als Primärquellen geprüft; Begründung und Übertragungsgrenzen im Profil. Keine vollständige Literaturübersicht oder SACM-Implementierung.
 
-Das übernommene Codebook verwendet `location`, `data_flow`, `protection_precondition`, `exploitability_impact` sowie `other`/`unclear`. Das ist eine Entwicklungsbasis, keine validierte Taxonomie. Ausnutzbarkeit und Wirkung getrennt erfassen, wenn sie getrennt behauptet werden. Keine Kategorie pro Finding erzwingen. Das bestehende P-Schema bündelt Bedingungen in `qualifiers`; explizite Kontext-/Codebezugs-/Prüfaufgabenfelder für P/D fehlen noch.
+Festgelegte Details: `null` = nicht angegeben, explizite Negation/Unbekanntheit als
+Text; P-Zitate exakt mit einsbasiertem Vorkommen, Offsets später lokal wie bisher;
+Codebezüge nach jeweiligem Input erhalten, inhaltlich falsche Positionen beider
+Routen separat bewerten. ID-Scope ist die einzelne Ausgabe, dauerhafte Zuordnung
+über Run-ID. Vorhandene Evidenz und Wahrheitsurteile stehen ausschließlich in der
+separaten Annotation. JSON-Schema plus wenige lokale Prüfungen genügen in Schritt 3.
 
-Konkrete Entscheidungen vor der Implementierung:
+Die neuen Beispiele sind KI-gestützte redaktionelle Entwicklungsarbeit, keine
+neuen menschlichen Annotationen, Modellläufe oder PoV-Reproduktionen. Die historische
+Annotation bleibt unverändert. Alle drei Fälle samt Varianten gehören fortan zur
+Entwicklung, nicht zur zurückgehaltenen Evaluation. Realbeispiele/Referenzen stehen
+außerhalb des an Modelle gesendeten Codebooks. Die allgemeine Codebook-Präzisierung
+ist schon aktiv; der ausführbare P-Antwortvertrag bleibt bis Schritt 3 bei Version 1.
 
-- Fehlende Angaben, explizite Negation und unbekannte Zustände unterscheidbar machen; keinen Akteur, Schutz oder Impact hinzuerfinden.
-- P-Zitate auf unveränderte Titel-/Reportfelder beziehen; D braucht keine künstliche Reportfundstelle. Der bestehende Decomposer verwendet exakte Zitate mit einsbasiertem Vorkommen und berechnet nullbasierte Unicode-Codepoint-Offsets mit exklusivem Ende; diese bereits getestete Konvention beibehalten, sofern kein begründeter Änderungsbedarf entsteht.
-- Beim P-Extraktor Codebezüge nur aus dem Report übernehmen. Ergänzender Kontext oder abgeleitete Prüfaufgaben dürfen nicht als im Report behauptete Aussage erscheinen.
-- Claim-ID-Scope, Referenzen, Einheiten der Annotation, Mehrfachzuordnungen und Umgang mit mehrdeutigen Zitaten festlegen. Semantische Übereinstimmung zählt, nicht Wortlaut oder identische Claimzahl.
-- **Reportreferenz für P:** tatsächlich enthaltene Propositionen und Bedingungen, unabhängig von ihrer Wahrheit.
-- **Codereferenz für beide Routen:** vorab abgegrenzte relevante Propositionen und offene Fragen, bezogen auf das identische bereitgestellte Codepaket. Erkenntnisse aus zusätzlichem Patch-/PoV-Material getrennt kennzeichnen; sie machen fehlende Evidenz im Modellkontext nicht nachträglich sichtbar.
-- Auf einem Teilbestand zwei unabhängig annotierende Personen, möglichst ohne Kenntnis der Route. Einzelurteile vor Adjudikation erhalten. Ein weiteres LLM darf unterstützen, aber nicht allein die Referenz bilden.
-
-Ergebnis dieses Schritts: ein versioniertes Profil, ein Codebook mit echten Entwicklungsbeispielen/Grenzfällen und ein dokumentierter Annotationsablauf. Dateiformat und kleinste notwendige Validierung erst daran festlegen.
+Validierung: vier Beispiele gegen Draft-2020-12-Schema geprüft, negative
+Formatbeispiele abgelehnt; Zitate, lokale IDs, Zeilen/Hashes und originale
+Archivbytes geprüft. Die 29 Offline-Regressionstests bleiben erfolgreich.
+Die Taxonomie und Annotationszeit werden erst im Pilot empirisch geprüft;
+zweite menschliche Annotation und Übereinstimmung sind weiterhin offen.
 
 ## 3. Kleinster vollständiger P/D-Versuch
 
@@ -95,14 +104,14 @@ Der Pilot prüft Annotationzeit, Fehlerarten, Vergleichbarkeit und technische Du
 
 Gepaarte Unterschiede **pro Codefall** mit Effektgrößen und Konfidenzintervallen auswerten. Claims und Wiederholungen desselben Falls nicht als unabhängige Stichproben behandeln. Verfahren zur Unsicherheitsbestimmung, Aggregation, Nennern bei Null-Ergebnissen und Umgang mit fehlgeschlagenen Routen vor der Hauptstudie festlegen. Annotationsübereinstimmung und Urteile vor/nach Adjudikation getrennt berichten. Nichtsignifikanz ist kein Gleichwertigkeitsnachweis.
 
-Die engsten Vorarbeiten aus Abschnitt 2 und der Literaturliste der Skizze gezielt prüfen: DnDScore, DecompScore, VeriScore, LLMSAN, GPTAid, VERGE und EviGuard. Literaturangaben und Neuheitsabgrenzung wurden bei der Repo-Einrichtung nicht neu verifiziert. Security-Systeme nur bei kompatibler Teilaufgabe als Vergleich einsetzen. Bibliographie, passende Baseline und Abgrenzung vor der Hauptstudie festhalten.
+Die engsten Vorarbeiten aus Abschnitt 2 und der Literaturliste der Skizze gezielt prüfen: DnDScore, DecompScore, VeriScore, LLMSAN, GPTAid, VERGE und EviGuard. Die fünf Profilquellen sind in Schritt 2 gezielt geprüft; engste Security-Vergleiche, vollständige Literaturabgrenzung und Neuheitsbewertung bleiben offen. Security-Systeme nur bei kompatibler Teilaufgabe als Vergleich einsetzen. Bibliographie, passende Baseline und Abgrenzung vor der Hauptstudie festhalten.
 
 Anhand des Piloten Hauptstichprobe, Präzisions-/Fallzahlbegründung, Zeitplan und Umfang mit der Betreuung abstimmen; zweiten Annotator klären. Danach Schema, Codebook, Prompts, Protokoll und Auswertung einfrieren. Ablage/Archivierung der Forschungsdaten festlegen, damit ein Clone plus freigegebene Daten die Studie nachvollziehbar macht.
 
 ## Offen, bevor neue Experimente starten
 
 - Keine offene Datenübernahme als Voraussetzung für die Profilentwicklung; historische Zusatzlogs/Revisionsnotizen bleiben optional.
-- Profil-/Annotationsdetails und Auswahl zusätzlicher Entwicklungsfälle.
+- Profil 0.1 in Schritt 3 anbinden; Grenzfälle und Annotationsaufwand anschließend im Pilot überprüfen.
 - Modell/Provider, Reasoning, Budget, Wiederholungen und Baseline-Implementierungen.
 - Zweiter Annotator, Pilotbestand und spätere Hauptstichprobe.
 

@@ -1,14 +1,23 @@
 # Claim-Codebook
 
-Arbeitsregeln für manuelle und automatische Zerlegung. Wir erfassen Behauptungen
-im Finding; ihre Wahrheit wird hier nicht geprüft. Die Kategorien sind vorläufig.
+Version 0.1 des gemeinsamen P/D-Profils, 2026-10-05. Arbeitsregeln für
+Propositionen und ihre Zerlegung; die Kategorien bleiben vorläufig.
+P erfasst Behauptungen im Finding, D formuliert Behauptungen aus dem gelieferten
+Code. Wahrheit und Qualität bewertet anschließend eine getrennte Annotation.
+Das mitgelieferte Antwortschema bestimmt die Felder: Der bestehende P-Extraktor
+verwendet bis zur Umstellung weiterhin seinen achtteiligen Antwortvertrag.
+Dieses Codebook enthält nur generische Regeln und erfundene Beispiele.
 
 ## Ziel und Ablauf
 
-Wir erfassen, **was ein Finding behauptet**, einschließlich möglicher Fehler.
+Bei P erfassen wir, **was ein Finding behauptet**, einschließlich möglicher Fehler.
 Eine originalgetreue Extraktion kann eine falsche Behauptung enthalten.
-Code, Fix und PoV dienen später der Wahrheitsprüfung; sie dürfen den Report bei
+Code, Fix und PoV dürfen den Report bei
 der Zerlegung weder korrigieren noch um zusätzliche Aussagen ergänzen.
+Bei D ist ausschließlich das bereitgestellte Codepaket Fallmaterial. Fehlender
+Aufrufer-/Bibliotheks-/Deployment-Kontext bleibt offen. Fix, PoV und Referenzlabels
+gehören in keine der beiden Erzeugungsrouten. Folgender Leseablauf bezieht sich auf P;
+die Regeln zu Granularität, Bedingungen und Typisierung gelten auch für D.
 
 1. Titel und vollständigen Report lesen. Satzgrenzen sind nur Lesehilfen.
 2. Pro unabhängig beurteilbarer Behauptung einen Claim-Block im
@@ -49,9 +58,15 @@ angeben; dieser Entwicklungspilot ist keine verblindete oder unabhängige Evalua
   Auswirkungen aus dem Schwachstellenlabel ergänzen. Fehlende Angaben als
   „nicht genannt“ markieren; eine mehrdeutige Angabe als „unklar“.
 - **Vollständigkeit:** Titel mitprüfen. Fasst er den Report nur zusammen oder
-  wiederholt bereits erfasste Aussagen, keinen zusätzlichen Claim anlegen. Zusätzliche
+  wiederholt bereits erfasste Aussagen mit gleicher Aussagekraft, Bedingungen und
+  gleichem Umfang, keinen zusätzlichen Claim anlegen. Ein kategorisches Titellabel
+  ist nicht automatisch identisch mit einer nur möglichen Wirkung im Text. Zusätzliche
   Behauptungen separat erfassen. Empfehlungen oder nicht zuordenbare Inhalte im
   Abdeckungscheck ausdrücklich behandeln, nicht still weglassen.
+- **Abwesenheit präzisieren:** Nicht erwähnt ist nicht explizit verneint und nicht
+  dasselbe wie ausdrücklich unbekannt. „Ohne ausreichende Validierung“ bedeutet
+  nicht „ohne jede Validierung“. Ein Schutzaufruf beweist nicht seine Wirksamkeit;
+  fehlender Schutz im Ausschnitt beweist nicht seine Abwesenheit im ganzen System.
 
 ## Vorläufige Familien
 
@@ -73,6 +88,9 @@ Datenflussbehauptung vorläufig als other behandeln. Ein eigenständiges Titella
 ist ebenfalls other, soweit es mehr als eine Zusammenfassung des Reports enthält.
 Ein Pfad oder Parametername allein entscheidet nicht über die Familie.
 Diese Beispiele sind erfunden und keine Annotation des aktuell zerlegten Findings.
+Fehlendes Dekodieren ist für sich keine fehlende Schutzmaßnahme. Eine Methode
+in einer Datenflussproposition rechtfertigt keinen zusätzlichen Location-Claim,
+wenn damit nur dieselbe Aussage wiederholt wird.
 
 ## Beispiel: mehrere Claims aus einem Satz
 
@@ -110,6 +128,13 @@ Begründung nachvollziehbar? Dafür sind keine zusätzlichen Prüffelder oder
 Änderungsprotokolle pro Claim erforderlich.
 Die Wahrheit bleibt für sämtliche Claims `not_evaluated`; „Extraktion geprüft“
 bedeutet nicht „Schwachstelle bewiesen“.
+
+Für D bedeutet eine lokal sichtbare Operation nicht automatisch externen
+Angreiferzugriff, eine ausnutzbare Schwachstelle oder Wirkung. Voraussetzungen
+und offene Kontextgrenzen explizit erhalten. Prüfaufgaben sind abgeleitete Fragen;
+benötigte Evidenz darf nicht als bereits vorhandener Beleg erscheinen.
+Diese Trennung gilt auch bei P. Nachgelagerte Bewertungsurteile werden weder
+in die Proposition noch in deren sprachliche Unsicherheit zurückgeschrieben.
 
 Änderungen direkt in dieser Datei pflegen; die Historie liegt in Git.
 Für neue Modellläufe speichert das Skript die verwendeten Ressourcenbytes und

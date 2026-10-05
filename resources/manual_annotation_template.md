@@ -1,82 +1,85 @@
-Kopiervorlage: Für einen Fall zuerst nach `data/annotations/` kopieren. Das aktuelle
-Arbeitsblatt ist in [README.md](../README.md#manual-annotation-and-automatic-extraction) verlinkt.
+# Arbeitsblatt — {{CASE_OR_FINDING_ID}}
 
-# Manuelle Zerlegung — {{FINDING_ID}}
+Kopiervorlage für [Profil 0.1](claim_profile.md) und
+[Annotationsprotokoll 0.1](annotation_protocol.md). Nach `data/annotations/` in
+einen neuen Pfad kopieren. Nur zum jeweiligen Durchgang passende Tabellen nutzen;
+Referenzen und Ausgabeurteile in getrennten Dateien bearbeiten. Unausgefüllte
+Vorlage ist kein Annotationsresultat. Die Links hier gelten am Vorlagenstandort;
+in einer Arbeitskopie die Referenzen relativ zum neuen Pfad anpassen.
 
 ## Zuordnung
 
-- Status: vorbereitet; noch keine menschliche Annotation.
-- Vorbereitung: {{PREPARED_BY_DATE}}
-- Finding-Datei (Pfad relativ zur Repo-Wurzel): `{{SOURCE_PATH}}`
-- SHA-256 der Finding-Datei: `{{SOURCE_SHA256}}`
-- Finding-ID: `{{FINDING_ID}}`
-- Codebook: `resources/claim_codebook.md`
-- SHA-256 der verwendeten Codebook-Datei: `{{CODEBOOK_SHA256}}`
-- Annotator/in (Kürzel): **AUSFÜLLEN**
-- Bearbeitet am: **AUSFÜLLEN**
-- Vorwissen / Hilfsmittel: {{PRIOR_KNOWLEDGE}}
-- Wahrheitsprüfung aller Claims: `not_evaluated` (nicht Teil dieses Durchgangs).
+- Durchgang: Reportreferenz / Codereferenz / Ausgabebewertung / Adjudikation
+- Fall, Variante, Split: AUSFÜLLEN
+- Eingabepfade und SHA-256; bei P Finding-ID: AUSFÜLLEN
+- Profil-/Codebook-Version und Git-Commit: AUSFÜLLEN
+- Annotator/in, Datum, Zeitaufwand: AUSFÜLLEN
+- Hilfsmittel, Vorwissen, Blindierung: AUSFÜLLEN
+- Status: vorbereitet; noch keine menschliche Annotation
 
-Das Original unten nicht bearbeiten. Die Claim-Blöcke und Abschlussfelder sind
-dein Arbeitsbereich. Ein Claim ist eine Behauptung, nicht notwendigerweise ein Satz.
-`{{...}}` kennzeichnet Metadaten, die beim Vorbereiten einer neuen Kopie ersetzt
-werden. Fallbezogene Arbeitsblätter liegen unter dem ignorierten `data/annotations/`.
+## Reportreferenz — nur P, ohne Codebewertung
 
-## Original (unverändert)
+Original-Titel und Original-Report unverändert beilegen oder eindeutig per
+Datei/Hash referenzieren. Pro unabhängig beurteilbarer Aussage einen Block:
 
-### T — title
+### R01
 
-```text
-{{TITLE}}
-```
+- Proposition: AUSFÜLLEN
+- Exakte Zitate: `field`, `quote`, `occurrence` (einsbasiert)
+- Familie, ggf. Subtyp, Begründung: AUSFÜLLEN
+- Akteur/Rechte; Voraussetzungen; Negation; Modalität; Quantoren; Scope: AUSFÜLLEN
+- Kontextreferenzen und Relation im Aussageinhalt: AUSFÜLLEN
+- Grenze/alternative Lesart: AUSFÜLLEN oder keine
 
-### report
+| Titel/Satz | Referenz-IDs oder begründeter Ausschluss |
+|---|---|
+| AUSFÜLLEN | |
 
-```text
-{{REPORT}}
-```
+## Codereferenz — vor Einsicht in Ausgaben
 
-## Abdeckung
+Codepaket/Manifest per Hash fixieren. Keine Fakten aus Fix/PoV/Advisory importieren.
 
-{{COVERAGE_TABLE}}
+| ID | Art (`proposition`/`open_question`) | Relevante Proposition/Frage | Relevanzgrund | Datei/Zeilen | Kontextgrenze |
+|---|---|---|---|---|---|
+| K01 | | | | | |
 
-Nach dem Zerlegen jeder Passage alle zugehörigen Claim-IDs zuordnen. Nicht jede
-Passage braucht einen eigenen Claim: Wiederholungen dürfen auf denselben verweisen.
-Nicht erfasste Teile begründen; Satzkennungen sind keine vorgegebene Zerlegung.
-Ein Satz darf mehrere Claims mit unterschiedlichen Familien belegen. Ein Titel,
-der nur den Report zusammenfasst, braucht keinen zusätzlichen Claim.
+Externes Zusatzwissen, separat vom Codepaket: AUSFÜLLEN oder keines.
 
-## Claims — diesen Block je weiterer Aussage kopieren
+## Profilentwurf — optionale Entwicklung, keine Modellmessung
 
-### C01
+Für P/D-Beispiele alle Felder aus `claim_profile.schema.json` in einer separaten
+JSON-Datei ausfüllen und hier Pfad/Hash vermerken. Herkunft deutlich benennen
+(menschlich, KI-unterstützt oder konkreter Modelllauf). Keine menschliche
+Bestätigung für automatisch erstellte Entwürfe eintragen.
 
-- **Originalzitat(e):** AUSFÜLLEN — `title`/`report`, T/Satzkennung und exakter Text;
-  bei Bedarf mehrere Zitate einschließlich Bezugssatz.
-- **Proposition:** AUSFÜLLEN — eine eigenständig verständliche Behauptung. Deutsch
-  oder Englisch möglich; Fachbezeichner und behauptete Codepositionen erhalten.
-- **Familie und Begründung:** AUSFÜLLEN — siehe Codebook; bei
-  `exploitability_impact` zusätzlich Untertyp.
-- **Unsicherheit / Negation / Bedingungen / Geltungsbereich:** AUSFÜLLEN — im
-  Original behauptete Akteure, Voraussetzungen und Einschränkungen; „nicht genannt“
-  ist erlaubt. Diese Einschränkungen müssen auch in der Proposition erhalten bleiben.
-- **Benötigter Kontext:** AUSFÜLLEN — andere Claim-IDs mit Erklärung oder „keiner“;
-  ungelöste Bezüge ausdrücklich markieren.
+- Profilausgabe: AUSFÜLLEN
+- Prüfaufgaben/benötigte Evidenz/Zusatzannahmen von Aussagen getrennt: AUSFÜLLEN
 
-## Grenzfälle / Vorschläge für das Codebook
+## Zuordnung und Bewertung
 
-| Passage oder Claim | Problem | Entscheidung oder offener Vorschlag | Begründung |
+| Referenz-ID | Ausgabe-IDs | Abdeckung (`full`/`partial`/`none`) | Fehlteil/Mehrdeutigkeit |
 |---|---|---|---|
 | AUSFÜLLEN | | | |
 
-Wenn keine Grenzfälle auftreten, ausdrücklich „keine“ eintragen. Codefehler oder
-Wahrheitsvermutungen nicht zur Korrektur der extrahierten Aussage verwenden.
+| Ausgabe-ID | P-Treue/Änderung (nur P) | Codeurteil | Konkrete Evidenz/fehlender Kontext | Unsicherheit | Prüfbarkeit |
+|---|---|---|---|---|---|
+| AUSFÜLLEN | | | | | |
 
-## Abschluss durch den Menschen
+Zusatzclaims ohne Referenzzuordnung und Duplikate: AUSFÜLLEN oder keine.
+Lauf-/Bewertungsfehler separat: AUSFÜLLEN oder keine.
 
-- [ ] Titel und alle Reportsätze im Abdeckungscheck zugeordnet oder begründet ausgeschlossen.
-- [ ] Jede Proposition hat exakte Originalzitate; aufgelöste Bezüge sind im Finding belegt.
-- [ ] Negation, Modalität, Bedingungen, Alternativen und Geltungsbereich sind erhalten.
-- [ ] Codepositionen oder Behauptungen wurden nicht mit Wissen aus Code/Fix/PoV korrigiert.
-- [ ] Codebook-Grenzfälle und verwendete Hilfsmittel sind dokumentiert.
-- Ergebnis des Durchgangs: **offen** — nach Bearbeitung kurz festhalten, ob noch
-  Entscheidungen nötig sind. Keine Aussage über die Wahrheit der Claims ableiten.
+## Grenzen / Adjudikation
+
+| IDs | Problem / Urteil A | Unabhängiges Urteil B | Entscheidung, Begründung, Person |
+|---|---|---|---|
+| AUSFÜLLEN | | | |
+
+Originale A/B erhalten; eine Einzelbearbeitung nicht als Doppelannotation ausgeben.
+
+## Abschluss
+
+- [ ] Inputs/Hashes, Hilfsmittel, Vorwissen und Zeit dokumentiert.
+- [ ] Aussagen inkl. Bedingungen, Negation, Modalität und Alternativen erhalten.
+- [ ] Reporttreue, Codeurteil, Zusatzwissen und Prüfaufgabe getrennt.
+- [ ] Coverage-Zuordnungen und ungelöste Grenzen nachvollziehbar.
+- Ergebnis / offene Entscheidungen: AUSFÜLLEN

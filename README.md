@@ -37,28 +37,49 @@ they are not automatically safe programs.
 The reusable baseline comes from
 [What Can We Verify? at `5df7760`](https://github.com/sebi-gr/What-Can-We-Verify/tree/5df7760459b741ae36bd91af4af89f6e3ecfe18d).
 All three scripts, the current prompts, codebook, schema, annotation template,
-and tests are imported. Local adjustments are limited to a macOS test-fixture
-path and the template's documentation link. The P/D study plan remains the
-research direction of this repository.
+and tests are imported. The import record preserves the original hashes. Step 2
+refines the codebook and annotation template; the three scripts remain unchanged.
+The P/D study plan remains the research direction of this repository.
 
 | Component | Available here |
 |---|---|
 | Pinned VUL4J-18 preparation | Executable; five source/configuration files, separate references, hashes |
 | Prose-report generator | Executable; one direct OpenAI request, stored inputs, raw response, and run metadata |
 | P extractor and format validation | Executable; selected report only, exact quotes/offsets, claim IDs and context references |
-| Codebook, annotation template, response schema | Imported development baseline; not yet the shared P/D profile |
+| Shared claim profile, codebook and annotation protocol | Version 0.1 specified and exercised on three development cases; not yet wired into the scripts |
+| Current P response schema | Executable legacy contract, separate from the shared profile |
 | Offline regression tests | 29 tests using synthetic fixtures |
 | Historical Java-PoV reproduction | Imported protocol; original raw logs are not available here |
 | Historical JSPWiki report | Archived finding, request, raw response, prompt, and manifest; consistency verified |
 | Manual annotation with 13 claims | Archived accepted development revision; linked to the exact report |
 | Previous automatic decomposition runs | Historical summaries only; raw run artifacts are not archived here |
-| Shared P/D claim profile, D generator, evaluation | Planned; not implemented |
+| Shared-profile integration, D generator, evaluation | Next: step 3; not implemented |
 
 The six-file development archive is available in every clone; source and import
 hashes are documented in [docs/PROVENANCE.md](docs/PROVENANCE.md). Additional old
 decomposition runs and PoV logs are optional historical evidence, not prerequisites
-for the next step. The repository is ready to refine the claim profile using the
-original report and annotation; it is not yet an implemented P/D comparison.
+for the next step. Step 2 is complete as a development PoC; the repository is
+ready to implement the paired routes, not yet to report a P/D comparison.
+
+## Shared profile and annotation
+
+[Claim profile 0.1](resources/claim_profile.md) defines the common P/D contract
+and its [JSON Schema](resources/claim_profile.schema.json). It separates the
+proposition, explicit conditions, provenance and a derived verification question.
+Missing information, explicit negation and stated uncertainty remain distinct.
+The [annotation protocol](resources/annotation_protocol.md) separates P report
+fidelity from code grounding and defines semantic coverage and adjudication.
+
+The [development walkthrough](resources/profile_development/README.md) covers
+JSPWiki, Jackson XML (VUL4J-47) and Commons Configuration YAML (VUL4J-9), with
+pinned source fixtures and ten selected profile claims. These are AI-assisted
+editorial examples, not model outputs, independent human ground truth or new
+PoV executions. All three cases remain development data. Case-specific references
+and examples must never be injected into generation prompts.
+
+Step 3 will integrate this profile. Until then, the existing P script still uses
+`claim_response_schema.json` with `schema_version: "1"`; the new profile schema
+is a design contract, not a second selectable runtime mode.
 
 ## Start here
 
@@ -161,7 +182,7 @@ usage is preserved; `cost_usd` remains `null` because billing is not calculated.
 
 ## Manual annotation and automatic extraction
 
-The imported [codebook](resources/claim_codebook.md) and
+The refined [codebook](resources/claim_codebook.md) and
 [annotation template](resources/manual_annotation_template.md) provide the
 development rules for faithful extraction. Copy the template into a new file
 under `data/annotations/` for new manual work. The accepted historical
@@ -203,8 +224,8 @@ one-based occurrence numbers, and local context IDs. Local validation resolves
 quotes to zero-based Unicode-codepoint offsets (exclusive end), validates fields
 and references, then adds run/finding IDs and `verification_status: not_evaluated`.
 It does not validate granularity, coverage, semantic fidelity, or truth.
-Dedicated context, code-reference, and verification-task fields for the shared
-P/D profile remain design work; this extraction schema is the starting point.
+The dedicated context, code-reference and verification-task fields are now
+specified in profile 0.1. Integrating them into this script is step 3.
 
 Outputs include `findings_input.jsonl`, `finding.json`, all three resource
 snapshots, `request.json`, `decomposition_raw.json` when received,
@@ -264,7 +285,9 @@ protection, failure handling, model-ID checks, `.env` loading, reasoning control
 and claim format/quotes/offsets/references. On Windows the symlink test explicitly skips if the privilege is
 unavailable. Tests do not establish live API compatibility or research results.
 
-Our code is under [MIT](LICENSE). Downloaded JSPWiki files retain their upstream
+Our code is under [MIT](LICENSE). Curated XML/YAML source fixtures retain their
+Apache 2.0 licenses and notices under `resources/profile_development/`.
+Downloaded JSPWiki files retain their upstream
 licenses and notices. Dataset attribution and pinned revisions are recorded in
 [docs/PROVENANCE.md](docs/PROVENANCE.md); third-party material is not relicensed
 by this repository.

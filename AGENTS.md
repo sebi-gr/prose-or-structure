@@ -22,6 +22,7 @@
 
 - P und D erhalten identische, fixierte Code-/Konfigurationsbytes. Der P-Extraktor erhält nur den unveränderten Report als Fallmaterial sowie generische Schema-/Codebook-Anweisungen; keine zusätzliche Codeanalyse.
 - Fix, PoV, Advisory, Benchmark-Labels, Referenzannotation, Manifest und Projektdokumentation aus Generierungskontexten ausschließen. Bei Agenten den tatsächlichen Toolzugriff begrenzen; getrennte Ordner allein reichen nicht.
+- Schritt-2-Vertrag: `resources/claim_profile.md` und `claim_profile.schema.json`, Version 0.1; noch nicht im P-Skript aktiv. Reale Beispiele und Referenzen unter `resources/profile_development/` sowie das Annotationsprotokoll niemals als Modellkontext verwenden. Das Codebook bleibt generisch.
 - Ein gemeinsames Claimprofil verwenden. Aussage, Annahmen/ergänzender Kontext, abgeleitete Prüfaufgabe und bereits vorliegende Evidenz getrennt halten. Akteur/Rechte, Voraussetzungen, Negation, Modalität, Quantoren und Geltungsbereich erhalten.
 - Extraktionstreue ist keine Wahrheitsprüfung. Eine falsche Reportaussage kann korrekt extrahiert sein. Modellübereinstimmung oder ein erfolgreicher PoV bestätigt nicht automatisch alle Claims.
 - Reportreferenz für P und unabhängige, auf den bereitgestellten Kontext bezogene Codereferenz getrennt erstellen. Nicht entscheidbare Claims und technische Bewertungsfehler getrennt erfassen.

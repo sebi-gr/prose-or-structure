@@ -5,3 +5,8 @@ data/annotations/VUL4J-18-review-001/* -text
 data/runs/VUL4J-18-review-001/review_prompt_v1.txt whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 # Provider whitespace belongs to the hashed raw response and must stay intact.
 data/runs/VUL4J-18-review-001/generation_raw.json -whitespace
+
+# Verbatim third-party profile-development material; hashes use original bytes.
+resources/profile_development/code/* -text -whitespace
+resources/profile_development/*LICENSE*.txt -text
+resources/profile_development/*NOTICE*.txt -text

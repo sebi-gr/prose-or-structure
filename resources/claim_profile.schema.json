@@ -1,0 +1,93 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Prose or Structure shared claim profile 0.1 (step 3 contract)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["profile_version", "route", "claims"],
+  "properties": {
+    "profile_version": {"const": "0.1"},
+    "route": {"enum": ["P", "D"]},
+    "claims": {"type": "array", "items": {"$ref": "#/$defs/claim"}}
+  },
+  "allOf": [{
+    "if": {"properties": {"route": {"const": "P"}}},
+    "then": {"properties": {"claims": {"items": {"properties": {"source_quotes": {"minItems": 1}}}}}},
+    "else": {"properties": {"claims": {"items": {"properties": {"source_quotes": {"maxItems": 0}}}}}}
+  }],
+  "$defs": {
+    "text": {"type": "string", "pattern": "\\S"},
+    "nullable_text": {"anyOf": [{"$ref": "#/$defs/text"}, {"type": "null"}]},
+    "claim_id": {"type": "string", "pattern": "^C[0-9]{2,}[a-z]?$"},
+    "line": {"anyOf": [{"type": "integer", "minimum": 1}, {"type": "null"}]},
+    "claim": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["claim_id", "proposition", "family", "subtype", "family_reason", "context", "source_quotes", "code_refs", "context_claim_ids", "verification"],
+      "properties": {
+        "claim_id": {"$ref": "#/$defs/claim_id"},
+        "proposition": {"$ref": "#/$defs/text"},
+        "family": {"enum": ["location", "data_flow", "protection_precondition", "exploitability_impact", "other", "unclear"]},
+        "subtype": {"enum": [null, "exploitability", "impact", "unclear"]},
+        "family_reason": {"$ref": "#/$defs/text"},
+        "context": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["actor", "preconditions", "negation", "modality", "quantifier", "scope"],
+          "properties": {
+            "actor": {"$ref": "#/$defs/nullable_text"},
+            "preconditions": {"$ref": "#/$defs/nullable_text"},
+            "negation": {"$ref": "#/$defs/nullable_text"},
+            "modality": {"$ref": "#/$defs/nullable_text"},
+            "quantifier": {"$ref": "#/$defs/nullable_text"},
+            "scope": {"$ref": "#/$defs/nullable_text"}
+          }
+        },
+        "source_quotes": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["field", "quote", "occurrence"],
+            "properties": {
+              "field": {"enum": ["title", "report"]},
+              "quote": {"$ref": "#/$defs/text"},
+              "occurrence": {"type": "integer", "minimum": 1}
+            }
+          }
+        },
+        "code_refs": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["path", "line_start", "line_end", "symbol"],
+            "properties": {
+              "path": {"$ref": "#/$defs/nullable_text"},
+              "line_start": {"$ref": "#/$defs/line"},
+              "line_end": {"$ref": "#/$defs/line"},
+              "symbol": {"$ref": "#/$defs/nullable_text"}
+            }
+          }
+        },
+        "context_claim_ids": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/claim_id"}},
+        "verification": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["question", "required_evidence", "assumptions"],
+          "properties": {
+            "question": {"$ref": "#/$defs/text"},
+            "required_evidence": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/text"}},
+            "assumptions": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/text"}}
+          }
+        }
+      },
+      "allOf": [{
+        "if": {"properties": {"family": {"const": "exploitability_impact"}}},
+        "then": {"properties": {"subtype": {"enum": ["exploitability", "impact", "unclear"]}}},
+        "else": {"properties": {"subtype": {"type": "null"}}}
+      }]
+    }
+  }
+}

@@ -1,50 +1,74 @@
 # Handoff: Prose or Structure?
 
-Stand: 2026-10-05, nach Einordnung des kleinen Übergabepakets. Plan: [WORKPLAN.md](WORKPLAN.md). Forschungsrichtung: [Projektskizze v0.1](prose_or_structure_projektskizze.pdf). Herkunft und Prüfgrenzen: [docs/PROVENANCE.md](docs/PROVENANCE.md).
+Stand: 2026-10-05, nach Schritt 2. Maßgeblich: [WORKPLAN.md](WORKPLAN.md),
+[Projektskizze](prose_or_structure_projektskizze.pdf), [Herkunft](docs/PROVENANCE.md).
 
-## Ziel und nächste Arbeit
+## Ziel und nächster Schritt
 
-Vergleich **P: Code → Report → Claims** mit **D: Code → Claims**, bei identischem Codekontext und gemeinsamem Claimprofil. RQ1: Profil; RQ2: Qualität/Aufwand; RQ3: Darstellungsfehler und Kontextfeld-Ablation. KISS bleibt verbindlich.
+P: Code → Report → Claims und D: Code → Claims bei identischem Codekontext
+vergleichen. RQ1 entwickelt das Profil, RQ2 vergleicht Qualität/Aufwand, RQ3
+untersucht Darstellungsfehler und Kontextfelder. Keine Überlegenheit vorwegnehmen.
 
-**Schritt 1 ist für den vereinbarten Minimalumfang abgeschlossen.** Originalreport und angenommene manuelle Revision mit 13 Claims sind verfügbar. Als Nächstes das bestehende Codebook/P-Schema anhand dieser Beispiele zum gemeinsamen P/D-Profil weiterentwickeln und getrennte Referenzregeln festlegen. P-Decomposer und Validierung weiterverwenden; D anschließend ergänzen. Kein neuer Report nötig.
+**Schritt 2 ist als Entwicklungs-PoC erledigt. Als Nächstes Schritt 3:** Den
+vorhandenen P-Extraktor samt Validierung auf das gemeinsame Profil umstellen und
+einen kleinen D-Schritt ergänzen. Zuerst den archivierten Report verwenden;
+kein neuer Report nötig. Nur den jeweils beauftragten Schritt implementieren.
 
-## Verfügbares Entwicklungsarchiv
+## Verbindlicher Entwicklungsstand
 
-Die sechs vom Nutzer im Repo-Wurzelverzeichnis gepushten Dateien sind jetzt passend eingeordnet:
+- [Profil 0.1](resources/claim_profile.md) und [Schema](resources/claim_profile.schema.json): Aussage, sechs einfache Kontexttexte, Code-/Reportbezüge, lokale Kontext-IDs, getrennte Prüfaufgabe mit benötigter Evidenz und Zusatzannahmen. Vorhandene Evidenz und Wahrheitsurteile stehen separat.
+- [Codebook](resources/claim_codebook.md): generische Regeln für P/D; nur erfundene Beispiele. Fehlend (`null`), explizite Negation und ausdrücklich unbekannt unterscheiden; Bedingungen und Alternativen bleiben in der Proposition.
+- [Annotationsprotokoll](resources/annotation_protocol.md) mit [Arbeitsblatt](resources/manual_annotation_template.md): getrennte Report-/Codereferenz, semantische Coverage, offene Fragen, Unsicherheit/Prüfbarkeit, Doppelannotation und Adjudikation.
+- [Entwicklungsdurchgang](resources/profile_development/README.md): historische 13 JSPWiki-Claims eingeordnet, zwei zusätzliche Codefälle (VUL4J-47/Jackson XML, VUL4J-9/YAML), getrennte Referenzinventare und zehn ausgewählte JSON-Beispielclaims. Quellen/Revisionen/Hashes und Apache-Lizenzen liegen bei; 19 KB Quell-/Lizenzmaterial.
+- Die neuen Beispiele/Urteile sind KI-gestützte redaktionelle Entwürfe, keine unabhängige menschliche Referenz und keine Modellmessung. Keine neue Java-/PoV-Ausführung. Alle drei Fälle samt Varianten bleiben Entwicklung, nicht Holdout.
+- Fünf Profilquellen gezielt geprüft; Begründung im Profil. Vollständige Literaturabgrenzung, Security-Baselines und Neuheitsbewertung bleiben offen.
 
-- `data/runs/VUL4J-18-review-001/`: `findings.jsonl`, `request.json`, `generation_raw.json`, `review_prompt_v1.txt`, `run_manifest.json`.
-- `data/annotations/VUL4J-18-review-001/manual_annotation_001.md`: angenommene Entwicklungsrevision mit 13 Claims.
-- Importweg, Eingangs-/Archivhashes und einzige Wiederherstellung: `resources/inherited_artifacts.json`. Gesamtumfang 108.158 Bytes.
-- `.gitignore` lässt genau diese sechs Dateien zu; alle anderen Fall-/Laufdaten, Toolchains und Caches bleiben ignoriert. `.gitattributes` schützt archivierte Bytes vor Zeilenumbruch-Konvertierung. Originale nicht überschreiben oder auf neue Ressourcenbezeichnungen umschreiben.
+Reale Beispiele, Referenzinventare, Annotationen und Quellenmanifeste **nicht an
+Modelle senden**. Nur das generische Codebook ist Teil des bisherigen P-Requests.
+Falsche Codepositionen in beiden Routen als Inhalt erhalten und separat bewerten;
+P-Zitate müssen exakt zum Report passen. Keine zusätzlichen Referenzfakten in P.
 
-Der Prompt wurde bei der Nachlieferung mit LF statt historischen CRLF-Zeilenumbrüchen versioniert. Die ursprünglichen Bytes wurden exakt aus der gespeicherten Request-Systemnachricht wiederhergestellt und passen zum Manifest-Hash. Alle anderen gelieferten Dateien blieben bytegleich. Das historische Manifest wurde nicht geändert.
+## Was bereits ausführbar ist
 
-## Geprüfte Zuordnung
+Die drei Skripte stammen unverändert aus What-Can-We-Verify `5df7760`:
 
-- Request-, Antwort- und Prompt-Hashes passen zum Manifest; Parameter, Provider-/Modell-/Response-ID und Usage sind konsistent.
-- Das Finding ist exakt aus der Rohantwort ableitbar und wird vom aktuellen P-Eingabelader gelesen. Run-ID: `0721c0a0-bba7-48c1-a63c-da196a69d97c`, ein Finding, damaliger OpenRouter/Nemotron-Lauf ohne Reasoning.
-- Die Annotation referenziert exakt diese Finding-Datei per Hash/ID; eingebetteter Titel und Report sind identisch. 13 eindeutige Claim-IDs, alle 15 Originalzitate und auflösbare Kontextreferenzen geprüft.
-- Die fünf lokal aus fixierten Quellen vorbereiteten Modelldateien passen zu den historischen Quellhashes; die daraus rekonstruierte gesamte User-Nachricht entspricht dem gespeicherten Request. Eine weitere versionierte Quellkopie ist nicht nötig.
-- Diese Prüfungen belegen Konsistenz und Herkunft, keine neue Bewertung der Claim-Wahrheit oder Extraktionsqualität. Die Annotation nennt SG, Codex-Unterstützung und Vorwissen über Code/Fix/PoV; keine unabhängige Wahrheitsreferenz.
+- `01_prepare_case.py`: fixierter VUL4J-18-Export, fünf erlaubte Modelldateien plus getrennte Referenzen. Lokal vorbereitet; in neuen Clones regenerieren. Kein allgemeiner Fallloader und kein Java-Test.
+- `02_generate_findings.py`: Prose-Report aus genau diesem Paket.
+- `03_decompose_findings.py`: ein ausgewähltes gespeichertes Finding, kein Code, keine Nachbarfindings. Format-/Zitat-/Unicode-Offset-/Kontext-ID-Prüfung vorhanden.
 
-## Implementierungsstand
+**Umstellungsgrenze:** `claim_response_schema.json` und der alte P-Prompt bleiben
+operativ bei `schema_version: "1"` (acht Felder, freies `qualifiers`). Das neue
+`claim_profile.schema.json` mit `profile_version: "0.1"` ist der Vertrag für
+Schritt 3, noch kein auswählbarer Laufmodus. Nur die generischen Codebook-Regeln
+sind bereits präzisiert. Bei der Umstellung alten Vertrag ersetzen, keine zweite
+Pipeline pflegen. Bestehende Tests für Kontexttrennung/Originale weiterverwenden.
 
-- Zielrepo: [sebi-gr/prose-or-structure](https://github.com/sebi-gr/prose-or-structure), Branch `main`; aktuellen Commit/Remote-Stand mit Git prüfen.
-- Codebasis aus What-Can-We-Verify `5df7760459b741ae36bd91af4af89f6e3ecfe18d`; alle drei Pipeline-Skripte bytegleich. 15 Importdateien und zwei lokale Anpassungen (macOS-Testfixture, README-Linkanker) sind in `resources/inherited_baseline.json` festgehalten.
-- `01_prepare_case.py`: fixierter VUL4J-18-Export. Lokale Daten vorhanden, für neue Clones erneut erzeugbar. Fall-ID und fünf erlaubte Pfade sind weiterhin fest auf VUL4J-18 begrenzt. Kein Java-Test durch die Vorbereitung.
-- `02_generate_findings.py` und `03_decompose_findings.py`: heute direkte OpenAI Chat Completions, `OPENAI_API_KEY`, explizites Modell/Tokenlimit, JSON-Modus, `store=false`, keine Tools/Fallbacks/Retry. `--no-reasoning` setzt `reasoning_effort=none`, sofern vom Modell unterstützt. Diese Einstellungen gelten nicht rückwirkend für den archivierten OpenRouter-Lauf.
-- P-Extraktion erhält nur ausgewählten Titel/Report plus Prompt/Codebook/Schema; lokale Validierung prüft Format, exakte Zitate/Offsets und Kontext-IDs. Das P-Schema mit `qualifiers` ist noch nicht das gemeinsame P/D-Profil.
-- **Offen:** gemeinsames Profil, D-Erzeugung/Überarbeitung, Baselines, Ablation, Vergleichsauswertung sowie Modell/Budget und Evaluationsprotokoll.
+Beide vorhandenen Modellschritte verwenden direkten OpenAI-Zugriff mit
+`OPENAI_API_KEY`, explizitem Modell/Tokenlimit, JSON-Modus, `store=false`, ohne
+Tools/Retry/Repair. `--no-reasoning` setzt `reasoning_effort=none`, sofern unterstützt.
+Modell, Budget, Wiederholungen und Pilotprotokoll sind nicht festgelegt;
+keine ungeplanten Live-Läufe. Neue XML/YAML-Fixtures sind keine vom CLI bereits
+unterstützten Fälle und kein gepaarter Versuch.
 
-## Optionale historische Ergänzungen
+## Historisches Archiv erhalten
 
-Die alten Decomposition-Rohdaten 001–003, PoV-Logs sowie die in der Annotation genannten Originalabgabe, das separate Review und das damalige Codebook v0.2 wurden nicht geliefert. Sie sind für den nächsten Entwicklungsschritt nicht erforderlich. Heutiges Codebook nicht als alten Snapshot ausgeben; deren vollständige Revisionsgeschichte bleibt ungeprüft.
-
-Das PoV-Protokoll beschreibt den damaligen Windows-Lauf; die Original-Logs fehlen. Frühere Decomposition-Befunde sind nur als Quellnotizen übernommen. Neue Läufe können wir separat durchführen, erzeugen aber neue Evidenz und ersetzen keine historischen Rohdaten.
+- `data/runs/VUL4J-18-review-001/`: Finding, Request, Rohantwort, Originalprompt und Manifest.
+- `data/annotations/VUL4J-18-review-001/manual_annotation_001.md`: angenommene SG-Revision mit 13 Claims und Codex-Unterstützung/Vorwissen.
+- Genau diese sechs Dateien unter `data/` versioniert, insgesamt 108.158 Bytes; andere Downloads/Läufe ignoriert. `inherited_artifacts.json` hält Hashes und Importweg fest. Keine Originale überschreiben.
+- Historischer Run `0721c0a0-bba7-48c1-a63c-da196a69d97c`, OpenRouter/Nemotron; entspricht nicht dem heutigen Anbieter. Prompt-CRLF wurden beim Import aus dem Request exakt wiederhergestellt.
+- Die fünf lokalen JSPWiki-Quelldateien passen zu den historischen Hashes; der gesamte Requesttext wurde beim Import rekonstruiert. Zusätzliche Quellkopie unnötig.
+- Alte Decomposition-Rohdaten, PoV-Logs, ursprüngliche Annotationsabgabe/Review und damaliges Codebook v0.2 fehlen optional. Das heutige Codebook ist kein Ersatzsnapshot.
 
 ## Prüfstand und Grenzen
 
-- Letzter Code-Prüfstand unverändert: macOS/Python 3.13.2, 29/29 Offline-Tests bestanden; drei CLI-Hilfen funktionieren. Pipeline-Code und Tests bei dieser Einordnung nicht verändert.
-- Aktuell: sechs Artefakte samt Importnachweis und Bezügen geprüft, ohne Modellrequest. Staged Git-Blobs und Probe-Checkout mit `core.autocrlf=true` behalten die archivierten Hashes. Genau sechs Daten-Dateien versioniert, andere Ausgaben ignoriert; 38 lokale Links/Anker aufgelöst und `git diff --cached --check` ohne Befund. GitHub-CI führt die Offline-Tests aus.
-- Kein Live-Modellaufruf, keine neue Annotation oder Java-Reproduktion. Archivierte historische Texte bleiben unverändert, auch wenn sie frühere Dateinamen oder damals offene Implementierungsschritte nennen.
-- Der erste GitHub-Lauf bestand alle 29 Tests, beanstandete aber absichtlich erhaltene Leerzeichen der Provider-Rohantwort im flachen Checkout. Eine dateispezifische Whitespace-Ausnahme für diese Rohantwort ergänzt die CRLF-Regel des Prompts; keine Änderung an den sechs Artefakt-Hashes. Auch der vollständige Git-Baum wurde anschließend erfolgreich auf Whitespace geprüft, um diesen CI-Fall abzudecken.
+29/29 Offline-Regressionstests bestanden (macOS/Python 3.13.2). Die vier
+Profilbeispiele wurden einmalig mit JSON Schema Draft 2020-12 validiert,
+einschließlich negativer Formatproben; keine neue Projektabhängigkeit.
+Exakte P-Zitate, Kontext-IDs, Codezeilen, Quell-/Archivhashes und lokale Links
+geprüft. Die bestehenden Tests prüfen noch den alten ausführbaren P-Vertrag;
+Profilvalidierung wird erst mit Schritt 3 Teil der Pipeline/Regressionstests.
+
+Keine Messwerte zur P/D-Qualität, menschlichen Übereinstimmung oder Annotationzeit.
+Profil und Familien bleiben vorläufig. Vor Pilot: Modell/Budget, Fallbestand,
+Referenzen, Doppelannotator, Blindierung und Fehlerregeln festlegen. Der Pilot
+umfasst vorgeschlagene 5–10 neue Fälle; Hauptstichprobe erst daraus begründen.

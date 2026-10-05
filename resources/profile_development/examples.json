@@ -1,0 +1,413 @@
+{
+  "prepared_at": "2026-10-05",
+  "authorship": "Codex-assisted development drafts; no new human annotation or independent ground truth; no API generation.",
+  "jspwiki_finding_id": "0721c0a0-bba7-48c1-a63c-da196a69d97c:F001",
+  "examples": [
+    {
+      "example_id": "jspwiki-P-selected",
+      "case_id": "VUL4J-18",
+      "note": "Ausgewählte historische Propositionen C07/C08/C11d/C12, neue lokale IDs; keine vollständige Extraktion. Kontextbezüge innerhalb dieser Auswahl neu zugeordnet.",
+      "output": {
+        "profile_version": "0.1",
+        "route": "P",
+        "claims": [
+          {
+            "claim_id": "C01",
+            "proposition": "Der aus request.pathInfo extrahierte Seitenname wird in WikiServlet.java Zeilen 97–98 direkt mit der URL verkettet, um einen Forward-Request-Dispatcher zu erzeugen.",
+            "family": "data_flow",
+            "subtype": null,
+            "family_reason": "Verbindet den extrahierten Seitennamen mit der URL-Konstruktion des Dispatchers.",
+            "context": {
+              "actor": null,
+              "preconditions": null,
+              "negation": null,
+              "modality": null,
+              "quantifier": null,
+              "scope": "WikiServlet.java, Zeilen 97–98; extrahierter Seitenname"
+            },
+            "source_quotes": [
+              {
+                "field": "report",
+                "quote": "In WikiServlet.java line 89, the method DefaultURLConstructor.parsePageFromURL is used to extract the page name from the request's pathInfo without sufficient validation.",
+                "occurrence": 1
+              },
+              {
+                "field": "report",
+                "quote": "This value is then used in line 97-98 to construct a forward request dispatcher by concatenating it directly into the URL without sanitization.",
+                "occurrence": 1
+              }
+            ],
+            "code_refs": [
+              {
+                "path": "WikiServlet.java",
+                "line_start": 97,
+                "line_end": 98,
+                "symbol": null
+              }
+            ],
+            "context_claim_ids": [],
+            "verification": {
+              "question": "Wird der extrahierte Seitenname an der behaupteten Stelle direkt mit der Dispatcher-URL verkettet?",
+              "required_evidence": [
+                "Behauptete Codeposition und Verarbeitungsschritte des Seitennamens"
+              ],
+              "assumptions": []
+            }
+          },
+          {
+            "claim_id": "C02",
+            "proposition": "Der aus request.pathInfo extrahierte Seitenname wird beim Erzeugen des Forward-Request-Dispatchers ohne Sanitization mit der URL verkettet.",
+            "family": "protection_precondition",
+            "subtype": null,
+            "family_reason": "Behauptet fehlende Sanitization bei einer bestimmten Verwendung des Werts.",
+            "context": {
+              "actor": null,
+              "preconditions": null,
+              "negation": "ohne Sanitization",
+              "modality": null,
+              "quantifier": null,
+              "scope": "Verkettung des extrahierten Seitennamens zur Dispatcher-URL"
+            },
+            "source_quotes": [
+              {
+                "field": "report",
+                "quote": "In WikiServlet.java line 89, the method DefaultURLConstructor.parsePageFromURL is used to extract the page name from the request's pathInfo without sufficient validation.",
+                "occurrence": 1
+              },
+              {
+                "field": "report",
+                "quote": "This value is then used in line 97-98 to construct a forward request dispatcher by concatenating it directly into the URL without sanitization.",
+                "occurrence": 1
+              }
+            ],
+            "code_refs": [
+              {
+                "path": "WikiServlet.java",
+                "line_start": 97,
+                "line_end": 98,
+                "symbol": null
+              }
+            ],
+            "context_claim_ids": [
+              "C01"
+            ],
+            "verification": {
+              "question": "Welche Behandlung des Seitennamens findet vor der Verkettung statt und erfüllt sie den behaupteten Schutzbegriff?",
+              "required_evidence": [
+                "Code der Verkettung und ggf. aufgerufene Transformationen; geklärter Sanitization-Begriff"
+              ],
+              "assumptions": []
+            }
+          },
+          {
+            "claim_id": "C03",
+            "proposition": "Das Fehlen zusätzlicher Prüfungen im Servlet ermöglicht die Weiterleitung bösartiger Pfadsequenzen an interne JSPs.",
+            "family": "data_flow",
+            "subtype": null,
+            "family_reason": "Behauptet eine Weiterleitungsbeziehung samt Ursache; fehlende zusätzliche Prüfungen bleiben Teil der Proposition.",
+            "context": {
+              "actor": null,
+              "preconditions": null,
+              "negation": "Fehlen zusätzlicher Prüfungen",
+              "modality": null,
+              "quantifier": null,
+              "scope": "Servlet; Weiterleitung bösartiger Pfadsequenzen an interne JSPs"
+            },
+            "source_quotes": [
+              {
+                "field": "report",
+                "quote": "Although the DefaultURLConstructor.parsePageFromURL method (lines 245-268) only removes a leading slash and does not decode or validate the path further, the lack of additional checks in the servlet allows malicious path sequences to be forwarded to internal JSPs, potentially leading to information disclosure or further exploitation depending on the target JSP's handling of the 'page' parameter.",
+                "occurrence": 1
+              }
+            ],
+            "code_refs": [],
+            "context_claim_ids": [],
+            "verification": {
+              "question": "Ermöglicht das behauptete Fehlen zusätzlicher Prüfungen die genannte Weiterleitung?",
+              "required_evidence": [
+                "Weiterleitungspfad, vorgeschaltete Prüfungen und Zielauswahl"
+              ],
+              "assumptions": []
+            }
+          },
+          {
+            "claim_id": "C04",
+            "proposition": "Die Weiterleitung bösartiger Pfadsequenzen an interne JSPs könnte zu Informationspreisgabe oder weiterer Ausnutzung führen, abhängig von der Verarbeitung des 'page'-Parameters durch die Ziel-JSP.",
+            "family": "exploitability_impact",
+            "subtype": "impact",
+            "family_reason": "Behauptet mögliche alternative Folgen unter einer expliziten Ziel-JSP-Bedingung.",
+            "context": {
+              "actor": null,
+              "preconditions": "abhängig von der Verarbeitung des 'page'-Parameters durch die Ziel-JSP",
+              "negation": null,
+              "modality": "könnte / potentially",
+              "quantifier": null,
+              "scope": "Weiterleitung bösartiger Pfadsequenzen an interne JSPs"
+            },
+            "source_quotes": [
+              {
+                "field": "report",
+                "quote": "Although the DefaultURLConstructor.parsePageFromURL method (lines 245-268) only removes a leading slash and does not decode or validate the path further, the lack of additional checks in the servlet allows malicious path sequences to be forwarded to internal JSPs, potentially leading to information disclosure or further exploitation depending on the target JSP's handling of the 'page' parameter.",
+                "occurrence": 1
+              }
+            ],
+            "code_refs": [],
+            "context_claim_ids": [
+              "C03"
+            ],
+            "verification": {
+              "question": "Kann die genannte Weiterleitung unter der behaupteten JSP-Bedingung eine der alternativen Wirkungen haben?",
+              "required_evidence": [
+                "Weiterleitung und Verarbeitung des page-Parameters in der Ziel-JSP; Bedingungen für Informationspreisgabe oder weitere Ausnutzung"
+              ],
+              "assumptions": []
+            }
+          }
+        ]
+      }
+    },
+    {
+      "example_id": "jspwiki-D-selected",
+      "case_id": "VUL4J-18",
+      "note": "Neu redaktionell formuliert anhand des fünfteiligen Pakets; kein Modelllauf.",
+      "output": {
+        "profile_version": "0.1",
+        "route": "D",
+        "claims": [
+          {
+            "claim_id": "C01",
+            "proposition": "WikiServlet.doGet verwendet jspPage als Dispatcherpfad und m_engine.encodeName(pageName) als Wert des Queryparameters page.",
+            "family": "data_flow",
+            "subtype": null,
+            "family_reason": "Unterscheidet die zwei Werte und ihre Verwendung.",
+            "context": {
+              "actor": null,
+              "preconditions": null,
+              "negation": null,
+              "modality": null,
+              "quantifier": null,
+              "scope": "Sichtbarer Aufruf in WikiServlet.doGet, Zeilen 96–98"
+            },
+            "source_quotes": [],
+            "code_refs": [
+              {
+                "path": "jspwiki-main/src/main/java/org/apache/wiki/WikiServlet.java",
+                "line_start": 96,
+                "line_end": 98,
+                "symbol": "WikiServlet.doGet"
+              }
+            ],
+            "context_claim_ids": [],
+            "verification": {
+              "question": "Welche Werte bilden Pfad und page-Queryparameter?",
+              "required_evidence": [
+                "Zuweisungen und Argumentausdruck des RequestDispatchers"
+              ],
+              "assumptions": []
+            }
+          },
+          {
+            "claim_id": "C02",
+            "proposition": "Aus dem bereitgestellten Codepaket ist nicht entscheidbar, welcher URLConstructor im Deployment tatsächlich aktiv ist.",
+            "family": "other",
+            "subtype": null,
+            "family_reason": "Explizite Erkenntnisgrenze, keine Aussage über einen sicheren oder unsicheren Konstruktor.",
+            "context": {
+              "actor": null,
+              "preconditions": null,
+              "negation": "Aktiver Konstruktor ist im Paket nicht entscheidbar",
+              "modality": null,
+              "quantifier": null,
+              "scope": "Bereitgestellte fünf Dateien; Deployment außerhalb des Pakets"
+            },
+            "source_quotes": [],
+            "code_refs": [
+              {
+                "path": "jspwiki-main/src/main/java/org/apache/wiki/WikiServlet.java",
+                "line_start": 96,
+                "line_end": 96,
+                "symbol": "WikiServlet.doGet"
+              },
+              {
+                "path": "jspwiki-main/src/main/resources/ini/jspwiki.properties",
+                "line_start": 438,
+                "line_end": 439,
+                "symbol": null
+              }
+            ],
+            "context_claim_ids": [],
+            "verification": {
+              "question": "Welche Laufzeitkonfiguration und Initialisierung bestimmen den aktiven URLConstructor?",
+              "required_evidence": [
+                "WikiEngine-Initialisierung und tatsächliche Deploymentkonfiguration"
+              ],
+              "assumptions": []
+            }
+          }
+        ]
+      }
+    },
+    {
+      "example_id": "jackson-D-selected",
+      "case_id": "VUL4J-47",
+      "note": "Neu redaktionell formuliert anhand XmlFactory.java:84–144; kein Modelllauf.",
+      "output": {
+        "profile_version": "0.1",
+        "route": "D",
+        "claims": [
+          {
+            "claim_id": "C01",
+            "proposition": "Wenn xmlIn null ist, erzeugt der gezeigte XmlFactory-Konstruktor eine XMLInputFactory und setzt IS_SUPPORTING_EXTERNAL_ENTITIES auf Boolean.FALSE.",
+            "family": "protection_precondition",
+            "subtype": null,
+            "family_reason": "Explizite Schutzkonfiguration in einem bedingten Zweig.",
+            "context": {
+              "actor": null,
+              "preconditions": "xmlIn == null",
+              "negation": "IS_SUPPORTING_EXTERNAL_ENTITIES wird auf false gesetzt",
+              "modality": null,
+              "quantifier": null,
+              "scope": "Gezeigter XmlFactory-Konstruktor; keine Aussage über alle Provider"
+            },
+            "source_quotes": [],
+            "code_refs": [
+              {
+                "path": "src/main/java/com/fasterxml/jackson/dataformat/xml/XmlFactory.java",
+                "line_start": 112,
+                "line_end": 116,
+                "symbol": "XmlFactory"
+              }
+            ],
+            "context_claim_ids": [],
+            "verification": {
+              "question": "Wird die Property im Null-Zweig auf false gesetzt?",
+              "required_evidence": [
+                "Gezeigter Konstruktor und Null-Zweig"
+              ],
+              "assumptions": []
+            }
+          },
+          {
+            "claim_id": "C02",
+            "proposition": "Bei einem nicht-null übergebenen xmlIn überspringt der gezeigte Konstruktor die Zuweisung von IS_SUPPORTING_EXTERNAL_ENTITIES; die übergebene Factory wird an _initFactories weitergereicht.",
+            "family": "protection_precondition",
+            "subtype": null,
+            "family_reason": "Begrenzte negative Aussage über dieselbe Konfiguration im anderen Kontrollflusszweig.",
+            "context": {
+              "actor": null,
+              "preconditions": "xmlIn != null",
+              "negation": "Keine Zuweisung von IS_SUPPORTING_EXTERNAL_ENTITIES in diesem Zweig",
+              "modality": null,
+              "quantifier": null,
+              "scope": "Gezeigter Konstruktor und _initFactories; Konfiguration des Aufrufers unbekannt"
+            },
+            "source_quotes": [],
+            "code_refs": [
+              {
+                "path": "src/main/java/com/fasterxml/jackson/dataformat/xml/XmlFactory.java",
+                "line_start": 104,
+                "line_end": 123,
+                "symbol": "XmlFactory"
+              },
+              {
+                "path": "src/main/java/com/fasterxml/jackson/dataformat/xml/XmlFactory.java",
+                "line_start": 138,
+                "line_end": 144,
+                "symbol": "_initFactories"
+              }
+            ],
+            "context_claim_ids": [],
+            "verification": {
+              "question": "Wird die externe-Entity-Property für eine übergebene Factory in diesen Methoden gesetzt?",
+              "required_evidence": [
+                "Kontrollfluss und _initFactories; für Gesamtverhalten zusätzlich Aufruferkonfiguration"
+              ],
+              "assumptions": []
+            }
+          }
+        ]
+      }
+    },
+    {
+      "example_id": "yaml-D-selected",
+      "case_id": "VUL4J-9",
+      "note": "Neu redaktionell formuliert anhand vollständiger YAMLConfiguration.java; kein Modelllauf.",
+      "output": {
+        "profile_version": "0.1",
+        "route": "D",
+        "claims": [
+          {
+            "claim_id": "C01",
+            "proposition": "YAMLConfiguration.read(Reader) übergibt in an yaml.load(in) einer lokal mit new Yaml() erzeugten Instanz und reicht das in Map gecastete Ergebnis an load(map) weiter.",
+            "family": "data_flow",
+            "subtype": null,
+            "family_reason": "Verfolgt Eingabe und Ergebnis im sichtbaren Methodencode; Angreiferkontrolle nicht behauptet.",
+            "context": {
+              "actor": null,
+              "preconditions": null,
+              "negation": null,
+              "modality": null,
+              "quantifier": null,
+              "scope": "YAMLConfiguration.read(Reader)"
+            },
+            "source_quotes": [],
+            "code_refs": [
+              {
+                "path": "src/main/java/org/apache/commons/configuration2/YAMLConfiguration.java",
+                "line_start": 63,
+                "line_end": 76,
+                "symbol": "YAMLConfiguration.read(Reader)"
+              }
+            ],
+            "context_claim_ids": [],
+            "verification": {
+              "question": "Welche Argumente und Ergebnisse verbindet die read-Methode?",
+              "required_evidence": [
+                "Lokale Zuweisungen und Aufrufe"
+              ],
+              "assumptions": []
+            }
+          },
+          {
+            "claim_id": "C02",
+            "proposition": "Die read-Overloads für Reader und InputStream mit LoaderOptions erzeugen jeweils new Yaml(options) und übergeben in an yaml.load(in).",
+            "family": "data_flow",
+            "subtype": null,
+            "family_reason": "Gleicher Options-/Eingabedatenfluss in zwei ausdrücklich benannten Overloads.",
+            "context": {
+              "actor": null,
+              "preconditions": null,
+              "negation": null,
+              "modality": null,
+              "quantifier": "beide genannten Overloads jeweils",
+              "scope": "read(Reader, LoaderOptions) und read(InputStream, LoaderOptions)"
+            },
+            "source_quotes": [],
+            "code_refs": [
+              {
+                "path": "src/main/java/org/apache/commons/configuration2/YAMLConfiguration.java",
+                "line_start": 78,
+                "line_end": 91,
+                "symbol": "read(Reader, LoaderOptions)"
+              },
+              {
+                "path": "src/main/java/org/apache/commons/configuration2/YAMLConfiguration.java",
+                "line_start": 130,
+                "line_end": 143,
+                "symbol": "read(InputStream, LoaderOptions)"
+              }
+            ],
+            "context_claim_ids": [],
+            "verification": {
+              "question": "Werden die übergebenen Optionen und Eingaben in beiden Overloads weitergereicht?",
+              "required_evidence": [
+                "Beide gezeigten Methoden; für Optionswirkung zusätzlich Bibliotheksimplementierung"
+              ],
+              "assumptions": []
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
