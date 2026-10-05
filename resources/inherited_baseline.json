@@ -1,0 +1,43 @@
+{
+  "source_repository": "https://github.com/sebi-gr/What-Can-We-Verify",
+  "source_commit": "8f9b25e1d5d53208f6f58dba9ffba8396a68dd5c",
+  "import_date": "2026-10-05",
+  "files": [
+    {
+      "path": ".env.example",
+      "sha256": "047e097256db4922a2580079650ee76a7d2b50a34490728938f4708e6ebd7018"
+    },
+    {
+      "path": "LICENSE",
+      "sha256": "76bac38f747da8dfd967f0323c78859acd97485ded61e2dbfc4fe18199c6340d"
+    },
+    {
+      "path": "src/01_prepare_case.py",
+      "sha256": "03716cd5bf2f53c4688d8524b6189fa70adb311544736a2c6f45318204c14507"
+    },
+    {
+      "path": "src/02_generate_findings.py",
+      "sha256": "9c62b6295cd4fdb2cc9515a921f07086b2a8f65c1f309435150efff3297b7f17"
+    },
+    {
+      "path": "tests/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "tests/test_01_prepare_case.py",
+      "sha256": "5fc7412a4a23a94f90cba0b032c7d3217d252354dc813615d93c6f68d04d772a"
+    },
+    {
+      "path": "tests/test_02_generate_findings.py",
+      "sha256": "b335590b80928721177792d1030c3b1a74c204380a30c3995cba7952ba6b6660"
+    },
+    {
+      "path": "resources/review_prompt_v1.txt",
+      "sha256": "a9846dfe5458c8642631e38a22467c9f4bacfea92f22296d15c86f4a66638bd6"
+    },
+    {
+      "path": "resources/reproduce_vul4j18.md",
+      "sha256": "7742ca6d429fb64d2417baebe4eced667a7e8c3bddf607e299ca77897ff65b3f"
+    }
+  ]
+}
