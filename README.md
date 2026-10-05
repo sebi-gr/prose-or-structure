@@ -35,19 +35,23 @@ they are not automatically safe programs.
 ## Current state
 
 The reusable baseline comes from
-[What Can We Verify? at `8f9b25e`](https://github.com/sebi-gr/What-Can-We-Verify/tree/8f9b25e1d5d53208f6f58dba9ffba8396a68dd5c).
-The implementation, prompt, and tests are unchanged. The original research plan
-has been replaced with the P/D study plan.
+[What Can We Verify? at `5df7760`](https://github.com/sebi-gr/What-Can-We-Verify/tree/5df7760459b741ae36bd91af4af89f6e3ecfe18d).
+All three scripts, the current prompts, codebook, schema, annotation template,
+and tests are imported. Local adjustments are limited to a macOS test-fixture
+path and the template's documentation link. The P/D study plan remains the
+research direction of this repository.
 
 | Component | Available here |
 |---|---|
 | Pinned VUL4J-18 preparation | Executable; five source/configuration files, separate references, hashes |
-| Prose-report generator | Executable; one OpenRouter request, stored inputs, raw response, and run metadata |
-| Offline regression tests | 15 tests using synthetic fixtures |
+| Prose-report generator | Executable; one direct OpenAI request, stored inputs, raw response, and run metadata |
+| P extractor and format validation | Executable; selected report only, exact quotes/offsets, claim IDs and context references |
+| Codebook, annotation template, response schema | Imported development baseline; not yet the shared P/D profile |
+| Offline regression tests | 29 tests using synthetic fixtures |
 | Historical Java-PoV reproduction | Imported protocol; original raw logs are not available here |
 | Historical JSPWiki report | Described in the source repository; original run artifacts are not available here |
-| 13 manual claims and first codebook | Mentioned in the sketch; original files are not available here |
-| Shared claim schema, P extractor, D generator, evaluation | Planned; not implemented |
+| 13 manual claims and previous decomposition runs | Described upstream; filled annotation and raw run artifacts are still absent |
+| Shared P/D claim profile, D generator, evaluation | Planned; not implemented |
 
 Missing originals are tracked in [docs/PROVENANCE.md](docs/PROVENANCE.md). They
 must not be reconstructed from summaries and presented as historical evidence.
@@ -67,6 +71,7 @@ the standard library; no package installation is required.
 python3 -m unittest -v
 python3 src/01_prepare_case.py --help
 python3 src/02_generate_findings.py --help
+python3 src/03_decompose_findings.py --help
 ```
 
 Prepare the development case with internet access to `raw.githubusercontent.com`:
@@ -90,8 +95,8 @@ for preparation, and this command does not run the PoV.
 Only `model_input/` belongs in a code-analysis model's context. References,
 manifest, project documentation, patches, PoVs, and benchmark labels do not.
 The implemented generator reads only its five allowlisted files, without agent
-tools. Future P extraction must receive only the report as case material, plus
-its generic schema/codebook instructions; it must not inspect the source code.
+tools. The P extractor receives only the selected title/report as case material,
+plus its schema/codebook instructions; it does not inspect the source code.
 
 The five files are `WikiServlet.java`, `DefaultURLConstructor.java`,
 `URLConstructor.java`, `jspwiki.properties`, and `web.xml`, at the paths fixed in
@@ -107,7 +112,7 @@ specific to VUL4J-18; `--model-input` changes the directory, not the case ID or
 file allowlist. It is not yet a multi-case study runner.
 
 For a deliberately planned run, create a local `.env` from the blank
-[.env.example](.env.example) and set `OPENROUTER_API_KEY` there. A nonempty process
+[.env.example](.env.example) and set `OPENAI_API_KEY` there. A nonempty process
 environment variable takes precedence. The file is ignored by Git. The loader
 accepts a simple optionally quoted value, with no inline comments or expansion.
 
@@ -116,19 +121,21 @@ the placeholders below. This is a command template, not a selected study model:
 
 ```bash
 python3 src/02_generate_findings.py \
-  --model 'PROVIDER/MODEL:free' \
+  --model OPENAI_MODEL_ID \
   --max-output-tokens TOKEN_LIMIT \
-  --output data/runs/VUL4J-18-review-001
+  --output data/runs/VUL4J-18-openai-001
 ```
 
-The script accepts only explicit `:free` IDs, requests zero provider price
-ceilings, and disables fallbacks. No current model availability is guaranteed.
-Model IDs need not identify immutable revisions. Model, provider, reasoning
-mode, prompts, budgets, and repetitions for the new study remain undecided.
-`--no-reasoning` explicitly sends `reasoning.enabled=false`; without it, the
-provider default applies. It changes the experimental condition and must not be
-silently selected from the old proof of concept. The output token limit is not
-a monetary budget.
+Both model steps now call the direct OpenAI Chat Completions endpoint and reject
+OpenRouter IDs. This imported change removes the old free-model restriction;
+live calls can incur costs. No live call was made during the import. Select an
+explicit compatible model, preferably a snapshot where available. Model access,
+prompts, budgets, and repetitions for the study remain undecided.
+`--max-output-tokens` sends `max_completion_tokens`; `--no-reasoning` sends
+`reasoning_effort=none`, which requires model support. Without the flag the model
+default applies. Requests use JSON mode and `store=false`. The output token limit
+is not a monetary budget, and the historical OpenRouter run retains its original
+provider and settings.
 
 One request is made with a 180-second timeout and no automatic retry, repair,
 follow-up, or tools. The prompt requests a JSON envelope containing titles and
@@ -137,7 +144,7 @@ unchanged; the sent view adds paths and original one-based line numbers.
 
 | Run artifact | Contents |
 |---|---|
-| `model_input/`, `review_prompt_v1.txt` | Exact source and prompt bytes |
+| `model_input/`, `review_prompt.txt` | Exact source and prompt bytes |
 | `request.json` | Request body, without the authorization header |
 | `generation_raw.json` | Unmodified response bytes, when received |
 | `findings.jsonl` | Validated titles/reports with run-scoped IDs, without text correction |
@@ -149,6 +156,55 @@ retains an empty JSONL file. Invalid or incomplete responses yield
 status creates findings. Started runs remain on disk; a forcibly interrupted
 process can leave `running`. Existing output is never overwritten. Provider
 usage is preserved; `cost_usd` remains `null` because billing is not calculated.
+
+## Manual annotation and automatic extraction
+
+The imported [codebook](resources/claim_codebook.md) and
+[annotation template](resources/manual_annotation_template.md) provide the
+development rules for faithful extraction. Copy the template into a new file
+under `data/annotations/` for manual work. The template is blank: it is not the
+historical annotation of 13 claims, which is still missing from GitHub.
+
+The source documentation describes that annotation as assisted development work
+with prior knowledge of code/fix/PoV, not an independent truth reference.
+Keep exact quotes, conditions, uncertainty, and claim relationships. A sentence
+can support several distinct propositions; do not enforce a target claim count.
+
+`src/03_decompose_findings.py` can extract one finding from a saved generator
+JSONL file. Once such a file is available, replace the placeholders and select
+a fresh output directory; a new report is unnecessary for re-extraction:
+
+```bash
+python3 src/03_decompose_findings.py \
+  --findings PATH_TO_FINDINGS_JSONL \
+  --finding-id FINDING_ID \
+  --model OPENAI_MODEL_ID \
+  --max-output-tokens TOKEN_LIMIT \
+  --output data/decompositions/VUL4J-18-openai-001
+```
+
+The request includes only the selected title/report,
+[decomposition prompt](resources/decomposition_prompt.txt), codebook, and
+[response schema](resources/claim_response_schema.json). It excludes neighboring
+findings, code, reference files, annotations, and the finding ID. The explicit
+input JSONL is preserved in full on disk, but other findings are not sent.
+Symlinks in the input path or its ancestors are rejected.
+
+The inherited response contract uses `schema_version: "1"`, proposition,
+family/subtype/reason, a free-text `qualifiers` field, exact source quotes with
+one-based occurrence numbers, and local context IDs. Local validation resolves
+quotes to zero-based Unicode-codepoint offsets (exclusive end), validates fields
+and references, then adds run/finding IDs and `verification_status: not_evaluated`.
+It does not validate granularity, coverage, semantic fidelity, or truth.
+Dedicated context, code-reference, and verification-task fields for the shared
+P/D profile remain design work; this extraction schema is the starting point.
+
+Outputs include `findings_input.jsonl`, `finding.json`, all three resource
+snapshots, `request.json`, `decomposition_raw.json` when received,
+`run_manifest.json`, and `validation.json`. `claims.jsonl` exists only after the
+whole output validates. An empty result is `no_claims`; invalid output and run
+errors are retained without partial claims, repair, or retry. As with the
+generator, `completed` means format-valid and `cost_usd` stays `null`.
 
 ## Evidence and reproducibility
 
@@ -171,9 +227,9 @@ No live model request or Java reproduction is needed for the repository setup.
 ## Repository layout and checks
 
 ```text
-src/                    Existing preparation and prose-report scripts
+src/                    Preparation, prose-report generation, and P extraction
 tests/                  Offline tests; responses are synthetic
-resources/              Review prompt, historical PoV protocol, import checksums
+resources/              Prompts, codebook, schema, template, PoV protocol, checksums
 docs/PROVENANCE.md      Import source, evidence inventory, and missing originals
 .github/workflows/      Offline checks on pushes and pull requests
 data/                   Local artifacts, ignored by Git
@@ -185,8 +241,8 @@ git diff --check
 ```
 
 The tests cover reference isolation, preserved bytes and hashes, overwrite
-protection, failure handling, model restrictions, `.env` loading, and reasoning
-control. On Windows the symlink test explicitly skips if the privilege is
+protection, failure handling, model-ID checks, `.env` loading, reasoning control,
+and claim format/quotes/offsets/references. On Windows the symlink test explicitly skips if the privilege is
 unavailable. Tests do not establish live API compatibility or research results.
 
 Our code is under [MIT](LICENSE). Downloaded JSPWiki files retain their upstream

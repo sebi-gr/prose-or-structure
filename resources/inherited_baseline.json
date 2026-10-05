@@ -1,15 +1,41 @@
 {
   "source_repository": "https://github.com/sebi-gr/What-Can-We-Verify",
-  "source_commit": "8f9b25e1d5d53208f6f58dba9ffba8396a68dd5c",
+  "source_commit": "5df7760459b741ae36bd91af4af89f6e3ecfe18d",
   "import_date": "2026-10-05",
   "files": [
     {
       "path": ".env.example",
-      "sha256": "047e097256db4922a2580079650ee76a7d2b50a34490728938f4708e6ebd7018"
+      "sha256": "a6fa3fba3845bda1b64b03eb365c97d2b87b402303e01aa912f93a71e2475126"
     },
     {
       "path": "LICENSE",
       "sha256": "76bac38f747da8dfd967f0323c78859acd97485ded61e2dbfc4fe18199c6340d"
+    },
+    {
+      "path": "resources/claim_codebook.md",
+      "sha256": "77122da95c8f2a4c58624e27c251497b3d0ab4df244eab3c555e2763420094ce"
+    },
+    {
+      "path": "resources/claim_response_schema.json",
+      "sha256": "ec6d6b5f16ce8104f218c42a3fd7e3c9003752627c5f799030e4c17479872789"
+    },
+    {
+      "path": "resources/decomposition_prompt.txt",
+      "sha256": "ab050d79dff2fa13583b683159f6b3b7428fa791c3a2cea54962050782fcd868"
+    },
+    {
+      "path": "resources/manual_annotation_template.md",
+      "sha256": "f74c7c7b3e04f8e1c2b34f1d1289415719109296994b221417e8327ce28c98c9",
+      "local_sha256": "2384c352ead6a56e0ca6c0472e11c3b65a96192424ff02bc3d20b6d7fd29ddde",
+      "adjustment": "Point the README fragment to the P/D repository section."
+    },
+    {
+      "path": "resources/reproduce_vul4j18.md",
+      "sha256": "7742ca6d429fb64d2417baebe4eced667a7e8c3bddf607e299ca77897ff65b3f"
+    },
+    {
+      "path": "resources/review_prompt.txt",
+      "sha256": "a9846dfe5458c8642631e38a22467c9f4bacfea92f22296d15c86f4a66638bd6"
     },
     {
       "path": "src/01_prepare_case.py",
@@ -17,7 +43,11 @@
     },
     {
       "path": "src/02_generate_findings.py",
-      "sha256": "9c62b6295cd4fdb2cc9515a921f07086b2a8f65c1f309435150efff3297b7f17"
+      "sha256": "2b97b57dcfaee360b7cf48c9d82a9b0c9bdab71c09c9630f548dac4ec3171d01"
+    },
+    {
+      "path": "src/03_decompose_findings.py",
+      "sha256": "2fd911cd45087d21e0866fcb0e90a42a36df46e7cdbfbaba4d2593d158857522"
     },
     {
       "path": "tests/__init__.py",
@@ -29,15 +59,13 @@
     },
     {
       "path": "tests/test_02_generate_findings.py",
-      "sha256": "b335590b80928721177792d1030c3b1a74c204380a30c3995cba7952ba6b6660"
+      "sha256": "fae4654aa1592beca2256a0f1d5956032f3618fa1e634b4b37d676119141bd40"
     },
     {
-      "path": "resources/review_prompt_v1.txt",
-      "sha256": "a9846dfe5458c8642631e38a22467c9f4bacfea92f22296d15c86f4a66638bd6"
-    },
-    {
-      "path": "resources/reproduce_vul4j18.md",
-      "sha256": "7742ca6d429fb64d2417baebe4eced667a7e8c3bddf607e299ca77897ff65b3f"
+      "path": "tests/test_03_decompose_findings.py",
+      "sha256": "793ad56278259c2078f8b7ca8f0cc9cacbded93e9cad70803564e47c898854a8",
+      "local_sha256": "fa3922e08f5df73667bd2c6e8118a8b34677a68e635942f3d8a9bdbf2e734c49",
+      "adjustment": "Resolve the temporary fixture root to avoid the macOS /var system symlink; production checks unchanged."
     }
   ]
 }
