@@ -72,7 +72,7 @@ class PreparePilotTests(unittest.TestCase):
         for variant_name, variant in self.case["variants"].items():
             variant_root = case_root / variant_name
             inputs = variant_root / "model_input"
-            self.assertEqual({str(path.relative_to(inputs)) for path in inputs.rglob("*") if path.is_file()},
+            self.assertEqual({path.relative_to(inputs).as_posix() for path in inputs.rglob("*") if path.is_file()},
                              set(self.paths))
             manifest = json.loads((variant_root / "case_manifest.json").read_bytes())
             self.assertEqual(manifest["case_id"], "VUL4J-1")

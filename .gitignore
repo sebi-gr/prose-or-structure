@@ -23,3 +23,10 @@ venv/
 !.env.example
 .DS_Store
 /tmp/
+
+# Keep the deliverable PDF and LaTeX source, not compiler intermediates.
+/docs/*.aux
+/docs/*.log
+/docs/*.out
+/docs/*.toc
+/docs/*.synctex.gz
