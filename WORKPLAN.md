@@ -4,6 +4,8 @@ Stand: 06.10.2026. Forschungsgrundlage ist die
 [Projektskizze](prose_or_structure_projektskizze.pdf), aktualisiert in der
 [Projektdokumentation](docs/projektstand.pdf). Dieser Plan ist die maßgebliche
 Quelle für Reihenfolge, Status, Abschlusskriterien und offene Entscheidungen.
+Das Projektpapier enthält konkrete Code-/Ausgabebeispiele und Erläuterungen zur
+Bewertung; seine Beispielreferenzen ersetzen nicht die ausstehende Pilotannotation.
 
 ## Ziel
 

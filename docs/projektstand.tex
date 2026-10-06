@@ -7,13 +7,18 @@
 \usepackage[left=20mm,right=20mm,top=23mm,bottom=22mm,headheight=14pt,headsep=7mm]{geometry}
 \usepackage{microtype,booktabs,tabularx,array,xcolor,fancyhdr,lastpage,titlesec,enumitem}
 \usepackage{amsmath,xurl}
+\usepackage{listings}
+\lstset{basicstyle=\ttfamily\footnotesize,breaklines=true,columns=fullflexible,
+  keepspaces=true,showstringspaces=false,frame=single,rulecolor=\color{black!15},
+  backgroundcolor=\color{black!3},xleftmargin=6pt,xrightmargin=6pt,
+  framesep=6pt,aboveskip=8pt,belowskip=8pt}
 \usepackage[colorlinks=true,urlcolor=blue!55!black,linkcolor=blue!55!black,citecolor=blue!55!black,pdftitle={Prose or Structure? -- Projektplan und Arbeitsstand},pdfauthor={Sebastian Grünewald}]{hyperref}
 \definecolor{muted}{gray}{0.40}
 \pagestyle{fancy}
 \fancyhf{}
 \fancyhead[L]{\footnotesize\color{muted}Sebastian Grünewald}
 \fancyhead[R]{\footnotesize\color{muted}Projektplan und Arbeitsstand\enspace\textperiodcentered\enspace06.10.2026}
-\fancyfoot[L]{\footnotesize\color{muted}Prose or Structure?\enspace\textperiodcentered\enspace Diskussionsgrundlage}
+\fancyfoot[L]{\footnotesize\color{muted}Prose or Structure?}
 \fancyfoot[R]{\footnotesize\color{muted}\thepage\,/\,\pageref*{LastPage}}
 \renewcommand{\headrulewidth}{0.4pt}
 \renewcommand{\footrulewidth}{0pt}
@@ -30,140 +35,349 @@
 \setlength{\tabcolsep}{5pt}
 \emergencystretch=1.5em
 \begin{document}
-{\footnotesize\color{muted}PROJEKTPLAN FÜR EIN ERSTES PAPER\enspace\textperiodcentered\enspace VERSION 0.2}\par
 {\fontsize{23}{27}\selectfont\bfseries Prose or Structure?}\par
 {\large Evaluating Security-Claim Generation in LLM-Based Code Analysis}\par
-\textbf{Sebastian Grünewald}\par
-Diskussionsgrundlage für Dr. Andreas Ekelhart\enspace\textperiodcentered\enspace6. Oktober 2026
+\textbf{Sebastian Grünewald}, 6. Oktober 2026
 
 \section{Idee und Ziel}
-Wie sollten Sprachmodelle die Ergebnisse einer Sicherheitsanalyse ausgeben, damit diese anschlie\ss{}end zuverlässig weiterverarbeitet werden können? Diese Arbeit vergleicht zwei Wege vom selben Quellcodekontext zu strukturierten Sicherheitsbehauptungen (\textit{Claims}):
+Sprachmodelle können Quellcode untersuchen und mögliche Sicherheitsprobleme beschreiben. Ihre Antworten bestehen häufig aus längeren Berichten. Wenn man diese Ergebnisse anschlie\ss{}end systematisch prüfen oder miteinander vergleichen möchte, braucht man jedoch einzelne, klar formulierte Aussagen. Solche Sicherheitsbehauptungen werden in dieser Arbeit als \textit{Claims} bezeichnet.
+
+Das Projekt untersucht zwei Wege, um aus demselben Quellcode zu solchen Claims zu gelangen. Beim ersten Weg schreibt das Modell zunächst einen Bericht. Aus diesem Bericht werden danach einzelne Aussagen herausgearbeitet. Beim zweiten Weg gibt das Modell seine Aussagen unmittelbar in einer vorgegebenen Struktur aus:
 
 \begin{center}
 \begin{tabular}{@{}ll@{}}
-\textbf{P --- über einen Report:} & Code $\rightarrow$ Flie\ss{}textbericht $\rightarrow$ extrahierte Claims \\
-\textbf{D --- direkt strukturiert:} & Code $\rightarrow$ direkt erzeugte Claims
+\textbf{P --- über einen Bericht:} & Code $\rightarrow$ Flie\ss{}textbericht $\rightarrow$ einzelne Claims \\
+\textbf{D --- direkt strukturiert:} & Code $\rightarrow$ einzelne Claims im vorgegebenen Format
 \end{tabular}
 \end{center}
 
-Beide Wege sollen dasselbe Claimformat verwenden. Verglichen werden die Fundierung im bereitgestellten Code, die Abdeckung relevanter Aussagen sowie der Umgang mit Voraussetzungen und Unsicherheit. Nur bei P kommt die Treue zum ursprünglichen Report als zusätzliche Bewertungsgrö\ss{}e hinzu.
+Beide Wege verwenden dasselbe Ausgabeformat. Bewertet wird, ob der bereitgestellte Code die Aussagen belegt, ob wichtige Sicherheitsaspekte erfasst werden und ob Voraussetzungen und Unsicherheit erhalten bleiben. Bei P kommt eine weitere Frage hinzu: Geben die extrahierten Claims den ursprünglichen Bericht richtig wieder?
 
-Ein Beispiel verdeutlicht das Problem: Aus \glqq{}Bei aktivierter Exportfunktion könnten angemeldete Benutzer fremde Dateien lesen\grqq{} darf nicht ohne Weiteres \glqq{}Jeder Benutzer kann fremde Dateien lesen\grqq{} werden. Die zweite Aussage lässt eine Bedingung weg und behauptet mehr Gewissheit. Umgekehrt kann eine fachlich falsche Aussage korrekt aus einem Report extrahiert sein. \textbf{Bedeutungstreue und tatsächliche Richtigkeit sind deshalb getrennte Fragen.}
+Ein Claim kann den Bericht genau wiedergeben und trotzdem fachlich falsch sein. \textbf{Die Treue zum Bericht und die Richtigkeit im Code werden deshalb getrennt bewertet.} Das ZIP-Beispiel ab Seite~\pageref{sec:zip-example} macht diesen Unterschied konkret.
 
-Ziel ist ein überschaubares empirisches Paper über die \textit{Erzeugung und Darstellung} von Security-Claims. Eine vollständige automatische Verifikationsplattform wird dafür zunächst nicht entwickelt.
+Ziel ist eine überschaubare empirische Studie für ein erstes Paper. Sie soll zeigen, wie sich die beiden Wege auf die Qualität und den Aufwand der Claim-Erzeugung auswirken. Ein System, das sämtliche Sicherheitsbehauptungen automatisch auf ihre Wahrheit prüft, ist dafür zunächst nicht erforderlich.
 
-\section{Forschungsstand und vorläufige Abgrenzung}
-Die Grundidee, Aussagen zu zerlegen und einzeln zu prüfen, ist bereits erforscht. \textbf{DnDScore, DecompScore und VeriScore} untersuchen Zerlegung, Kontextbehandlung beziehungsweise überprüfbare Aussagen und deren Bewertung~\cite{dnd,decomp,veriscore}. Im Softwarebereich zerlegt \textbf{LLMSAN} generierte Datenflusspfade in prüfbare Programmeigenschaften; \textbf{GPTAid} gewinnt Sicherheitsregeln unmittelbar aus API-Code und validiert sie dynamisch~\cite{llmsan,gptaid}. \textbf{VERGE und EviGuard} verbinden strukturierte Claims mit unterschiedlichen Prüfverfahren~\cite{verge,eviguard}.
+\section{Forschungsstand und möglicher Beitrag}
+Die Zerlegung längerer Texte in einzeln prüfbare Aussagen ist bereits Gegenstand bestehender Forschung. \textbf{DnDScore, DecompScore und VeriScore} untersuchen unter anderem, wie Aussagen zerlegt werden, welcher Kontext dabei erhalten bleiben muss und wie ihre Qualität bewertet werden kann~\cite{dnd,decomp,veriscore}.
 
-Der mögliche Beitrag liegt daher nicht in einer erstmaligen Claim-Zerlegung, einer neuen allgemeinen Claim-Sprache oder der blo\ss{}en Kombination von Verifiern. Untersucht werden soll vielmehr, welchen Unterschied der Report-Zwischenschritt bei einer \textit{identischen Codegrundlage} und einem \textit{gemeinsamen Zielschema} macht.
+Auch für Software gibt es verwandte Ansätze. \textbf{LLMSAN} zerlegt vom Modell beschriebene Datenflusspfade in prüfbare Programmeigenschaften. \textbf{GPTAid} leitet Sicherheitsregeln aus dem Code von Programmierschnittstellen ab und prüft sie durch Programmausführung~\cite{llmsan,gptaid}. \textbf{VERGE und EviGuard} verbinden strukturierte Aussagen mit unterschiedlichen Prüfverfahren~\cite{verge,eviguard}.
 
-\textbf{Vorläufige Forschungslücke:} In den bisher betrachteten Arbeiten wurde kein unmittelbar entsprechender kontrollierter Vergleich identifiziert, der beide Wege anhand von Code-Fundierung, relevanter Abdeckung und erhaltenen Voraussetzungen bewertet. Diese Abgrenzung muss vor der Hauptstudie durch eine gezielte Prüfung der engsten Vorarbeiten weiter abgesichert werden. Eine Überlegenheit der direkten Route wird nicht vorausgesetzt.
+Der geplante Beitrag setzt bei einer konkreten Frage an: \textbf{Was verändert sich, wenn zwischen Codeanalyse und strukturierten Claims zunächst ein Bericht entsteht?} Für einen fairen Vergleich erhalten beide Wege dieselben Codeinformationen und müssen dasselbe Ausgabeformat einhalten.
+
+In den bisher betrachteten Arbeiten wurde kein direkt entsprechender Vergleich gefunden, der zugleich die Belege im Code, die Abdeckung wichtiger Aussagen und den Erhalt von Voraussetzungen untersucht. Diese vorläufige Abgrenzung muss vor der Hauptstudie durch eine genauere Literaturprüfung abgesichert werden. Ob P oder D besser abschneidet, bleibt eine offene Forschungsfrage.
 
 \newpage
 \section{Forschungsfragen}
-\textbf{RQ1 --- Was muss ein Claim enthalten?} Welche Kontextangaben und Beziehungen sind erforderlich, damit Security-Claims eindeutig interpretiert und in passende Prüfaufgaben überführt werden können?\par
-\textit{Methode und Ergebnis:} Literatur und manuelle Kodierung von Entwicklungsfällen liefern ein begründetes Claimprofil samt Codebook und Grenzfällen.
+\subsection{RQ1: Welche Angaben braucht ein verständlicher und prüfbarer Claim?}
+Eine Sicherheitsbehauptung ist nur dann eindeutig, wenn erkennbar ist, auf wen oder was sie sich bezieht und unter welchen Bedingungen sie gelten soll. Die erste Forschungsfrage untersucht deshalb, welche Angaben ein Claim enthalten muss und welche Beziehungen zwischen Claims wichtig sind. Daraus soll sich auch ableiten lassen, welche konkrete Prüfung zur Beurteilung einer Aussage erforderlich wäre.
 
-\textbf{RQ2 --- Welcher Erzeugungsweg liefert welche Qualität?} Wie unterscheiden sich P und D hinsichtlich fachlicher Fundierung, relevanter Abdeckung, angemessener Voraussetzungen und Aufwand?\par
-\textit{Methode und Ergebnis:} Gepaarter Vergleich mit unabhängigen Referenzinformationen. Ergebnis sind Qualitäts- und Kostenunterschiede samt Unsicherheit, kein vorab festgelegter Sieger.
+Als Grundlage dienen die Literatur und die manuelle Untersuchung ausgewählter Entwicklungsfälle. Das Ergebnis ist ein \textit{Claimprofil}: eine begründete Festlegung der benötigten Felder. Dazu gehört ein \textit{Codebook}, also ein Leitfaden, der die Felder erklärt und Regeln für schwierige oder mehrdeutige Fälle enthält.
 
-\textbf{RQ3 --- Welche Fehler wirken sich auf die Prüfung aus?} Welche Darstellungsfehler verändern die daraus abgeleitete Prüfaufgabe, und helfen explizite Kontextfelder, diese Fehler zu reduzieren?\par
-\textit{Methode und Ergebnis:} Fehleranalyse und eine kleine Ablationsstudie auf einem Teilbestand. Ergebnis ist eine Einordnung relevanter Fehler und ihrer Folgen; kein neuer allgemeiner Verifier.
+\subsection{RQ2: Wie unterscheiden sich die beiden Erzeugungswege?}
+Die zweite Forschungsfrage vergleicht P und D hinsichtlich Qualität und Aufwand. Entscheidend ist, ob ihre Claims durch den verfügbaren Code gestützt werden, wichtige Sicherheitsaspekte abdecken und notwendige Voraussetzungen angemessen ausdrücken. Zusätzlich werden die benötigten Modellaufrufe, Laufzeiten und Kosten erfasst.
 
-\section{Studiendesign und Claimformat}
-\subsection{Daten und fairer Vergleich}
-Ausgangspunkt sind reproduzierbare Java-Fälle aus \textbf{Vul4J} mit Patches und Proof-of-Vulnerability-Tests~\cite{vul4j}. Zunächst werden zwei bis drei passende Schwachstellenklassen gewählt. JSPWiki bleibt Entwicklungsfall; andere Fälle werden für die Evaluation zurückgehalten. Reparierte Varianten kontrollieren die konkrete Schwachstelle, sind aber nicht pauschal \glqq{}sichere Programme\grqq{}.
+Beide Wege werden auf denselben Fällen ausgeführt. Ihre Ausgaben werden anschlie\ss{}end anhand unabhängig erstellter Referenzen bewertet. Berichtet werden die beobachteten Unterschiede und die Unsicherheit dieser Ergebnisse. Ein Gewinner wird nicht vorab festgelegt.
 
-P und D erhalten identische Quellcode- und Konfigurationsdateien, aber keine Patches, PoVs, Advisories oder Benchmark-Labels. Bei P sieht der Extraktor nur den Report und führt keine zusätzliche Codeanalyse durch. Modellversion, Prompt, Kontext, Wiederholungen, Tokenbudget und Formatvorgaben werden dokumentiert.
+\subsection{RQ3: Welche Darstellungsfehler erschweren eine spätere Prüfung?}
+Die dritte Forschungsfrage betrachtet Fehler, die beim Formulieren oder Zerlegen von Aussagen entstehen. Dazu gehören beispielsweise verlorene Bedingungen, zu weit gefasste Aussagen oder ein veränderter Grad an Gewissheit. Untersucht wird, ob solche Fehler dazu führen, dass aus einem Claim eine andere oder unpassende Prüfaufgabe abgeleitet wird.
 
-Da P zwei Aufrufe benötigt und D zunächst einen, werden komplette Erzeugungswege verglichen. Eine zusätzliche D-Variante mit einem Überarbeitungsschritt sowie Kosten- und Laufzeitauswertungen dienen als Budgetkontrolle. Der Vergleich isoliert dadurch nicht automatisch den reinen Effekt des Ausgabeformats.
+Auf einem Teil der Fälle werden au\ss{}erdem Ausgaben mit und ohne ausdrücklich vorgesehene Kontextfelder verglichen. Dieser gezielte Vergleich wird als \textit{Ablation} bezeichnet. Er soll zeigen, ob zusätzliche Felder für Voraussetzungen und ähnliche Angaben helfen, relevante Fehler zu vermeiden.
 
-\subsection{Ein kleines gemeinsames Claimprofil}
-CAE und SACM liefern die begriffliche Grundlage für Claims, Argumente und Evidenzbezüge~\cite{cae,sacm}. Für den Pilot genügt ein einfaches strukturiertes Format mit folgenden Feldgruppen:
+\section{Aufbau des Vergleichs}
+\subsection{Fälle und gleiche Ausgangsbedingungen}
+Ausgangspunkt sind Java-Fälle aus \textbf{Vul4J}. Dieser Datensatz enthält bekannte Sicherheitsprobleme, zugehörige Codekorrekturen und Tests, mit denen sich die jeweilige Schwachstelle nachvollziehen lässt~\cite{vul4j}. Zunächst werden Fälle aus zwei bis drei passenden Schwachstellenklassen betrachtet. JSPWiki dient weiterhin der Entwicklung; andere Fälle werden für die spätere Evaluation zurückgehalten. Eine reparierte Variante erlaubt die Untersuchung einer bestimmten Korrektur. Sie gilt deshalb noch nicht als insgesamt sicheres Programm.
+
+P und D erhalten exakt dieselben Quellcode- und Konfigurationsdateien. Informationen über die Korrektur, Schwachstellentests, veröffentlichte Sicherheitshinweise und die Einstufung im Datensatz werden ihnen nicht zusätzlich gegeben. Bei P sieht das Modell im zweiten Schritt ausschlie\ss{}lich den Bericht sowie allgemeine Anweisungen zum Claimformat. Es kann in diesem Schritt keine weitere Codeanalyse durchführen.
+
+Für jeden Versuch werden Modellversion, Anweisungen, Eingaben, Wiederholungen und Grenzen der Ausgabelänge festgehalten. P benötigt bis zu zwei Modellaufrufe, D zunächst nur einen. Deshalb wird zusätzlich eine D-Variante untersucht, bei der das Modell seine erste Ausgabe einmal überarbeitet. Damit lassen sich vollständige Erzeugungswege mit ihrem jeweiligen Aufwand vergleichen. Der Einfluss des Ausgabeformats allein wird dadurch noch nicht vollständig isoliert.
+
+\newpage
+\subsection{Ein gemeinsames Format für die Claims}
+Beide Wege verwenden dieselbe einfache Struktur. Die Konzepte CAE und SACM helfen dabei, Aussagen, begründende Argumente und Belege voneinander zu unterscheiden~\cite{cae,sacm}. Für den Pilotversuch ergibt sich folgendes Format:
 
 \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{33mm}Y@{}}
 \toprule
-\textbf{Feldgruppe} & \textbf{Inhalt} \\ \midrule
-Aussage & Claim-ID, Proposition, vorläufiger Claim-Typ. \\
-Bedingungen und Umfang & Akteur/Rechte, Voraussetzungen, Negation, Modalität, betroffene Version oder Konfiguration. \\
-Herkunft und Beziehungen & Codebezüge; Report-Textstelle bei P; explizit benannte verbundene Claims. \\
-Prüfbezug & Benötigte Evidenz oder Prüfaufgabe, getrennt von der behaupteten Aussage und bereits vorliegenden Belegen. \\
+\textbf{Bereich} & \textbf{Welche Angaben werden festgehalten?} \\ \midrule
+Aussage & Der Claim erhält eine Kennung, eine ausformulierte Behauptung und eine vorläufige Kategorie. \\
+Bedingungen und Umfang & Wer ist betroffen, welche Rechte und Voraussetzungen sind nötig, und wann gilt die Aussage? Auch Verneinungen und Unsicherheit bleiben erhalten. \\
+Herkunft und Beziehungen & Codeverweise und, bei P, Berichtszitate zeigen die Herkunft. Beziehungen zu anderen Claims werden ausdrücklich angegeben. \\
+Prüfaufgabe & Was müsste geprüft werden, und welche Belege fehlen dafür? Diese Aufgabe bleibt von der Behauptung getrennt. \\
 \bottomrule
 \end{tabularx}
 
-Annahmen sind keine bestätigten Systemzustände. Extrahierte Aussagen, ergänzender Kontext und abgeleitete Prüfaufgaben bleiben getrennt. Vollständige SACM-Implementierung und Lean-Formalisierung sind nicht vorgesehen.
+Eine genannte Voraussetzung gilt nicht automatisch als erfüllt. Die Aussage, ergänzende Informationen und die Prüfaufgabe bleiben deshalb getrennt. Eine vollständige Umsetzung von SACM oder eine Übersetzung der Claims in die formale Beweissprache Lean ist nicht vorgesehen.
 
-\newpage
-\section{Referenzbewertung und Auswertung}
-Es werden zwei Referenzen getrennt erstellt: Für P werden die tatsächlich im Report enthaltenen Aussagen und Bedingungen annotiert. Für beide Wege wird unabhängig davon festgehalten, welche relevanten Aussagen das bereitgestellte Codepaket rechtfertigt und welche Fragen offenbleiben. Ein echter CVE oder ein erfolgreicher PoV bestätigt nicht automatisch jede Aussage eines Reports.
+\subsection{Wer übernimmt welche Aufgabe?}
+Die Python-Skripte stellen die Eingaben zusammen, senden die Anfragen an das Modell und speichern dessen Antworten. Das Sprachmodell schreibt den Bericht beziehungsweise die Claims. Die Software prüft danach das Format und bestimmte Verweise. Menschen erstellen die unabhängigen Vergleichsgrundlagen und bewerten die Bedeutung der Aussagen. Der Prototyp entscheidet also nicht automatisch, ob ein Sicherheitsproblem tatsächlich ausnutzbar ist.
 
-Mindestens ein Teilbestand soll von zwei Personen unabhängig und möglichst ohne Kenntnis der Erzeugungsroute annotiert werden. Unterschiedliche Bewertungen werden vor der gemeinsamen Klärung aufbewahrt. Ein zweites LLM kann unterstützen, bildet aber nicht allein die Referenz. Ma\ss{}geblich ist semantische Übereinstimmung, nicht identischer Wortlaut oder eine feste Anzahl von Claims.
+\subsection{Die sechs Kontextfelder in einfachen Worten}
+Die folgenden Fragen sollen verhindern, dass beim Formulieren wichtige Bedingungen verloren gehen. Im gespeicherten Format haben sie kurze englische Namen. Die Angaben müssen zur vollständigen Aussage passen und dürfen keine neuen Tatsachen erfinden.
 
-\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{36mm}Y@{}}
+\begin{tabularx}{\linewidth}{@{}p{33mm}Y@{}}
 \toprule
-\textbf{Kriterium} & \textbf{Operationalisierung} \\ \midrule
-Fundierung im Code & Anteil der durch den bereitgestellten Kontext belegten, widerlegten oder nicht entscheidbaren Aussagen; Unsicherheit separat bewerten. \\
-Relevante Abdeckung & Erfasste Propositionen eines vorab abgegrenzten Referenzbestands; keine Belohnung für blo\ss{} viele oder triviale Claims. \\
-Bedeutungstreue (nur P) & Auslassungen, unbelegte Ergänzungen sowie Änderungen an Bedingungen, Negation, Akteur oder Aussagekraft. \\
-Prüfbarkeit & Eindeutige Entitäten, Geltungsbereiche und Voraussetzungen; Übereinstimmung der daraus formulierten Prüfaufgaben. \\
-Aufwand und Robustheit & Aufrufe, Tokens, Laufzeit, Kosten, Formatfehler und notwendige Reparaturen. \\
+\textbf{Feld} & \textbf{Welche Frage beantwortet es?} \\ \midrule
+\texttt{actor} & Wer handelt oder ist betroffen? Sind bestimmte Rechte oder eine Anmeldung ausdrücklich genannt? \\
+\texttt{preconditions} & Was muss vorausgesetzt werden, damit die Aussage gilt, etwa eine bestimmte Konfiguration oder kontrollierbare Eingabedaten? \\
+\texttt{negation} & Was wird ausdrücklich verneint, etwa \glqq{}es findet keine Prüfung statt\grqq{}? \\
+\texttt{modality} & Wird etwas als möglich, sicher oder eingeschränkt behauptet, etwa \glqq{}könnte\grqq{}? \\
+\texttt{quantifier} & Geht es um alle, einige oder nur bestimmte Objekte oder Fälle? \\
+\texttt{scope} & Auf welchen Codepfad, welche Version oder welchen sonstigen Bereich ist die Aussage begrenzt? \\
 \bottomrule
 \end{tabularx}
 
-Als Vergleich für die Extraktion in P dienen eine einfache satzweise Aufteilung, ein vorhandener allgemeiner Claim-Extraktionsansatz und die codebookgestützte Variante. D ist eine starke direkte Schema-Prompting-Baseline. Security-Systeme wie LLMSAN werden nur bei tatsächlich kompatiblen Teilaufgaben einbezogen. Kleine Zusatzversuche untersuchen die Wirkung expliziter Kontextfelder in beiden Routen.
-
-Ausgewertet werden gepaarte Unterschiede pro Codefall mit Effektgrö\ss{}en und Konfidenzintervallen. Claims desselben Falls sind keine unabhängigen Stichproben. Annotationsübereinstimmung, Ausfälle und offene Fälle werden separat berichtet. Ein nicht signifikanter Unterschied gilt nicht automatisch als Gleichwertigkeit.
-
-\section{Erarbeiteter Stand}
-\subsection{Gemeinsames Profil und Bewertungsgrundlage}
-Das \textbf{Claimprofil 0.1} liegt als Schema mit gemeinsamem Codebook vor und wird von beiden Routen verwendet. Es trennt die Proposition, sechs Kontextaspekte, Herkunft und Claimbeziehungen sowie die abgeleitete Prüfaufgabe. Nicht genannte Voraussetzungen werden von expliziter Negation und ausdrücklich unbekanntem Kontext unterschieden. Vorhandene Evidenz und Wahrheitsurteile gehören in die separate Annotation.
-
-Grenzfälle wurden an JSPWiki sowie zwei weiteren Entwicklungsfällen ausgearbeitet. Diese Beispiele und die historische, assistierte JSPWiki-Annotation mit 13 Claims sind Entwicklungsmaterial; sie ersetzen keine unabhängige Referenz. Ein Annotationsprotokoll und neutrale Codepakete mit Arbeitsblättern sind vorbereitet. Die engsten Vorarbeiten wurden gezielt eingeordnet; eine abschlie\ss{}ende Neuheitsprüfung steht noch aus.
+Eine nicht genannte Information bleibt \texttt{null}. Dagegen werden \glqq{}keine Anmeldung erforderlich\grqq{} und \glqq{}ob eine Anmeldung nötig ist, ist unbekannt\grqq{} als Text festgehalten. Diese drei Situationen bedeuten etwas Unterschiedliches. Wie die Felder in einer echten Ausgabe aussehen, zeigt das folgende Beispiel.
 
 \newpage
-\subsection{Reproduzierbarer Forschungsprototyp}
-Ein kleiner Python-Prototyp deckt Fallvorbereitung, beide Erzeugungswege, Zusatzkontrollen und Annotationsexport ab. Fixierte Quellen und gemeinsame Formatierung stellen identische Codekontexte sicher. P verarbeitet sämtliche Findings eines Reports gemeinsam; D benötigt keinen erfolgreichen P-Report. Gemeinsame Validatoren prüfen Format und Beziehungen, bei P zusätzlich exakte Reportzitate. Sie entscheiden nicht über die inhaltliche Wahrheit.
+\subsection{Ein echtes Beispiel: ZIP-Dateien entpacken}
+\label{sec:zip-example}
+Das folgende Beispiel stammt aus dem abgeschlossenen Pilotversuch: \textbf{VUL4J-43, Eclipse RDF4J, verwundbare Variante, erste Wiederholung}. Code und Modellausgaben sind vorhanden. Die deutschen Erläuterungen fassen die englischen Ausgaben zusammen; eine unabhängige menschliche Bewertung liegt dazu noch nicht vor.
 
-Originaleingaben, Prompts, Modellantworten und Herkunft bleiben nachvollziehbar gespeichert. Ein budgetierter Versuchsablauf erfasst auch ungültige oder leere Ergebnisse, ohne sie automatisch zu reparieren oder zu wiederholen. 106 Offline-Tests prüfen unter anderem Kontexttrennung, Quellenpaarung und Fehlerbehandlung.
+Beim Entpacken einer ZIP-Datei muss das Programm entscheiden, wo es jeden enthaltenen Eintrag ablegt. Im bereitgestellten Code von \texttt{ZipUtil.java} steht in den Zeilen 93--104 der folgende Ausschnitt. Lediglich die Einrückung wurde für die Darstellung angepasst:
 
-\subsection{Erster Pilot: Erzeugung abgeschlossen, Bewertung offen}
-Der Pilot umfasst \textbf{fünf neue Vul4J-Fälle} aus zwei Familien: XXE (Apache CXF, OpenRefine) und Pfadverarbeitung (Plexus Archiver, Eclipse RDF4J, Retrofit). Je eine verwundbare und reparierte Variante ergeben zehn begrenzte Codekontexte. Jede Route wurde zweimal mit balancierter Reihenfolge ausgeführt. Alle Entwicklungs- und Pilotprojekte bleiben von der späteren zurückgehaltenen Evaluation ausgeschlossen.
+\begin{lstlisting}[language=Java]
+File outFile = new File(destDir, entry.getName());
 
-Verwendet wurde \texttt{gpt-5.4-mini-2026-03-17} mit deaktiviertem Reasoning. Hinzu kommen eine D-Revision je Kontext, die Kontextfeld-Ablation beider Routen auf vier Kontexten sowie Satz- und VeriScore-basierte Extraktionsbaselines. Die VeriScore-Baseline adaptiert den lizenzierten Originalprompt; sie ist keine Reproduktion des gesamten Systems. Die D-Revision kontrolliert einen zusätzlichen Aufruf, nicht ein identisches Tokenbudget.
+if (entry.isDirectory()) {
+    outFile.mkdirs();
+}
+else {
+    outFile.getParentFile().mkdirs();
+
+    try (InputStream in = zipFile.getInputStream(entry)) {
+        IOUtil.writeStream(in, outFile);
+    }
+}
+\end{lstlisting}
+
+\texttt{destDir} ist das vorgesehene Zielverzeichnis. \texttt{entry.getName()} liefert den Namen eines Eintrags aus dem ZIP-Archiv. Aus beiden wird ein Dateipfad gebildet. Danach werden Verzeichnisse angelegt oder die enthaltenen Daten an die Schreibfunktion übergeben.
+
+Warum ist das sicherheitsrelevant? Ein Dateiname kann auch Pfadbestandteile wie \texttt{../} enthalten. Als vereinfachtes Anschauungsbeispiel führt der Pfad \texttt{/tmp/ausgabe/../andere.txt} eine Ebene aus \texttt{ausgabe} heraus. Die Sicherheitsfrage lautet deshalb: \textbf{Wird verhindert, dass Einträge au\ss{}erhalb des vorgesehenen Verzeichnisses geschrieben werden?} Dieses Pfadbeispiel erklärt die Fragestellung; es ist kein hier ausgeführter Angriffstest.
+
+\textbf{Weg P, erster Aufruf: Das Modell schreibt einen Bericht.} Der echte Bericht beschreibt die Bildung des Zielpfads, behauptet eine fehlende Prüfung der Verzeichnisgrenze und nennt mögliche Folgen. Eine zentrale Passage lautet im Original:
+
+\begin{quote}\small
+As a result, if an attacker can control the ZIP contents supplied to \texttt{extract(...)} (lines 48-75), extraction may overwrite arbitrary files accessible to the process.
+\end{quote}
+
+Gemeint ist: Wenn ein Angreifer die übergebenen ZIP-Inhalte kontrollieren kann, könnte das Entpacken Dateien überschreiben, auf die der Prozess zugreifen kann. Der Bericht behauptet damit nicht, dass jeder beliebige Benutzer unter allen Umständen jede Datei überschreiben kann.
+
+\textbf{Weg P, zweiter Aufruf: Ein Modell zerlegt nur diesen Bericht.} Es sieht dabei keinen Code. In diesem Lauf entstanden fünf Claims: die Bildung des Zielpfads, die behauptete fehlende Pfadprüfung, die bedingte Möglichkeit des Überschreibens, die Einordnung als ZIP-Slip-Problem und die Abhängigkeit des Risikos von Umgebung und Dateisystemrechten.
+
+\newpage
+\subsection{So sehen die erzeugten Claims aus}
+Der dritte P-Claim enthält die eben erläuterte bedingte Aussage. Der folgende Ausschnitt zeigt echte Feldinhalte; weitere Felder der gespeicherten Ausgabe sind hier zur besseren Lesbarkeit weggelassen:
+
+\begin{lstlisting}
+"claim_id": "C03",
+"proposition": "If an attacker can control the ZIP contents supplied to `extract(...)`, extraction may overwrite arbitrary files accessible to the process.",
+"context": {
+  "actor": "an attacker",
+  "preconditions": "the attacker can control the ZIP contents supplied to `extract(...)`",
+  "negation": null,
+  "modality": "may",
+  "quantifier": null,
+  "scope": "`extract(...)` (lines 48-75)"
+}
+\end{lstlisting}
+
+Die \texttt{proposition} ist die vollständige Behauptung. Das Objekt \texttt{context} schreibt ihre Bedingungen und Einschränkungen zusätzlich einzeln auf: Wer handelt? Was muss vorausgesetzt werden? Ist etwas nur möglich? Worauf bezieht sich die Aussage? \texttt{null} bedeutet dabei \glqq{}nicht angegeben\grqq{}, nicht \glqq{}falsch\grqq{} oder \glqq{}geprüft und nicht vorhanden\grqq{}.
+
+Die getrennten Felder sind ein zusätzlicher Fragenbogen zur Aussage. Sie sollen helfen, wichtige Einschränkungen beim Formulieren zu erhalten. Aus dem Original darf nicht einfach \glqq{}Ein Angreifer überschreibt beliebige Dateien\grqq{} werden. Dann gingen die Voraussetzung, die Möglichkeit statt Gewissheit und die Begrenzung durch Prozessrechte verloren. Auch mit ausgefüllten Feldern muss der Aussagesatz selbst vollständig bleiben. Im echten Beispiel steht die Beschränkung durch Prozessrechte im Satz, aber nicht ausdrücklich im Feld \texttt{scope}; die Felder sind also ebenfalls zu beurteilen.
+
+\textbf{Weg D: Das Modell erzeugt Claims unmittelbar aus demselben Code.} In diesem Lauf entstanden sechs Claims. Der erste beschreibt, wie \texttt{writeEntry} den Zielpfad bildet und Verzeichnisse beziehungsweise Dateien verarbeitet. Die übrigen Claims beschreiben den Ablauf von \texttt{extract} sowie Hilfsfunktionen zum Lesen und Übertragen von Daten. Die sechs Aussagesätze benennen die fehlende Prüfung der Zielverzeichnisgrenze nicht ausdrücklich.
+
+Das zeigt einen möglichen Unterschied, noch keinen Sieger: D hat hier mehr Claims erzeugt, P benennt das mögliche Sicherheitsproblem deutlicher. Ob die Aussagen richtig und für die Sicherheitsfrage relevant sind, muss anhand einer unabhängig erstellten Codereferenz beurteilt werden. Viele zutreffende Beschreibungen nebensächlicher Operationen wären noch keine gute Abdeckung wichtiger Sicherheitsaspekte.
+
+\textbf{Ein Verweis ist noch kein Beleg.} P speichert zu C03 das exakte Berichtszitat und die dort genannten Codepositionen. D nennt beispielsweise den Dateipfad und die Zeilen 90--104 von \texttt{writeEntry}. Diese Angaben helfen beim Nachschlagen. Ob die Stelle die gesamte Behauptung trägt, wird erst bei der Bewertung entschieden. Die im Claim enthaltene Prüfaufgabe zu C03 fragt nach dem Überschreiben unter der genannten Voraussetzung und nennt unter anderem benötigte Informationen über Dateisystemrechte. Das ist ein Prüfauftrag, kein bereits durchgeführter Nachweis.
+
+\newpage
+\section{Bewertung und Auswertung}
+Für die Bewertung werden zwei Grundlagen erstellt. Die \textbf{Codereferenz} hält fest, welche wichtigen Aussagen der bereitgestellte Code erlaubt und welche Fragen offenbleiben. Sie entsteht, bevor die bewertenden Personen Modellantworten sehen. Die \textbf{Reportreferenz} erfasst den Inhalt und die Bedingungen des jeweiligen P-Berichts. So lässt sich unterscheiden, ob ein Claim den Bericht falsch wiedergibt oder ob schon die Berichtsaussage nicht durch den Code gestützt ist.
+
+\subsection{Wie die Referenzen beim ZIP-Beispiel aussehen könnten}
+\textbf{Die folgenden Tabellen sind Erläuterungsentwürfe, keine vorhandenen menschlichen Referenzdaten.} Sie wurden für dieses Dokument anhand des bereits besprochenen Falls zusammengestellt. Für die eigentliche Bewertung werden die Referenzen unabhängig nach dem festgelegten Verfahren erstellt; Kenntnis dieser Beispiele wird als Vorwissen dokumentiert.
+
+Eine \textbf{Codereferenz} beantwortet: Welche wichtigen Aussagen und offenen Fragen ergeben sich aus dem Code, den auch das Modell sehen durfte? Jeder Eintrag erhält eine eigene Kennung, eine Fundstelle und eine Begründung seiner Relevanz. Ein verkürzter Ausschnitt könnte so aussehen:
+
+\begin{tabularx}{\linewidth}{@{}p{9mm}Y>{\raggedright\arraybackslash}p{47mm}@{}}
+\toprule
+\textbf{ID} & \textbf{Aussage oder offene Frage} & \textbf{Fundstelle und Grenze} \\ \midrule
+K01 & Der Zielpfad wird aus dem Zielverzeichnis und dem Namen des ZIP-Eintrags gebildet. & \texttt{ZipUtil.java}, Zeile 93; relevant für den Einfluss des Eintragsnamens. \\
+K02 & In \texttt{writeEntry} ist keine Prüfung sichtbar, die den Zielpfad auf das Zielverzeichnis begrenzt. & \texttt{ZipUtil.java}, Zeilen 90--105; Aussage über diese Methode. \\
+K03 & Offen: Kann ein Angreifer in der tatsächlichen Anwendung die übergebenen ZIP-Inhalte kontrollieren? & \texttt{extract}, Zeilen 48--75, zeigt die Verarbeitung; der Anwendungskontext fehlt. \\
+K04 & Offen: Welche Dateien dürfte der Prozess in seiner Einsatzumgebung überschreiben? & Aufruf der Schreibfunktion in Zeile 102; tatsächliche Prozessrechte fehlen. \\
+\bottomrule
+\end{tabularx}
+
+Eine \textbf{Reportreferenz} beantwortet eine andere Frage: Was behauptet der konkrete Bericht? Sie wird aus dem Bericht erstellt, ohne dessen Aussagen mithilfe des Codes zu verbessern. Dazu gehören exakte Textbelege. Drei beispielhafte Einträge, hier auf Deutsch zusammengefasst, wären:
+
+\begin{tabularx}{\linewidth}{@{}p{9mm}Y@{}}
+\toprule
+\textbf{ID} & \textbf{Im Bericht enthaltene Aussage} \\ \midrule
+R01 & Die Methode bildet den Zielpfad aus Zielverzeichnis und Eintragsname und schreibt beziehungsweise erstellt ihn direkt. \\
+R02 & Der Bericht behauptet, dass eine Prüfung der Verzeichnisgrenze und eine entsprechende Prüfung des normalisierten Pfads fehlen. \\
+R03 & Wenn ein Angreifer die übergebenen ZIP-Inhalte kontrollieren kann, ist das Überschreiben von Dateien möglich, auf die der Prozess zugreifen kann. \\
+\bottomrule
+\end{tabularx}
+
+Zu R03 würde beispielsweise das englische Originalzitat auf Seite~\pageref{sec:zip-example} gehören. Weitere Einträge würden die Einordnung als ZIP Slip und die genannten Einflüsse der Umgebung abdecken. Kennungen wie K01, R01 und C01 sind unabhängig: Die gleiche Nummer bedeutet nicht, dass es sich um die gleiche Aussage handelt.
+
+\textbf{Danach werden Claims inhaltlich zugeordnet.} K01 könnte sowohl durch den ersten P-Claim als auch durch den ersten D-Claim erfasst sein. R03 wird mit dem dritten P-Claim verglichen: Bleiben Voraussetzung, Möglichkeit und Begrenzung durch Prozessrechte erhalten? Mehrere Claims dürfen gemeinsam eine Referenzaussage abdecken; Wiederholungen zählen diese Aussage nicht mehrfach. Teilweise Abdeckung wird mit der konkreten Lücke erfasst.
+
+\newpage
+\subsection{Wie aus dem Vergleich eine Bewertung wird}
+Für jeden Claim wird gesondert geprüft, ob der sichtbare Code die vollständige Aussage unter ihren genannten Bedingungen stützt. Die folgenden Urteile veranschaulichen die Regeln; sie sind keine abgeschlossene Annotation der Pilotausgaben:
+
+\begin{tabularx}{\linewidth}{@{}p{25mm}YY@{}}
+\toprule
+\textbf{Urteil} & \textbf{Beispielaussage} & \textbf{Begründung} \\ \midrule
+Belegt & \glqq{}Der Zielpfad wird mit \texttt{new File(destDir, entry.getName())} gebildet.\grqq{} & Diese Operation ist in Zeile 93 direkt sichtbar. \\
+Widerlegt & \glqq{}Die Methode \texttt{writeEntry} prüft vor dem Schreiben, ob der Zielpfad im Zielverzeichnis bleibt.\grqq{} & Die vollständige sichtbare Methode enthält diese behauptete Prüfung nicht. \\
+Nicht entscheidbar & \glqq{}Ein nicht angemeldeter Internetnutzer kann über die laufende Anwendung Dateien überschreiben.\grqq{} & Netzwerkzugang, Anmeldung, Aufrufer und Einsatzumgebung sind im Paket nicht ausreichend sichtbar. \\
+\bottomrule
+\end{tabularx}
+
+\textbf{Nicht entscheidbar bedeutet nicht falsch.} Für eine Entscheidung fehlen bestimmte Informationen. Diese Lücke wird benannt. Umgekehrt macht ein vorsichtiges Wort wie \glqq{}könnte\grqq{} eine Aussage nicht automatisch richtig: Auch eine behauptete Möglichkeit braucht einen nachvollziehbaren Weg und passende Voraussetzungen.
+
+Bei P wird zusätzlich die \textbf{Treue zum Bericht} geprüft. Wenn der Bericht einen Angriff nur bei kontrollierbaren ZIP-Inhalten für möglich hält und der Claim diese Einschränkung erhält, kann die Extraktion bedeutungstreu sein. Das gilt auch dann, wenn die Aussage selbst mit dem Code nicht entscheidbar ist. Lässt der Claim die Voraussetzung weg oder macht er aus der Möglichkeit eine Gewissheit, liegt dagegen eine Bedeutungsänderung vor.
+
+Auch die \textbf{Prüfaufgabe} wird bewertet. Beim dritten P-Claim wäre die passende Frage, ob kontrollierbare Eintragsnamen unter den genannten Bedingungen zu einem Schreiben au\ss{}erhalb des Zielverzeichnisses führen können. Dafür könnten Informationen zum gesamten Schreibpfad und zu den Prozessrechten benötigt werden. Eine Aufgabe, die lediglich prüft, ob sich die ZIP-Datei öffnen lässt, würde diese Behauptung nicht beantworten. Benötigte Belege und zusätzliche Annahmen sind deshalb keine bereits vorhandenen Beweise.
+
+\textbf{Für die spätere Auswertung entsteht so pro Fall ein Vergleich:}
+\begin{enumerate}
+\item Welche relevanten Referenzaussagen erfassen P und D vollständig, teilweise oder gar nicht? Offene Fragen werden von belegbaren Aussagen getrennt betrachtet.
+\item Welche Claims sind belegt, widerlegt oder nicht entscheidbar? Welche drücken zu viel oder zu wenig Gewissheit aus?
+\item Wo verändert P die Bedeutung des Berichts, und wie gut passen die abgeleiteten Prüfaufgaben zu den Claims?
+\item Welchen Aufwand verursachen die vollständigen Wege einschlie\ss{}lich Modellaufrufen und menschlicher Bewertungszeit?
+\end{enumerate}
+
+Die getrennten Ergebnisse sollen zeigen, \emph{warum} ein Weg besser oder schlechter funktioniert. Ein technischer Formatfehler wird separat erfasst und nicht als fachlich falscher Claim gezählt. Ein festgelegter Teilbestand wird von zwei Menschen unabhängig beurteilt, möglichst ohne Kenntnis der Route. Die ersten Urteile bleiben erhalten; Unterschiede werden erst danach besprochen. Ein weiteres Sprachmodell ersetzt diese Unabhängigkeit nicht.
+
+P und D werden innerhalb desselben Codefalls verglichen. Claims, Varianten und Wiederholungen sind keine unabhängigen Fälle. Berichtet werden die Grö\ss{}e der Unterschiede und ihre Unsicherheit; ein statistisch uneindeutiges Ergebnis beweist keine Gleichwertigkeit. Auch eine bekannte Schwachstelle oder ein erfolgreicher Schwachstellentest bestätigt nicht automatisch jede Aussage.
+
+\newpage
+\section{Was bisher erarbeitet wurde}
+\subsection{Gemeinsames Claimprofil und Regeln für die Bewertung}
+Das \textbf{Claimprofil in Version 0.1} ist umgesetzt und wird von beiden Erzeugungswegen verwendet. Ein gemeinsames Schema legt fest, welche Felder eine Antwort enthalten muss. Das Codebook erklärt, wie diese Felder zu verstehen und auszufüllen sind.
+
+Zusätzlich zur eigentlichen Behauptung werden sechs Aspekte ihres Kontexts erfasst: beteiligte Akteure und Rechte, Voraussetzungen, Verneinungen, der Grad der Gewissheit, Mengenangaben wie \glqq{}alle\grqq{} oder \glqq{}einige\grqq{} und der Geltungsbereich. Das Profil unterscheidet dabei zwischen einer nicht genannten Voraussetzung, einer ausdrücklich verneinten Eigenschaft und einer ausdrücklich unbekannten Information. Diese Unterschiede dürfen beim Erzeugen eines Claims nicht verloren gehen.
+
+Codeverweise, Beziehungen zu anderen Claims und die daraus abgeleitete Prüfaufgabe werden ebenfalls festgehalten. Ob vorhandene Belege die Aussage tatsächlich stützen, wird jedoch erst in der gesonderten menschlichen Bewertung entschieden.
+
+Das Profil wurde anhand von JSPWiki und zwei weiteren Entwicklungsfällen ausgearbeitet. Dazu gehören Beispiele für schwierige Formulierungen und uneindeutige Grenzen zwischen Aussagen. Die ältere JSPWiki-Auswertung mit 13 Claims wurde mit KI-Unterstützung und Vorwissen erstellt. Sie hilft bei der Entwicklung, ist aber keine unabhängige Referenz für die spätere Studie.
+
+Für die menschliche Bewertung liegen bereits ein Ablaufplan und Arbeitsblätter vor. Die zugehörigen Codepakete tragen neutrale Kennungen, damit Fallnamen und Variantenlabels nicht zusätzlich auf die erwartete Bewertung hinweisen. Im Code selbst können allerdings weiterhin Projektmerkmale erkennbar sein. Die wichtigsten verwandten Arbeiten wurden ebenfalls eingeordnet; die Prüfung, wie neu der geplante Beitrag gegenüber der gesamten Literatur ist, bleibt offen.
+
+\subsection{Ein ausführbarer Forschungsprototyp}
+Ein kleiner Python-Prototyp bereitet die Fälle vor, führt beide Erzeugungswege aus und speichert ihre Ergebnisse. Er unterstützt auch die zusätzlichen Vergleiche sowie die Vorbereitung der menschlichen Bewertung. Festgelegte Quellversionen und eine gemeinsame Aufbereitung sorgen dafür, dass P und D dieselben Codeinformationen erhalten.
+
+P verarbeitet alle Befunde eines Berichts gemeinsam. D kann unabhängig davon ausgeführt werden, ob P einen verwendbaren Bericht erzeugt hat. Automatische Prüfungen kontrollieren, ob die Antworten dem vereinbarten Format entsprechen und ob Verweise innerhalb einer Antwort gültig sind. Bei P wird zusätzlich geprüft, ob die angegebenen Zitate exakt im Bericht vorkommen. Diese Kontrollen bewerten die Form der Antwort, nicht die Wahrheit ihrer Aussagen.
+
+Die ursprünglichen Eingaben, Modellanweisungen und Antworten werden zusammen mit ihrer Herkunft gespeichert. Auch leere, fehlerhafte und unvollständige Ergebnisse bleiben nachvollziehbar. Der Versuch wird nicht automatisch so lange wiederholt, bis eine gültige Antwort entsteht. Eine Kostenkontrolle prüft vor jedem Modellaufruf, ob er innerhalb der festgelegten Grenze liegt.
+
+106 Tests ohne Modellaufrufe prüfen unter anderem, ob beide Wege dieselben Quellen verwenden, ob unzulässige Zusatzinformationen aus den Eingaben ausgeschlossen bleiben und ob Fehler korrekt gespeichert werden. Damit ist die technische Grundlage geprüft. Die inhaltliche Bewertung der erzeugten Claims wird dadurch nicht ersetzt.
+
+\newpage
+\subsection{Erster Pilotversuch: Ausgaben liegen vor, ihre Bewertung folgt}
+Der erste Pilotversuch umfasst \textbf{fünf neue Fälle aus Vul4J}. Zwei Fälle betreffen die Verarbeitung externer Inhalte in XML-Dokumenten, sogenannte XXE-Probleme, in Apache CXF und OpenRefine. Drei weitere Fälle betreffen die Verarbeitung von Pfaden in Plexus Archiver, Eclipse RDF4J und Retrofit.
+
+Für jeden Fall wurde eine verwundbare und eine reparierte Variante vorbereitet. Daraus ergeben sich zehn Codepakete. Beide Erzeugungswege wurden auf jedem Paket zweimal ausgeführt. Die Reihenfolge wechselte so, dass bei jedem Paket einmal P und einmal D zuerst an der Reihe war. Sämtliche Projekte aus der Entwicklung und dem Pilotversuch bleiben von der späteren Evaluation an zurückgehaltenen Fällen ausgeschlossen.
+
+Alle Modellaufrufe verwendeten die festgelegte Version \texttt{gpt-5.4-mini-2026-03-17} mit der Reasoning-Einstellung \texttt{none}. Für jedes Codepaket wurde zusätzlich die erste D-Ausgabe einmal überarbeitet. Auf vier Codepaketen wurden beide Wege au\ss{}erdem ohne die gesonderten Kontextfelder ausgeführt. Eine einfache Satzaufteilung und ein an VeriScore angelehntes Verfahren liefern weitere Vergleichsergebnisse für P.
+
+Das VeriScore-basierte Verfahren verwendet einen angepassten, lizenzierten Originalprompt; das vollständige VeriScore-System wird damit nicht nachgebaut. Auch die zusätzliche Überarbeitung von D hat eine begrenzte Aussagekraft: Sie ermöglicht einen Vergleich mit einem zweiten Modellaufruf, gleicht aber nicht automatisch die Anzahl der verarbeiteten oder erzeugten Tokens an. Tokens sind die Texteinheiten, anhand derer unter anderem die API-Nutzung abgerechnet wird.
 
 \begin{tabularx}{\linewidth}{@{}Yrr@{}}
 \toprule
-\textbf{Bedingung} & \textbf{Ausgaben} & \textbf{Formal gültig} \\ \midrule
-P: Report / vollständige Claimextraktion & 20 / 20 & 20 / 16 \\
-D: direkte Claims & 20 & 19 \\
-D mit einem Überarbeitungsschritt & 10 & 10 \\
-Ohne explizite Kontextfelder: P / D & 4 / 4 & 3 / 4 \\
-Satz-/VeriScore-Baselinegruppen & 4 & 4 \\
+\textbf{Versuchsteil} & \textbf{Aufgaben} & \textbf{Formatprüfung bestanden} \\ \midrule
+P: Bericht erzeugen & 20 & 20 \\
+P: Claims aus dem Bericht extrahieren & 20 & 16 \\
+D: Claims direkt erzeugen & 20 & 19 \\
+D: erste Ausgabe einmal überarbeiten & 10 & 10 \\
+P ohne gesonderte Kontextfelder & 4 & 3 \\
+D ohne gesonderte Kontextfelder & 4 & 4 \\
+Satz-/VeriScore-Vergleiche je Bericht & 4 & 4 \\
+\midrule
+\textbf{Gesamt} & \textbf{82} & \textbf{76} \\
 \bottomrule
 \end{tabularx}
 
-Insgesamt wurden 82 Aufgaben mit 122 Modellaufrufen bearbeitet; sechs Ausgaben scheiterten an der Validierung. Die Fehler betreffen Zitatübereinstimmung, Subtypzuordnung, Zeilenangaben oder ein unerwartetes Feld. Rohantworten und Fehler sind erhalten. Der gesamte Pilot verursachte nach gemeldeten Tokens geschätzte API-Kosten von rund \textbf{1,09 USD}, einschlie\ss{}lich Zusatzkontrollen und ungültiger Ausgaben.
+Insgesamt wurden 82 Aufgaben mit 122 Modellaufrufen bearbeitet. Die Zahl der Aufrufe ist höher, weil das VeriScore-basierte Verfahren für einzelne Sätze eigene Anfragen stellt. Sechs Ausgaben bestanden die automatische Prüfung nicht. Dabei wurden ungenaue Zitate, unzulässige Unterkategorien, ungültige Zeilenangaben oder ein nicht vorgesehenes Feld festgestellt. Die ursprünglichen Antworten und Fehlermeldungen sind erhalten.
 
-\textbf{Aussagekraft:} Der Pilot belegt die technische Durchführbarkeit und zeigt konkrete Ausgabeprobleme. Code-Fundierung, Abdeckung, Bedeutungstreue und Annotationsaufwand sind noch nicht bewertet. Formale Gültigkeit erlaubt keinen Qualitätsvergleich oder Schluss auf eine überlegene Route. Öffentliche Benchmarkkenntnis und die gezielt ausgewählten, begrenzten Codekontexte bleiben Limitationen. Neue Java-/PoV-Ausführungen wurden nicht vorgenommen.
+Aus den gemeldeten Tokens ergeben sich für den gesamten Pilotversuch geschätzte API-Kosten von rund \textbf{1,09 USD}. Darin sind die zusätzlichen Vergleiche und die fehlerhaften Ausgaben enthalten. Der menschliche Arbeitsaufwand ist damit noch nicht erfasst.
+
+Der Pilot zeigt, dass der technische Ablauf funktioniert und welche konkreten Ausgabeprobleme auftreten. Ob die Claims fachlich richtig, vollständig und ihrem Bericht treu sind, ist noch nicht bewertet. Die Zahl formal gültiger Antworten reicht daher nicht aus, um einen Erzeugungsweg als besser einzustufen. Zudem könnten dem Modell die öffentlichen Fälle bereits bekannt sein. Die gezielt ausgewählten Codepakete bilden nur einen Teil des jeweiligen Projekts ab. Neue Java- oder Schwachstellentests wurden im Rahmen dieses Piloten nicht ausgeführt.
+
+\newpage
+\subsection{Welche Rolle VeriScore bereits spielt}
+Für vier P-Berichte wurde zusätzlich ausprobiert, wie andere Verfahren denselben Text zerlegen. Solche Vergleichsverfahren werden als \textit{Baselines} bezeichnet. Hier gibt es drei Möglichkeiten:
+
+\begin{tabularx}{\linewidth}{@{}p{38mm}Y@{}}
+\toprule
+\textbf{Verfahren} & \textbf{Was entsteht aus demselben Bericht?} \\ \midrule
+Unsere P-Extraktion & Claims im gemeinsamen Format, einschlie\ss{}lich Kontextfeldern, Zitaten und Prüfaufgaben. \\
+Einfache Satzaufteilung & Einzelne unveränderte Sätze aus Titel und Bericht. Dafür ist kein weiterer Modellaufruf nötig. \\
+VeriScore-basierte Extraktion & Einzelne vom Modell herausgearbeitete Aussagen. Unser zusätzliches Claimformat wird dabei nicht verlangt. \\
+\bottomrule
+\end{tabularx}
+
+Damit wird gefragt, ob unser speziell für Sicherheitsbehauptungen entwickeltes Format gegenüber einfacheren oder bereits vorhandenen Verfahren einen erkennbaren Nutzen hat. \textbf{VeriScore berechnet in diesem Projekt keinen Wahrheitswert.} Übernommen wird der Extraktionsprompt mit seinen Beispielen, nicht das vollständige System mit Suche und Faktenprüfung. Das Modell erhält jeweils einen markierten Satz und umgebenden Text zum Verständnis. Es soll daraus eigenständig verständliche Aussagen bilden.
+
+Ein echtes Beispiel stammt aus \textbf{VUL4J-41, Plexus Archiver, verwundbare Variante, erste Wiederholung}. Dies ist ein anderer Fall als das RDF4J-Beispiel. Der Bericht beschreibt, wie \texttt{extractFile(...)} einen Pfad ermittelt, dorthin schreibt und dabei laut Bericht keine ausdrückliche Prüfung der Verzeichnisgrenze vornimmt. Daraus entstanden unter anderem diese VeriScore-basierten Claims, hier auf Deutsch wiedergegeben:
+
+\begin{tabularx}{\linewidth}{@{}p{15mm}Y@{}}
+\toprule
+\textbf{ID} & \textbf{Tatsächlich extrahierte Aussage, übersetzt} \\ \midrule
+V0003 & \texttt{extractFile(...)} bestimmt den Pfad jedes Archiveintrags mit \texttt{FileUtils.resolveFile(dir, entryName)}. \\
+V0004 & \texttt{extractFile(...)} schreibt anschlie\ss{}end an den ermittelten Pfad. \\
+V0005 & \texttt{extractFile(...)} enthält keine ausdrückliche Prüfung, ob der ermittelte Pfad innerhalb von \texttt{dir} bleibt. \\
+\bottomrule
+\end{tabularx}
+
+Auch diese Ausgaben sind zunächst Behauptungen. In der späteren Bewertung werden ihre Inhalte, ihre Abdeckung des Berichts und ihre Bedeutungstreue verglichen. Dass sie keine Kontextfelder oder Prüfaufgaben enthalten, wird ihnen nicht als Fehler angerechnet; diese Felder wurden hier gar nicht verlangt.
+
+Der Vergleich wurde für VUL4J-15 und VUL4J-41 durchgeführt, jeweils für beide Codevarianten und die erste Wiederholung. Die vier Berichte führten zu insgesamt 44 VeriScore-basierten Modellaufrufen, weil einzelne Sätze getrennt bearbeitet werden. Verwendet wurden ein einfacher eigener Satzteiler, die getrennte Behandlung von Titel und Bericht und dasselbe Pilotmodell. Es handelt sich daher um eine dokumentierte Anpassung, keine exakte Reproduktion der veröffentlichten Methode.
+
+Eine Grenze ist für die Forschungsfrage besonders interessant: Der übernommene Prompt fordert dazu auf, hypothetische Inhalte auszuschlie\ss{}en. Sicherheitsberichte enthalten jedoch oft wichtige Aussagen wie \glqq{}Wenn ein Angreifer X kontrolliert, könnte Y passieren\grqq{}. Ob dabei Bedingungen oder ganze Aussagen verloren gehen, muss die Bewertung zeigen. Es wird nicht schon aus der Promptformulierung auf einen tatsächlichen Qualitätsverlust geschlossen.
+
+\newpage
+\subsection{Wie der Nutzen der Kontextfelder untersucht wird}
+Die sechs Kontextfelder sind Bestandteil unseres eigenen Formats. Sie sind kein zusätzlicher VeriScore-Schritt. Im ZIP-Beispiel wurden bereits Akteur, Voraussetzung, Verneinung, Möglichkeit, Mengenangabe und Geltungsbereich gezeigt. Nun stellt sich die Frage: \textbf{Hilft es dem Modell tatsächlich, diese Angaben zusätzlich einzeln aufzuschreiben?}
+
+Um das zu untersuchen, wurde auf einem Teil des Piloten jeweils eine weitere Ausgabe ohne das Objekt \texttt{context} erzeugt. Dies ist die geplante Kontextfeld-Ablation. Der Unterschied ist bewusst begrenzt:
+
+\begin{tabularx}{\linewidth}{@{}YY@{}}
+\toprule
+\textbf{Mit Kontextfeldern} & \textbf{Ohne Kontextfelder} \\ \midrule
+Die Proposition muss alle wesentlichen Bedingungen enthalten. & Die Proposition muss weiterhin alle wesentlichen Bedingungen enthalten. \\
+Die sechs Aspekte werden zusätzlich in eigenen Feldern festgehalten. & Das Objekt \texttt{context} fehlt vollständig. \\
+Codeverweise, P-Zitate, Beziehungen zu anderen Claims und Prüfaufgaben bleiben erhalten. & Dieselben übrigen Bestandteile bleiben erhalten. \\
+\bottomrule
+\end{tabularx}
+
+\textbf{Es werden keine Informationen aus dem Code oder Bericht entfernt.} Bei P wird derselbe ursprüngliche Bericht erneut extrahiert. Bei D werden aus denselben Codebytes erneut Claims erzeugt. Nur die Aufforderung, die sechs Aspekte in gesonderten Feldern auszugeben, entfällt aus Format und Anweisungen. Bereits erzeugte Felder werden also nicht einfach nachträglich gelöscht; das Modell erzeugt eine neue Antwort unter der geänderten Vorgabe.
+
+Als Anschauungsbeispiel sollte in beiden Varianten der Satz erhalten bleiben: \glqq{}Wenn ein Angreifer die ZIP-Inhalte kontrollieren kann, könnte das Entpacken für den Prozess zugängliche Dateien überschreiben.\grqq{} Wenn eine Variante stattdessen nur \glqq{}Ein Angreifer überschreibt Dateien\grqq{} liefert, wäre die relevante Bedeutung verändert. Das ist ein Beispiel für das Bewertungskriterium, kein beobachtetes Ergebnis dieses Zusatzversuchs.
+
+Verglichen wird später, ob Voraussetzungen, Rechte, Verneinungen und Unsicherheit mit Zusatzfeldern häufiger richtig erhalten bleiben. Auch unbelegte Ergänzungen und Widersprüche zwischen Satz und Feldern werden betrachtet. Eine vollständig ausgefüllte Struktur allein zählt nicht als bessere Qualität. Ebenso kann eine Ausgabe ohne Zusatzfelder alle wichtigen Einschränkungen korrekt im Satz ausdrücken.
+
+Der Zusatzversuch wurde für dieselben vier Codepakete von VUL4J-15 und VUL4J-41 ausgeführt. Drei von vier P-Ausgaben und alle vier D-Ausgaben ohne Kontextfelder bestanden die Formatprüfung. Für den zuvor gezeigten RDF4J-Fall VUL4J-43 gibt es diesen Zusatzversuch nicht. Dort dienen die vorhandenen Kontextfelder nur als konkretes Beispiel für das Format.
+
+Es liegen somit zwei unterschiedliche Vergleiche vor: Der \textbf{VeriScore-Vergleich} untersucht verschiedene Verfahren zur Zerlegung desselben Berichts. Der \textbf{Kontextfeld-Vergleich} untersucht innerhalb unseres Formats, ob das zusätzliche Aufschreiben der Bedingungen hilft. Beide Vergleiche wurden technisch durchgeführt. Ob sie einen Qualitätsunterschied zeigen, bleibt bis zur menschlichen Bewertung offen.
 
 \newpage
 \section{Nächste Schritte und Abstimmung}
-\begin{enumerate}
-\item \textbf{Unabhängige Referenzen erstellen.} Zuerst Codereferenzen allein anhand der bereitgestellten Codepakete, vor Einsicht in Modelloutputs. Danach die tatsächlichen P-Reporte unabhängig von den Extraktionen annotieren. Vorwissen und echte aktive Annotationszeit festhalten.
-\item \textbf{Pilot bewerten und Fehler einordnen.} Claims beider Routen nach dem Codebook beurteilen. Für vier Kontexte (beide Varianten von CXF und Plexus Archiver) ist eine zweite unabhängige menschliche Annotation vorgesehen; Abweichungen werden anschlie\ss{}end gemeinsam geklärt. Technische Ausfälle und im Codekontext nicht entscheidbare Claims getrennt behandeln.
-\item \textbf{Vergleichbarkeit und Aufwand prüfen.} Relevante Abdeckung, Code-Fundierung, P-Reporttreue und abgeleitete Prüfaufgaben gemeinsam mit vollständigen Routenkosten auswerten. Revision und Kontextablation als eigene Kontrollen betrachten. Varianten und Wiederholungen zunächst innerhalb des Falls zusammenführen.
-\item \textbf{Hauptstudie festlegen.} Auf Grundlage des annotierten Piloten Umfang, zurückgehaltene Fälle, Fallzahlbegründung, Zeitplan und statistische Auswertung abstimmen. Literaturabgrenzung vervollständigen, anschlie\ss{}end Schema, Prompts, Annotationsregeln und Auswertungsplan einfrieren. Änderungen nach Pilotergebnissen explizit begründen.
-\end{enumerate}
+\subsection{Zuerst die Grundlagen für eine unabhängige Bewertung schaffen}
+Im nächsten Schritt werden die zehn Codepakete von Menschen untersucht. Dabei halten sie fest, welche wichtigen Aussagen der sichtbare Code erlaubt und welche Fragen er offenlässt. Diese Codereferenzen müssen entstehen, bevor die Personen Modellantworten lesen. Danach werden die tatsächlich erzeugten P-Berichte getrennt von den daraus extrahierten Claims ausgewertet. So wird vermieden, dass die Modellantworten schon vorab bestimmen, was als richtige oder wichtige Aussage gilt.
 
-\textbf{Für die Abstimmung mit Andreas:} Ist der Fokus auf den P/D-Vergleich für ein erstes Paper angemessen? Wer kann die unabhängige Zweitannotation übernehmen? Welcher Umfang der Hauptstudie ist nach dem Pilot realistisch, und wie sollen Referenzen und Forschungsartefakte zugänglich gemacht werden?
+Bei dieser Arbeit werden Vorwissen, verwendete Hilfsmittel und die tatsächlich benötigte Arbeitszeit dokumentiert. Anschlie\ss{}end werden die Claims anhand des gemeinsamen Leitfadens bewertet. Für vier Codepakete, nämlich beide Varianten von CXF und Plexus Archiver, ist eine zweite unabhängige menschliche Bewertung vorgesehen. Die Personen geben ihre Urteile zunächst getrennt ab. Erst danach besprechen sie Unterschiede und halten eine gemeinsame Entscheidung fest.
 
-\textbf{Angestrebter Beitrag:} Ein nachvollziehbares Codebook, ein annotierter Referenzbestand und eine reproduzierbare Vergleichsstudie mit konkreten Befunden zu Informationsverlust, unberechtigten Ergänzungen und Qualitäts-/Aufwandskonflikten. Positive Ergebnisse werden ebenso wenig vorausgesetzt wie zwei Veröffentlichungen.
+\subsection{Den Pilot auswerten und daraus die Hauptstudie ableiten}
+Die Auswertung soll zeigen, welche Aussagen vom Code gestützt werden, welche wichtigen Inhalte fehlen und an welchen Stellen Bedingungen oder Bedeutungen verändert wurden. Dabei wird auch geprüft, ob sich aus den Claims sinnvolle Prüfaufgaben ableiten lassen. Technisch fehlgeschlagene Ausgaben werden getrennt von Aussagen erfasst, deren Wahrheit sich anhand des verfügbaren Codes nicht entscheiden lässt.
 
-\textbf{Umfang:} Keine vollständige Agentenplattform, kein universeller Security-Scanner und kein eigenes Modelltraining. Eine mögliche Anschlussarbeit untersucht später, welche unabhängige Evidenz welche Claim-Typen tatsächlich rechtfertigt. Zunächst steht die Bewertung der erzeugten Claims im Mittelpunkt.
+Zusätzlich werden der gesamte Aufwand beider Erzeugungswege und die menschliche Bewertungszeit betrachtet. Die einmalige Überarbeitung von D und der Vergleich mit und ohne Kontextfelder werden als eigene Versuche ausgewertet. Ergebnisse mehrerer Varianten und Wiederholungen werden zunächst innerhalb desselben Falls zusammengeführt.
 
-\vfill
-{\footnotesize\color{muted}\textbf{Dokumentstatus.} Aktualisierte Diskussionsgrundlage für ein erstes Paper, kein formales Exposé einer gesamten Dissertation. Die Abschnitte 1--5 übernehmen den Projektplan der Skizze vom 03.10.2026; die Abschnitte 6--7 ersetzen den damaligen Arbeitsstand. Der Pilot ist technisch abgeschlossen, die empirische Qualitätsbewertung und die Festlegung der Hauptstudie stehen aus.}\par
-{\footnotesize\color{muted}\textbf{Material.} Profil, Codebook, Versuchsprotokoll, technische Pilotübersicht und Quellcode: \href{https://github.com/sebi-gr/prose-or-structure}{github.com/sebi-gr/prose-or-structure}. Die Rohdaten des Piloten sind bislang lokal erhalten; ein freigegebenes Forschungsdatenarchiv steht noch aus.}
+Erst auf dieser Grundlage werden Umfang und Zeitplan der Hauptstudie festgelegt. Dazu gehören die Auswahl bisher zurückgehaltener Fälle, eine begründete Fallzahl und ein genauer statistischer Auswertungsplan. Auch die Literaturabgrenzung wird vervollständigt. Vor Beginn der Hauptstudie werden Schema, Modellanweisungen und Bewertungsregeln verbindlich festgehalten. Änderungen, die sich aus den Pilotergebnissen ergeben, müssen ausdrücklich begründet werden.
 
 \newpage
 \section*{Ausgewählte Literatur}
@@ -203,7 +417,4 @@ Konzeptionelle Dokumentation; abgerufen am 03.10.2026. \url{https://www.adelard.
 Normative Spezifikation und Metamodell. \url{https://www.omg.org/spec/SACM/2.2}.
 \end{thebibliography}
 \endgroup
-\vfill
-{\footnotesize\color{muted}\textbf{Redaktioneller Hinweis.} Der GPTAid-DOI wurde gegenüber der ursprünglichen Skizze bibliographisch korrigiert. Die ursprüngliche PDF bleibt unverändert.}\par
-{\footnotesize\color{muted}\textbf{Layout.} LaTeX-Neusatz in Anlehnung an die Projektskizze; deren Layout ist eine vereinfachte Anpassung von \glqq{}Template Text -- University of Vienna\grqq{} (Universität Wien, CC BY 4.0). Ohne Logo und separate Titelseite; keine offizielle Research-Proposal-Vorlage.}
 \end{document}

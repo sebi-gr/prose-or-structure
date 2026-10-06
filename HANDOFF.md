@@ -12,6 +12,10 @@ Aufgaben erfolgreich, sechs ungültige Ausgaben, 122 API-Aufrufe ohne Retry.
 [Technischer Bericht](docs/PILOT_RUN_20261006.md) mit Fehlern und Grenzen.
 **Menschliche Referenzen und Qualitätsbewertung stehen aus.**
 
+Das Projektpapier erklärt den Ablauf mit echtem ZIP-Code und Pilotausgaben sowie
+VeriScore und Kontextfeld-Vergleich. Die dortigen Referenz- und Bewertungsbeispiele
+sind illustrative Entwürfe, keine unabhängigen Annotationen; Einsicht als Vorwissen erfassen.
+
 106 Offline-Tests bestanden. Request-/Antwort- und Quellhashes, identische
 P/D-Codekontexte und die sechs historischen Archivdateien wurden geprüft.
 Windows benötigt `-X utf8`; aktive Ressourcen behalten LF-Zeilenumbrüche.

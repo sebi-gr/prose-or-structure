@@ -4,10 +4,16 @@
 
 [Projektplan und Arbeitsstand (PDF)](projektstand.pdf) ist die aktuelle
 Diskussionsgrundlage für Dr. Andreas Ekelhart. Die ersten fünf Abschnitte
-übernehmen den Projektplan der [ursprünglichen Skizze](../prose_or_structure_projektskizze.pdf).
+erläutern den Projektplan der [ursprünglichen Skizze](../prose_or_structure_projektskizze.pdf)
+und machen den Ablauf an echtem Code und Pilotausgaben verständlich.
 Der damalige Arbeitsstand ist durch Profil, Prototyp, technischen Pilotabschluss
 und nächste Schritte ersetzt. Der bereits geprüfte GPTAid-DOI ist korrigiert;
 das Original-PDF bleibt unverändert.
+
+Das ZIP-Beispiel führt von Code und Report zu P-/D-Claims und erklärt anschließend
+Referenzen und Bewertung. VeriScore und der Vergleich mit und ohne Kontextfelder
+werden gesondert erläutert. Die Beispielreferenzen und Bewertungsurteile dienen
+der Erklärung; sie sind keine unabhängigen menschlichen Pilotannotationen.
 
 Die [LaTeX-Quelle](projektstand.tex) enthält das vollständige Dokument einschließlich
 Literatur und Layout. Kompilieren vom Repository-Wurzelverzeichnis:
